@@ -561,8 +561,7 @@
                     <div
                         class="absolute right-0 top-full mt-1 w-48 bg-white border border-brandBorder rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
                         <div class="p-4 border-b border-brandBorder bg-slate-50">
-                            <p class="text-sm font-bold text-brandText truncate">{{
-                                user.first_name|default:user.username }} {{ user.last_name }}</p>
+                            <p class="text-sm font-bold text-brandText truncate">{{ user.first_name|default:user.username }} {{ user.last_name }}</p>
                             <p class="text-xs text-brandIcon truncate mt-0.5">{{ user.profile.role|default:"User" }}</p>
                         </div>
                         <a href="{% url 'profile' %}"

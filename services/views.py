@@ -101,6 +101,18 @@ def respond_service_request(request, request_id):
 
 @login_required
 @require_POST
+def withdraw_service_request(request, request_id):
+    """Job Provider withdraws a pending service request before it is accepted."""
+    service_req = get_object_or_404(ServiceRequest, id=request_id, provider=request.user)
+    
+    if service_req.status != 'pending':
+        return JsonResponse({'error': 'Can only withdraw pending requests.'}, status=400)
+        
+    service_req.delete()
+    return JsonResponse({'status': 'ok', 'message': 'Request withdrawn successfully.'})
+
+@login_required
+@require_POST
 def assign_job_to_worker(request, job_id, worker_id):
     """Job Provider assigns a specific job to a worker who accepted the invitation."""
     job = get_object_or_404(ServiceJob, id=job_id, provider=request.user)
@@ -332,22 +344,31 @@ def accept_job(request, job_id):
         messages.info(request, "You have already accepted this job.")
         return redirect(redirect_to)
 
+    from .models import JobApplication
+
     if job.status == 'Pending' and job.worker is None:
-        # Directly assign the job to the worker
-        job.worker = request.user
-        job.status = 'Accepted'
-        job.save()
+        # Check if already applied
+        if JobApplication.objects.filter(job=job, worker=request.user).exists():
+            messages.info(request, "You have already applied for this job.")
+            return redirect(redirect_to)
+
+        # Create a job application instead of instantly assigning
+        JobApplication.objects.create(
+            job=job,
+            worker=request.user,
+            status='pending'
+        )
         
         # Notify the job provider
         Notification.objects.create(
             user=job.provider,
             actor=f"{request.user.first_name or request.user.username} {request.user.last_name}".strip(),
-            verb='accepted your job:',
+            verb='applied for your job:',
             target=job.title,
             redirect_url='/services/provider/'
         )
         
-        messages.success(request, f'You accepted "{job.title}"! Check your dashboard for details.')
+        messages.success(request, f'You applied for "{job.title}"! The provider will review your application.')
         return redirect('worker_dashboard')
     else:
         messages.info(request, "This job is no longer available.")
@@ -535,3 +556,26 @@ def job_tracking(request, job_id):
         'job_lon': job.lon,
     }
     return render(request, 'job_tracking.html', context)
+
+@login_required
+def job_detail(request, job_id):
+    """Detailed view for a specific job, tracking activity and applications."""
+    job = get_object_or_404(ServiceJob, id=job_id)
+    
+    # Check permissions (Provider, Worker, or Applicant)
+    is_related = request.user == job.provider or request.user == job.worker
+    has_applied = JobApplication.objects.filter(job=job, worker=request.user).exists()
+    
+    if not (is_related or has_applied or request.user.is_superuser):
+        messages.error(request, "You do not have permission to view this job.")
+        return redirect('home')
+
+    applications = JobApplication.objects.filter(job=job).select_related('worker', 'worker__profile').order_by('-timestamp')
+    
+    context = {
+        'job': job,
+        'applications': applications,
+        'is_provider': request.user == job.provider,
+        'is_worker': request.user == job.worker,
+    }
+    return render(request, 'job_detail.html', context)

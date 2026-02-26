@@ -7,11 +7,16 @@
             <div class="bg-gradient-to-r from-brandBlue to-blue-600 h-[150px] rounded-t-[0.8rem]"></div>
 
             <div
-                class="w-32 h-32 rounded-full border-4 border-white bg-slate-200 ml-6 -mt-16 relative z-10 overflow-hidden shadow-sm">
+                class="w-32 h-32 rounded-full border-4 border-white bg-slate-200 ml-6 -mt-16 relative z-10 overflow-hidden shadow-sm flex items-center justify-center">
+                {% if request.user.profile.profile_picture %}
+                <img src="{{ request.user.profile.profile_picture.url }}"
+                    class="w-full h-full object-cover absolute inset-0 text-slate-100 flex items-center justify-center">
+                {% else %}
                 <svg class="w-full h-full text-slate-400 mt-2" fill="currentColor" viewBox="0 0 24 24">
                     <path
                         d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                 </svg>
+                {% endif %}
             </div>
 
             <div class="px-6 mt-3">

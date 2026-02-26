@@ -2,6 +2,16 @@
 
 {% block content %}
 <div class="max-w-[800px] mx-auto mt-6 pb-10 px-4">
+    <div class="mb-4">
+        <a href="javascript:history.back()"
+            class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-brandBlue transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+                </path>
+            </svg>
+            Back
+        </a>
+    </div>
     <!-- Profile Header Card -->
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-brandBorder mb-6 relative overflow-hidden">
         <!-- Background Banner -->
@@ -115,8 +125,7 @@
                 {% if target_user.profile.about %}
                 <p class="text-slate-600 leading-relaxed">{{ target_user.profile.about }}</p>
                 {% else %}
-                <p class="text-slate-400 italic">{{ target_user.first_name|default:target_user.username }} {{
-                    target_user.last_name }} hasn't added
+                <p class="text-slate-400 italic">{{ target_user.first_name|default:target_user.username }} {{ target_user.last_name }} hasn't added
                     an about section yet.</p>
                 {% endif %}
             </div>
@@ -199,7 +208,7 @@
     function sendConnection(userId) {
         const actions = document.getElementById('conn-actions-' + userId);
         actions.innerHTML = '<button class="bg-amber-50 text-amber-600 border border-amber-200 font-bold px-6 py-2.5 rounded-full text-sm cursor-default flex items-center gap-2 shadow-sm">⏳ Sending...</button>';
-        fetch('/connect/' + userId + '/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+        fetch('/connect/' + userId + '/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' }})
             .then(r => r.json())
             .then(data => {
                 if (data.result === 'connected') {
@@ -211,7 +220,7 @@
     }
 
     function acceptConnection(userId) {
-        fetch('/connect/' + userId + '/accept/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+        fetch('/connect/' + userId + '/accept/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' }})
             .then(r => r.json())
             .then(data => {
                 if (data.result === 'connected') {
@@ -221,7 +230,7 @@
     }
 
     function rejectConnection(userId) {
-        fetch('/connect/' + userId + '/reject/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+        fetch('/connect/' + userId + '/reject/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' }})
             .then(r => r.json())
             .then(data => {
                 if (data.result === 'rejected') {
@@ -232,7 +241,7 @@
 
     function cancelConnection(userId) {
         const actions = document.getElementById('conn-actions-' + userId);
-        fetch('/connect/' + userId + '/cancel/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+        fetch('/connect/' + userId + '/cancel/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' }})
             .then(r => r.json())
             .then(data => {
                 if (data.status === 'ok') {

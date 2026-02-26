@@ -471,7 +471,7 @@
     function sendConnection(userId) {
         const actions = document.getElementById('conn-actions-' + userId);
         actions.innerHTML = '<button class="btn-pending">Sending...</button>';
-        fetch('/connect/' + userId + '/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+        fetch('/connect/' + userId + '/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' }})
             .then(r => r.json())
             .then(data => {
                 if (data.result === 'connected') {
@@ -497,7 +497,7 @@
     }
 
     function acceptConnection(userId) {
-        fetch('/connect/' + userId + '/accept/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+        fetch('/connect/' + userId + '/accept/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' }})
             .then(r => r.json())
             .then(data => {
                 if (data.result === 'connected') {
@@ -511,7 +511,7 @@
     }
 
     function rejectConnection(userId) {
-        fetch('/connect/' + userId + '/reject/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+        fetch('/connect/' + userId + '/reject/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' }})
             .then(r => r.json())
             .then(data => {
                 if (data.result === 'rejected') {
@@ -526,7 +526,7 @@
     function cancelConnection(userId) {
         const actions = document.getElementById('conn-actions-' + userId);
         actions.innerHTML = '<button class="btn-pending">Canceling...</button>';
-        fetch('/connect/' + userId + '/cancel/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+        fetch('/connect/' + userId + '/cancel/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' }})
             .then(r => r.json())
             .then(data => {
                 if (data.result === 'cancelled') {

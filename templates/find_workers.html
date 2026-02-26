@@ -17,16 +17,10 @@
         border-color: #cbd5e1;
     }
 
-    .card-banner {
-        height: 60px;
-        background: linear-gradient(135deg, #1e3a8a 0%, #f97316 100%);
-    }
-
     .card-avatar {
-        width: 80px;
-        height: 80px;
+        width: 88px;
+        height: 88px;
         border-radius: 50%;
-        border: 4px solid #fff;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -34,10 +28,8 @@
         font-weight: 800;
         color: #1e3a8a;
         background: #eff6ff;
-        margin: -40px auto 0;
-        position: relative;
-        z-index: 2;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin: 0 auto 12px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
         overflow: hidden;
     }
 
@@ -48,7 +40,7 @@
     }
 
     .card-body {
-        padding: 12px 16px 16px;
+        padding: 0 16px 16px;
         text-align: center;
         flex: 1;
         display: flex;
@@ -248,40 +240,100 @@
         <span id="search-count" class="text-xs font-bold text-brandIcon"></span>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="workers-list">
+    <!-- Horizontal List Layout -->
+    <div class="flex flex-col gap-4" id="workers-list">
         {% for w in workers %}
-        <div class="worker-card"
+        <div class="worker-card border border-brandBorder rounded-2xl p-5 hover:border-brandBlue/50 hover:shadow-lg transition group bg-white flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6"
             data-search="{{ w.user.first_name|default:w.user.username }} {{ w.user.last_name }} {{ w.job_title }} {{ w.primary_category }}">
-            <div class="card-banner"></div>
-            <div class="card-avatar">
+
+            <!-- Avatar -->
+            <div
+                class="w-20 h-20 flex-shrink-0 rounded-full border-[3px] border-brandBlue/10 overflow-hidden shadow-sm flex items-center justify-center bg-slate-100 text-3xl font-black text-brandBlue">
                 {% if w.profile_picture %}
-                <img src="{{ w.profile_picture.url }}" alt="{{ w.user.username }}">
+                <img src="{{ w.profile_picture.url }}" alt="{{ w.user.username }}" class="w-full h-full object-cover">
                 {% else %}
                 {{ w.user.username|make_list|first|upper }}
                 {% endif %}
             </div>
-            <div class="card-body">
-                <p class="card-name">{{ w.user.first_name|default:w.user.username }} {{ w.user.last_name }}</p>
-                <p class="card-role">{{ w.primary_category|default:"Worker" }}</p>
-                {% if w.job_title %}<p class="card-tag">{{ w.job_title }}</p>{% endif %}
 
-                <div class="card-actions">
-                    {% if request.user.profile.role == 'Job Provider' %}
-                    {% if provider_jobs %}
-                    <select id="job-select-{{ w.user.id }}" class="job-select">
-                        <option value="">General Request</option>
-                        {% for pj in provider_jobs %}
-                        <option value="{{ pj.id }}">{{ pj.title|truncatechars:20 }}</option>
-                        {% endfor %}
-                    </select>
-                    {% endif %}
-                    <button onclick="sendTaskRequest('{{ w.user.id }}', this)" class="btn-ask">📝 Ask to do
-                        tasks</button>
-                    {% endif %}
-                    <div class="btn-secondary">
-                        <a href="{% url 'inbox' %}?user={{ w.user.id }}" class="btn-msg">Message</a>
-                        <a href="{% url 'user_profile' w.user.id %}" class="btn-view">Profile</a>
+            <!-- Body Info -->
+            <div class="flex-1 w-full">
+                <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+                    <div>
+                        <h3
+                            class="font-bold text-brandText text-lg leading-tight mb-1 group-hover:text-brandBlue transition flex items-center justify-center md:justify-start gap-1.5">
+                            {{ w.user.first_name|default:w.user.username }} {{ w.user.last_name }}
+                            {% if w.is_verified %}
+                            <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20"
+                                title="Verified Account">
+                                <path fill-rule="evenodd"
+                                    d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            {% endif %}
+                        </h3>
+                        <p class="text-sm font-black text-brandOrange tracking-wide uppercase">{{ w.primary_category|default:"Worker" }}</p>
+                        {% if w.job_title %}
+                        <p class="text-xs font-semibold text-brandIcon mt-0.5">{{ w.job_title }}</p>
+                        {% endif %}
+
+                        <!-- Rich Details -->
+                        <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-2.5">
+                            {% if w.rating %}
+                            <span
+                                class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-1 rounded-md border border-amber-200 flex items-center gap-1">⭐
+                                {{ w.rating|floatformat:1 }}</span>
+                            {% endif %}
+
+                            {% if w.years_experience %}
+                            <span
+                                class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded-md border border-blue-200 flex items-center gap-1">💼
+                                {{ w.years_experience }} Yrs Exp</span>
+                            {% endif %}
+
+                            {% if w.is_available %}
+                            <span
+                                class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200">🟢
+                                Available Now</span>
+                            {% else %}
+                            <span
+                                class="text-[10px] font-bold text-red-700 bg-red-50 px-2 py-1 rounded-md border border-red-200">🔴
+                                Busy</span>
+                            {% endif %}
+                        </div>
                     </div>
+                </div>
+
+                <!-- Interactive Actions (Moved to bottom row of card) -->
+                <div class="mt-4 pt-4 border-t border-slate-100 flex flex-col md:flex-row items-center gap-3 w-full">
+                    <div class="flex items-center gap-2 flex-1 w-full md:w-auto">
+                        <a href="{% url 'inbox' %}?user={{ w.user.id }}"
+                            class="flex-1 md:flex-none border border-brandBlue/20 text-brandBlue bg-blue-50/30 px-5 py-2 rounded-xl text-xs font-extrabold hover:bg-blue-50 transition text-center shadow-sm">
+                            💬 Message
+                        </a>
+                        <a href="{% url 'user_profile' w.user.id %}"
+                            class="flex-1 md:flex-none bg-slate-100 text-slate-700 px-5 py-2 rounded-xl text-xs font-extrabold hover:bg-slate-200 transition text-center shadow-sm">
+                            👤 Profile
+                        </a>
+                    </div>
+
+                    {% if request.user.profile.role == 'Job Provider' %}
+                    <div class="flex items-center gap-2 w-full md:w-auto">
+                        {% if provider_jobs %}
+                        <select id="job-select-{{ w.user.id }}"
+                            class="w-full md:w-48 text-xs font-bold text-brandText bg-slate-50 border border-brandBorder rounded-xl px-3 py-2.5 outline-none focus:border-brandBlue focus:ring-1 focus:ring-brandBlue/30 transition">
+                            <option value="">General Request</option>
+                            {% for pj in provider_jobs %}
+                            <option value="{{ pj.id }}">{{ pj.title|truncatechars:20 }}</option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                        <button onclick="sendTaskRequest('{{ w.user.id }}', this)"
+                            class="w-full md:w-auto bg-brandBlue text-white font-bold px-5 py-2.5 rounded-xl hover:bg-blue-900 transition text-sm shadow-sm flex items-center justify-center gap-2">
+                            📝 Ask to do tasks
+                        </button>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -87,7 +87,17 @@
 {% endblock %}
 
 {% block content %}
-<div class="flex flex-col lg:flex-row gap-6 w-full max-w-7xl mx-auto">
+<div class="w-full max-w-7xl mx-auto mb-4 px-4 xl:px-0">
+    <a href="javascript:history.back()"
+        class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-brandBlue transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+            </path>
+        </svg>
+        Back
+    </a>
+</div>
+<div class="flex flex-col lg:flex-row gap-6 w-full max-w-7xl mx-auto px-4 xl:px-0">
 
     <!-- Info Panel -->
     <aside class="w-full lg:w-[400px] flex-shrink-0 space-y-4">

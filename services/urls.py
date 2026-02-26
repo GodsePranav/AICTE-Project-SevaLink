@@ -16,6 +16,8 @@ urlpatterns = [
     path('<int:job_id>/track/', views.job_tracking, name='job_tracking'),
     path('request/send/<int:worker_id>/', views.send_service_request, name='send_service_request'),
     path('request/<int:request_id>/respond/', views.respond_service_request, name='respond_service_request'),
+    path('request/<int:request_id>/withdraw/', views.withdraw_service_request, name='withdraw_service_request'),
     path('job/<int:job_id>/assign/<int:worker_id>/', views.assign_job_to_worker, name='assign_job_to_worker'),
     path('application/<int:application_id>/respond/', views.respond_job_application, name='respond_job_application'),
+    path('job/<int:job_id>/detail/', views.job_detail, name='job_detail'),
 ]

@@ -4,15 +4,25 @@
 <div class="max-w-[1000px] mx-auto mt-4 pb-10 px-4">
     <!-- Header -->
     <div class="li-card p-6 mb-5">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>
                 <h1 class="text-xl font-extrabold text-brandText">Worker Dashboard</h1>
                 <p class="text-sm text-brandIcon mt-1">Manage your service assignments and history</p>
             </div>
-            <a href="{%url 'jobs' %}"
-                class="bg-brandOrange text-white px-5 py-2.5 rounded-xl font-bold hover:bg-orange-600 transition shadow-md">
-                🔍 Browse New Jobs
-            </a>
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex gap-1 bg-slate-100 p-1 rounded-xl">
+                    <button onclick="setView('cards')" id="view-cards"
+                        class="px-4 py-2 rounded-lg text-xs font-bold bg-white shadow-sm text-brandBlue transition">🗂️
+                        Cards</button>
+                    <button onclick="setView('table')" id="view-table"
+                        class="px-4 py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-brandText transition">📊
+                        Table</button>
+                </div>
+                <a href="{%url 'jobs' %}"
+                    class="bg-brandOrange text-white px-5 py-2.5 rounded-xl font-bold hover:bg-orange-600 transition shadow-md whitespace-nowrap">
+                    🔍 Browse New Jobs
+                </a>
+            </div>
         </div>
 
         <!-- Stats -->
@@ -33,151 +43,327 @@
     </div>
 
     <!-- Task Invitations (Incoming) -->
-    {%if service_requests %}
-    <div class="mb-6">
-        <h2 class="text-lg font-bold text-brandText mb-3">Incoming Task Invitations</h2>
-        <div class="grid grid-cols-1 gap-4">
-            {%for req in service_requests %}
-            {%if req.status == 'pending' %}
-            <div
-                class="li-card p-5 border-l-4 border-amber-500 bg-amber-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4 transition hover:shadow-md">
-                <div class="flex items-center gap-4">
-                    <div
-                        class="w-12 h-12 rounded-full bg-white flex items-center justify-center font-bold text-brandBlue shadow-sm border border-brandBorder overflow-hidden">
-                        {%if req.provider.profile.profile_picture %}
-                        <img src="{{ req.provider.profile.profile_picture.url }}" class="w-full h-full object-cover">
-                        {%else %}
-                        {{ req.provider.username|make_list|first|upper }}
-                        {%endif %}
-                    </div>
-                    <div>
-                        <p class="text-base font-bold text-brandText">{{ req.provider.first_name|default:req.provider.username }} {{ req.provider.last_name }}</p>
-                        {%if req.job %}
-                        <p class="text-xs text-brandIcon">Invited you to work on: <span
-                                class="font-bold text-brandBlue">{{ req.job.title }}</span></p>
-                        {%if req.job.price %}<p class="text-xs text-emerald-600 font-bold mt-0.5">₹{{ req.job.price }}
-                        </p>{%endif %}
-                        {%else %}
-                        <p class="text-xs text-brandIcon">Invited you to handle a potential task.</p>
-                        {%endif %}
-                        <p class="text-[10px] text-slate-500 mt-1 uppercase font-bold tracking-widest">{{ req.timestamp|timesince }} ago</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <form method="POST" action="{%url 'respond_service_request' req.id %}">
-                        {%csrf_token %}
-                        <input type="hidden" name="action" value="accepted">
-                        <button type="submit"
-                            class="bg-emerald-600 text-white px-5 py-2 rounded-xl font-bold hover:bg-emerald-700 transition shadow-md text-xs">Accept
-                            Invitation</button>
-                    </form>
-                    <form method="POST" action="{%url 'respond_service_request' req.id %}">
-                        {%csrf_token %}
-                        <input type="hidden" name="action" value="rejected">
-                        <button type="submit"
-                            class="bg-white border border-brandBorder text-slate-500 px-5 py-2 rounded-xl font-bold hover:bg-slate-50 transition text-xs">Reject</button>
-                    </form>
-                </div>
-            </div>
-            {%endif %}
-            {%endfor %}
-        </div>
-    </div>
-    {%endif %}
-
-    <!-- Active Assigned Jobs -->
-    <div class="mb-6">
-        <h2 class="text-lg font-bold text-brandText mb-3">Your Active Tasks</h2>
-        <div class="space-y-4">
-            {%for job in assigned_jobs %}
-            <div class="li-card p-5 border-l-4 border-l-brandOrange hover:shadow-md transition">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="text-base font-bold text-brandText">{{ job.title }}</h3>
-                        <p class="text-xs text-slate-500 mb-1">Posted on {{ job.created_at|date:"M d, Y" }} by {{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</p>
-                        <p class="text-sm text-brandIcon line-clamp-2 mt-1">{{ job.description }}</p>
-                        <div class="flex items-center gap-3 mt-3 text-xs font-bold">
-                            <span class="bg-blue-50 text-brandBlue px-2 py-1 rounded-md">{{ job.status }}</span>
-                            {%if job.price %}<span class="text-slate-600">💰 ₹{{ job.price }}</span>{%endif %}
-                            <span class="text-slate-500">📍 {{ job.address|truncatechars:30 }}</span>
-                            <span class="text-brandIcon">🕓
-                                {{ job.scheduled_time|date:"M d, Y h:i A"|default:"ASAP" }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 pt-4 border-t border-brandBorder flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs font-semibold text-brandIcon">Requested by:</span>
+    <div id="cards-view">
+        {%if service_requests %}
+        <div class="mb-6">
+            <h2 class="text-lg font-bold text-brandText mb-3">Incoming Task Invitations</h2>
+            <div class="grid grid-cols-1 gap-4">
+                {%for req in service_requests %}
+                {%if req.status == 'pending' %}
+                <div
+                    class="li-card p-5 border-l-4 border-amber-500 bg-amber-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4 transition hover:shadow-md">
+                    <div class="flex items-center gap-4">
                         <div
-                            class="w-6 h-6 rounded-full bg-slate-200 text-brandBlue text-xs font-bold flex items-center justify-center uppercase">
-                            {{ job.provider.username|make_list|first }}
+                            class="w-12 h-12 rounded-full bg-white flex items-center justify-center font-bold text-brandBlue shadow-sm border border-brandBorder overflow-hidden">
+                            {%if req.provider.profile.profile_picture %}
+                            <img src="{{ req.provider.profile.profile_picture.url }}"
+                                class="w-full h-full object-cover">
+                            {%else %}
+                            {{ req.provider.username|make_list|first|upper }}
+                            {%endif %}
                         </div>
-                        <span class="text-sm font-bold text-brandText">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</span>
-                        <a href="{%url 'inbox' %}?user={{ job.provider.id }}"
-                            class="text-xs text-brandBlue hover:underline ml-2 hidden sm:inline-block">Message
-                            Client</a>
+                        <div>
+                            <p class="text-base font-bold text-brandText">{{ req.provider.first_name|default:req.provider.username }} {{ req.provider.last_name }}
+                            </p>
+                            {%if req.job %}
+                            <p class="text-xs text-brandIcon">Invited you to work on: <span
+                                    class="font-bold text-brandBlue">{{ req.job.title }}</span></p>
+                            {%if req.job.price %}<p class="text-xs text-emerald-600 font-bold mt-0.5">₹{{ req.job.price }}
+                            </p>{%endif %}
+                            {%else %}
+                            <p class="text-xs text-brandIcon">Invited you to handle a potential task.</p>
+                            {%endif %}
+                            <p class="text-[10px] text-slate-500 mt-1 uppercase font-bold tracking-widest">{{ req.timestamp|timesince }} ago</p>
+                        </div>
                     </div>
-
-                    <div class="flex gap-2">
-                        <a href="{%url 'inbox' %}?user={{ job.provider.id }}"
-                            class="bg-slate-100 text-brandText px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-200 transition sm:hidden">💬</a>
-                        <form method="POST" action="{%url 'update_status' job.id %}" class="inline">
+                    <div class="flex items-center gap-3">
+                        <form method="POST" action="{%url 'respond_service_request' req.id %}">
                             {%csrf_token %}
-                            <input type="hidden" name="status" value="Completed">
+                            <input type="hidden" name="action" value="accepted">
                             <button type="submit"
-                                class="bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-emerald-600 transition shadow-sm">
-                                Mark Completed
-                            </button>
+                                class="bg-emerald-600 text-white px-5 py-2 rounded-xl font-bold hover:bg-emerald-700 transition shadow-md text-xs">Accept
+                                Invitation</button>
+                        </form>
+                        <form method="POST" action="{%url 'respond_service_request' req.id %}">
+                            {%csrf_token %}
+                            <input type="hidden" name="action" value="rejected">
+                            <button type="submit"
+                                class="bg-white border border-brandBorder text-slate-500 px-5 py-2 rounded-xl font-bold hover:bg-slate-50 transition text-xs">Reject</button>
                         </form>
                     </div>
                 </div>
+                {%endif %}
+                {%endfor %}
             </div>
-            {%empty %}
-            <div class="li-card p-8 text-center bg-slate-50">
-                <div class="text-4xl mb-3">🛠️</div>
-                <p class="text-brandIcon font-bold mb-2">You don't have any active tasks right now.</p>
-                <a href="{%url 'jobs' %}"
-                    class="bg-white border border-brandBorder text-brandText px-4 py-2 mt-2 inline-block rounded-lg font-bold hover:bg-slate-50 transition shadow-sm text-sm">Find
-                    New Tasks</a>
-            </div>
-            {%endfor %}
         </div>
-    </div>
+        {%endif %}
 
-    <!-- Completed History -->
-    <div>
-        <h2 class="text-lg font-bold text-brandText mb-3">Task History (Completed)</h2>
-        <div class="space-y-4">
-            {%for job in completed_jobs %}
-            <div class="li-card p-5 bg-slate-50/50">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="text-base font-bold text-brandText line-through text-slate-500">{{ job.title }}</h3>
-                        <p class="text-xs text-slate-400 mb-1">Posted on {{ job.created_at|date:"M d, Y" }} by {{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</p>
-                        <div class="flex items-center gap-3 mt-2 text-xs font-bold">
-                            <span class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-1 rounded-md">
-                                ✓ Completed
-                            </span>
-                            {%if job.price %}<span class="text-slate-500">Earned: ₹{{ job.price }}</span>{%endif %}
-                            <span class="text-slate-500">Finished on
-                                {{ job.updated_at|date:"M d, Y h:i A" }} by You
-                            </span>
+        <!-- Active Assigned Jobs -->
+        <div class="mb-6">
+            <h2 class="text-lg font-bold text-brandText mb-3">Your Active Tasks</h2>
+            <div class="space-y-4">
+                {%for job in assigned_jobs %}
+                <div class="li-card p-5 border-l-4 border-l-brandOrange hover:shadow-md transition">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-base font-bold text-brandText">{{ job.title }}</h3>
+                            <p class="text-xs text-slate-500 mb-1">Posted on {{ job.created_at|date:"M d, Y" }} by {{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}
+                            </p>
+                            <p class="text-sm text-brandIcon line-clamp-2 mt-1">{{ job.description }}</p>
+                            <div class="flex items-center gap-3 mt-3 text-xs font-bold">
+                                <span class="bg-blue-50 text-brandBlue px-2 py-1 rounded-md">{{ job.status }}</span>
+                                {%if job.price %}<span class="text-slate-600">💰 ₹{{ job.price }}</span>{%endif %}
+                                <span class="text-slate-500">📍 {{ job.address|truncatechars:30 }}</span>
+                                <span class="text-brandIcon">🕓
+                                    {{ job.scheduled_time|date:"M d, Y h:i A"|default:"ASAP" }}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <span class="text-xs font-bold text-slate-500">Client:</span>
-                        <p class="text-sm font-bold text-brandText">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</p>
+
+                    <div class="mt-4 pt-4 border-t border-brandBorder flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold text-brandIcon">Requested by:</span>
+                            <div
+                                class="w-6 h-6 rounded-full bg-slate-200 text-brandBlue text-xs font-bold flex items-center justify-center uppercase">
+                                {{ job.provider.username|make_list|first }}
+                            </div>
+                            <span class="text-sm font-bold text-brandText">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</span>
+                            <a href="{%url 'inbox' %}?user={{ job.provider.id }}"
+                                class="text-xs text-brandBlue hover:underline ml-2 hidden sm:inline-block">Message
+                                Client</a>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <a href="{%url 'inbox' %}?user={{ job.provider.id }}"
+                                class="bg-slate-100 text-brandText px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-200 transition sm:hidden">💬</a>
+                            <form method="POST" action="{%url 'update_status' job.id %}" class="inline">
+                                {%csrf_token %}
+                                <input type="hidden" name="status" value="Completed">
+                                <button type="submit"
+                                    class="bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-emerald-600 transition shadow-sm">
+                                    Mark Completed
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
+                {%empty %}
+                <div class="li-card p-8 text-center bg-slate-50">
+                    <div class="text-4xl mb-3">🛠️</div>
+                    <p class="text-brandIcon font-bold mb-2">You don't have any active tasks right now.</p>
+                    <a href="{%url 'jobs' %}"
+                        class="bg-white border border-brandBorder text-brandText px-4 py-2 mt-2 inline-block rounded-lg font-bold hover:bg-slate-50 transition shadow-sm text-sm">Find
+                        New Tasks</a>
+                </div>
+                {%endfor %}
             </div>
-            {%empty %}
-            <div class="li-card p-8 text-center bg-transparent border border-dashed border-slate-300 shadow-none">
-                <p class="text-slate-400 font-bold">No completed tasks yet.</p>
-            </div>
-            {%endfor %}
         </div>
+
+        <!-- Completed History -->
+        <div>
+            <h2 class="text-lg font-bold text-brandText mb-3">Task History (Completed)</h2>
+            <div class="space-y-4">
+                {%for job in completed_jobs %}
+                <div class="li-card p-5 bg-slate-50/50">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-base font-bold text-brandText line-through text-slate-500">{{ job.title }}
+                            </h3>
+                            <p class="text-xs text-slate-400 mb-1">Posted on {{ job.created_at|date:"M d, Y" }} by {{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}
+                            </p>
+                            <div class="flex items-center gap-3 mt-2 text-xs font-bold">
+                                <span
+                                    class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-1 rounded-md">
+                                    ✓ Completed
+                                </span>
+                                {%if job.price %}<span class="text-slate-500">Earned: ₹{{ job.price }}</span>{%endif %}
+                                <span class="text-slate-500">Finished on
+                                    {{ job.updated_at|date:"M d, Y h:i A" }} by You
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-slate-500">Client:</span>
+                            <p class="text-sm font-bold text-brandText">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {%empty %}
+                <div class="li-card p-8 text-center bg-transparent border border-dashed border-slate-300 shadow-none">
+                    <p class="text-slate-400 font-bold">No completed tasks yet.</p>
+                </div>
+                {%endfor %}
+            </div>
+        </div>
+    </div> <!-- Close cards-view -->
+
+    <!-- Tabular View Section -->
+    <div id="table-view" class="hidden space-y-8">
+        <!-- Active Tasks Table -->
+        <div class="li-card p-0 overflow-hidden">
+            <div class="p-5 border-b border-slate-100 bg-slate-50/50">
+                <h2 class="text-lg font-bold text-brandText">Active Tasks Tracker</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-xs text-brandIcon uppercase tracking-wider">
+                            <th class="p-4 font-bold border-b border-slate-200">Date Posted / ID</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Job Details</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Location & Pay</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Status</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Client / Requested By</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        {% for job in assigned_jobs %}
+                        <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                            <td class="p-4 font-medium text-slate-500 whitespace-nowrap">{{ job.created_at|date:"M d, Y" }}<br><span class="text-xs text-slate-400">#{{ job.id }}</span></td>
+                            <td class="p-4">
+                                <p class="font-bold text-brandText">{{ job.title }}</p>
+                                <p class="text-xs text-brandIcon truncate max-w-[200px] mt-0.5">{{ job.description }}
+                                </p>
+                            </td>
+                            <td class="p-4 text-slate-600 font-semibold whitespace-nowrap">📍 {{ job.address|truncatechars:20 }}<br>{% if job.price %}💰 ₹{{ job.price }}{% else %}-{% endif %}</td>
+                            <td class="p-4"><span
+                                    class="bg-brandOrange/10 text-brandOrange border border-brandOrange/20 px-2.5 py-1 rounded-md text-[11px] font-bold">{{ job.status }}</span></td>
+                            <td class="p-4 font-bold text-brandText whitespace-nowrap">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}
+                            </td>
+                            <td class="p-4">
+                                <a href="{% url 'job_detail' job.id %}"
+                                    class="bg-white border border-brandBorder text-brandText px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition shadow-sm whitespace-nowrap">View
+                                    Task</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="p-8 text-center text-slate-500 font-bold">No active tasks.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Completed Tasks Table -->
+        <div class="li-card p-0 overflow-hidden">
+            <div class="p-5 border-b border-slate-100 bg-slate-50/50">
+                <h2 class="text-lg font-bold text-brandText">Completed Tasks History</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-xs text-brandIcon uppercase tracking-wider">
+                            <th class="p-4 font-bold border-b border-slate-200">Date Posted / ID</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Job Details</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Location & Pay</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Status</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Client / Requested By</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        {% for job in completed_jobs %}
+                        <tr class="border-b border-slate-100 hover:bg-slate-50 transition opacity-80">
+                            <td class="p-4 font-medium text-slate-500 whitespace-nowrap">{{ job.created_at|date:"M d, Y" }}<br><span class="text-xs text-slate-400">#{{ job.id }}</span></td>
+                            <td class="p-4">
+                                <p class="font-bold text-slate-500 line-through">{{ job.title }}</p>
+                            </td>
+                            <td class="p-4 text-slate-600 font-semibold whitespace-nowrap">📍 {{ job.address|truncatechars:15 }}<br>{% if job.price %}💰 ₹{{ job.price }}{% else %}-{% endif %}</td>
+                            <td class="p-4"><span
+                                    class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded-md text-[11px] font-bold">Completed</span><br><span
+                                    class="text-[10px] text-slate-400 font-medium">{{ job.updated_at|date:"M d, Y h:i A" }}</span>
+                            </td>
+                            <td class="p-4 font-bold text-slate-600 whitespace-nowrap">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}
+                            </td>
+                            <td class="p-4">
+                                <a href="{% url 'job_detail' job.id %}"
+                                    class="bg-white border border-brandBorder text-slate-500 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition shadow-sm whitespace-nowrap">View
+                                    Record</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="p-8 text-center text-slate-400 font-bold">No completed tasks yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if service_requests %}
+        <!-- Incoming Task Invitations Table -->
+        <div class="li-card p-0 overflow-hidden">
+            <div class="p-5 border-b border-slate-100 bg-slate-50/50">
+                <h2 class="text-lg font-bold text-brandText">Incoming Task Invitations</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-xs text-brandIcon uppercase tracking-wider">
+                            <th class="p-4 font-bold border-b border-slate-200">Date/Time</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Client / Requested By</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Related Job</th>
+                            <th class="p-4 font-bold border-b border-slate-200">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        {% for req in service_requests %}
+                        {% if req.status == 'pending' %}
+                        <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                            <td class="p-4 font-medium text-slate-500 text-xs whitespace-nowrap">{{ req.timestamp|date:"M d, Y" }}<br>{{ req.timestamp|time:"h:i A" }}</td>
+                            <td class="p-4 font-bold text-brandText whitespace-nowrap">{{ req.provider.first_name|default:req.provider.username }} {{ req.provider.last_name }}
+                            </td>
+                            <td class="p-4 font-bold text-slate-600 text-xs">{% if req.job %}{{ req.job.title|truncatechars:35 }}{% else %}General Invite{% endif %}</td>
+                            <td class="p-4">
+                                <span
+                                    class="text-amber-600 font-bold text-xs uppercase bg-amber-50 px-2 py-1 rounded">Pending</span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
     </div>
+
 </div>
+
+<script>
+    function setView(mode) {
+        const cardsView = document.getElementById('cards-view');
+        const tableView = document.getElementById('table-view');
+        const btnCards = document.getElementById('view-cards');
+        const btnTable = document.getElementById('view-table');
+
+        if (mode === 'cards') {
+            cardsView.classList.remove('hidden');
+            tableView.classList.add('hidden');
+            btnCards.className = 'px-4 py-2 rounded-lg text-xs font-bold bg-white shadow-sm text-brandBlue transition';
+            btnTable.className = 'px-4 py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-brandText transition';
+            localStorage.setItem('workerDashView', 'cards');
+        } else {
+            cardsView.classList.add('hidden');
+            tableView.classList.remove('hidden');
+            btnTable.className = 'px-4 py-2 rounded-lg text-xs font-bold bg-white shadow-sm text-brandBlue transition';
+            btnCards.className = 'px-4 py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-brandText transition';
+            localStorage.setItem('workerDashView', 'table');
+        }
+    }
+
+    // Load saved preference
+    document.addEventListener("DOMContentLoaded", () => {
+        const saved = localStorage.getItem('workerDashView');
+        if (saved === 'table') {
+            setView('table');
+        }
+    });
+</script>
 {%endblock %}

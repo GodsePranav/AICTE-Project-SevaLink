@@ -78,6 +78,15 @@
 
 {% block content %}
 <div class="max-w-[1000px] mx-auto py-8 px-4">
+  <div class="mb-4">
+    <a href="javascript:history.back()"
+      class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-brandBlue transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back
+    </a>
+  </div>
   <div class="mb-8 text-center">
     <h1 class="text-3xl font-black text-brandBlue mb-1">Edit Profile</h1>
     <p class="text-brandIcon text-sm font-medium">Keep your profile up to date.</p>
@@ -93,16 +102,19 @@
     {% csrf_token %}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
       <div class="nit-card p-6 flex flex-col items-center text-center">
-        <div class="relative group mb-4">
+        <div class="relative group mb-4 cursor-pointer" onclick="document.getElementById('id_profile_picture').click()">
           <div
-            class="w-28 h-28 rounded-2xl border-4 border-white bg-blue-50 flex items-center justify-center overflow-hidden shadow-lg">
+            class="w-28 h-28 rounded-2xl border-4 border-white bg-blue-50 flex items-center justify-center overflow-hidden shadow-lg relative">
             {% if user.profile.profile_picture %}
             <img src="{{ user.profile.profile_picture.url }}" class="w-full h-full object-cover" id="pic-preview">
             {% else %}
-            <span class="text-4xl font-black text-brandBlue" id="pic-initial">{{ user.username|make_list|first|upper
-              }}</span>
+            <span class="text-4xl font-black text-brandBlue" id="pic-initial">{{ user.username|make_list|first|upper }}</span>
             <img src="" class="w-full h-full object-cover hidden" id="pic-preview">
             {% endif %}
+            <div
+              class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center transition-all">
+              <span class="text-white tracking-widest text-[10px] font-black uppercase">Change</span>
+            </div>
           </div>
         </div>
         <h3 class="text-lg font-black text-brandText">{{ user.first_name|default:user.username }} {{ user.last_name }}
@@ -125,15 +137,34 @@
         </div>
       </div>
     </div>
+    <!-- Identity & Contact Details (Visible to all users) -->
+    <div class="nit-card p-6 mb-6">
+      <div class="section-header">
+        <div class="header-icon">&#128100;</div>
+        <h3 class="text-base font-black text-brandBlue uppercase">Identity Verification</h3>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for field in profile_form %}
+        {% if field.name in "full_name,phone_number,aadhaar_number" %}
+        <div>
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Professional Details (Visible only to Workers) -->
     {% if request.user.profile.role != 'Job Provider' %}
     <div class="nit-card p-6 mb-6">
       <div class="section-header">
         <div class="header-icon">&#128188;</div>
-        <h3 class="text-base font-black text-brandBlue uppercase">Profile Details</h3>
+        <h3 class="text-base font-black text-brandBlue uppercase">Professional Info</h3>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for field in profile_form %}
-        {% if field.name != "live_location" %}
+        {% if field.name not in "full_name,phone_number,aadhaar_number,live_location,profile_picture" %}
         <div>
           <label class="form-label">{{ field.label }}</label>
           {{ field }}
@@ -171,6 +202,22 @@
     </div>
   </form>
 </div>
+
+<script>
+  document.getElementById('id_profile_picture').addEventListener('change', function (e) {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById('pic-preview').src = e.target.result;
+        document.getElementById('pic-preview').classList.remove('hidden');
+        if (document.getElementById('pic-initial')) {
+          document.getElementById('pic-initial').classList.add('hidden');
+        }
+      }
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  });
+</script>
 {% endblock %}
 
 {% block extra_scripts %}
@@ -197,7 +244,7 @@
     var me = document.getElementById("location-map");
     if (typeof L !== "undefined" && me) {
       var lat = 28.6139, lon = 77.209, zm = 11;
-      if (loc && loc.value) { try { var d = JSON.parse(loc.value); lat = d.lat; lon = d.lon; zm = 14; } catch (e) { } }
+      if (loc && loc.value) { try { var d = JSON.parse(loc.value); lat = d.lat; lon = d.lon; zm = 14; } catch (e) { }}
       var map = L.map("location-map").setView([lat, lon], zm);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
       var mk = L.marker([lat, lon], { draggable: true }).addTo(map);

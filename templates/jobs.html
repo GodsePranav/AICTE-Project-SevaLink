@@ -66,10 +66,8 @@
     <main class="w-full md:w-[680px] flex-shrink-0 flex flex-col gap-4">
         <div class="li-card p-5">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="font-bold text-lg text-brandText">{%if current_filter %}Results for "{{ current_filter
-                    }}"{%else %}Available Jobs{%endif %}</h2>
-                <span class="text-xs font-bold text-brandIcon bg-slate-100 px-3 py-1 rounded-full">{{
-                    service_jobs|length }} job{{ service_jobs|length|pluralize }}</span>
+                <h2 class="font-bold text-lg text-brandText">{%if current_filter %}Results for "{{ current_filter }}"{%else %}Available Jobs{%endif %}</h2>
+                <span class="text-xs font-bold text-brandIcon bg-slate-100 px-3 py-1 rounded-full">{{ service_jobs|length }} job{{ service_jobs|length|pluralize }}</span>
             </div>
 
             {%for job in service_jobs %}
@@ -78,23 +76,18 @@
                 <!-- Header: Title + Price -->
                 <div class="flex justify-between items-start">
                     <div class="flex-1">
-                        <h3 class="font-bold text-brandBlue text-base group-hover:text-blue-800 transition">{{ job.title
-                            }}</h3>
-                        <p class="text-xs font-semibold text-brandIcon mt-1">Posted by {{
-                            job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }} • {{
-                            job.created_at|timesince }}
+                        <h3 class="font-bold text-brandBlue text-base group-hover:text-blue-800 transition">{{ job.title }}</h3>
+                        <p class="text-xs font-semibold text-brandIcon mt-1">Posted by {{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }} • {{ job.created_at|timesince }}
                             ago</p>
                     </div>
                     {%if job.price %}
                     <span
-                        class="bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full text-xs ml-3 flex-shrink-0">₹{{
-                        job.price }}</span>
+                        class="bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full text-xs ml-3 flex-shrink-0">₹{{ job.price }}</span>
                     {%endif %}
                 </div>
 
                 <!-- Description -->
-                <p class="text-sm text-slate-600 mt-2 line-clamp-2">{{ job.description|default:"No description
-                    provided." }}</p>
+                <p class="text-sm text-slate-600 mt-2 line-clamp-2">{{ job.description|default:"No description provided." }}</p>
 
                 <!-- Job Details Row -->
                 <div class="flex flex-wrap gap-3 mt-3">
@@ -123,8 +116,7 @@
                     {%endif %}
 
                     <span
-                        class="text-xs font-bold px-2.5 py-1 rounded-lg {%if job.status == 'Pending' %}bg-blue-50 text-blue-600 border border-blue-100{%elif job.status == 'Accepted' %}bg-emerald-50 text-emerald-600 border border-emerald-100{%else %}bg-slate-50 text-slate-600 border border-slate-100{%endif %}">{{
-                        job.status }}</span>
+                        class="text-xs font-bold px-2.5 py-1 rounded-lg {%if job.status == 'Pending' %}bg-blue-50 text-blue-600 border border-blue-100{%elif job.status == 'Accepted' %}bg-emerald-50 text-emerald-600 border border-emerald-100{%else %}bg-slate-50 text-slate-600 border border-slate-100{%endif %}">{{ job.status }}</span>
                 </div>
 
                 <!-- Actions -->
@@ -133,8 +125,7 @@
                         <div
                             class="w-6 h-6 rounded-full bg-brandBlue/10 text-brandBlue text-xs font-bold flex items-center justify-center uppercase">
                             {{ job.provider.username|make_list|first }}</div>
-                        <span class="text-xs font-semibold text-brandIcon">{{
-                            job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</span>
+                        <span class="text-xs font-semibold text-brandIcon">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</span>
                     </div>
                     <div class="flex gap-2">
                         {%if request.user.profile.role == 'Worker' %}
@@ -142,7 +133,7 @@
                             {%csrf_token %}
                             <button type="submit"
                                 class="bg-brandBlue text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-900 transition shadow-sm">🚀
-                                Accept Job</button>
+                                Apply for Job</button>
                         </form>
                         {%endif %}
                         <a href="{%url 'inbox' %}?user={{ job.provider.id }}"
