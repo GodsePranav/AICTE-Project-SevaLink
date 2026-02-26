@@ -230,8 +230,31 @@ def post_job_page(request):
         errors = []
         if not title:
             errors.append('Job title is required.')
+        elif len(title) < 5:
+            errors.append('Job title must be at least 5 characters.')
         if not description:
             errors.append('Job description is required.')
+        elif len(description) < 20:
+            errors.append('Job description must be at least 20 characters.')
+        if price:
+            try:
+                price_val = float(price)
+                if price_val <= 0:
+                    errors.append('Budget must be greater than zero. Minimum is ₹50.')
+                elif price_val < 50:
+                    errors.append('Minimum budget is ₹50.')
+                elif price_val % 50 != 0:
+                    errors.append('Budget must be a multiple of ₹50 (e.g. ₹50, ₹100, ₹500).')
+                elif price_val > 1000000:
+                    errors.append('Maximum budget is ₹10,00,000.')
+            except ValueError:
+                errors.append('Budget must be a valid number.')
+        if scheduled_time:
+            from django.utils.dateparse import parse_datetime
+            from django.utils import timezone
+            sched_dt_check = parse_datetime(scheduled_time)
+            if sched_dt_check and sched_dt_check < timezone.now().replace(tzinfo=None):
+                errors.append('Scheduled date/time cannot be in the past.')
         
         if errors:
             from django.contrib import messages

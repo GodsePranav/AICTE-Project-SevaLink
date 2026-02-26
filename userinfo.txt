@@ -1,363 +1,453 @@
-SEVALINK TEST USERS (Nashik Region)
+SEVALINK TEST USERS (Nashik Region) - UPDATED WITH VALID DATA
 =========================
 
-Name: NewFirst NewLast
+Name: Fullname Test
 Username: testprovider
-Aadhaar: None
 Password: Password@123
 Role: Worker
-Location: 19.925333474876073, 73.72961842021503
-Description: No description provided.
+Phone: 9302651222
+Aadhaar: 288305019041
+DOB: 2004-05-29
+Location: 20.203729, 73.832588
+Description: Certified electrician focused on safety and quality wiring.
 -------------------------
 Name: Alex Smith
 Username: alex_worker_123
-Aadhaar: None
 Password: Password@123
 Role: Worker
-Location: 20.147522659649898, 73.94542394285057
-Description: No description provided.
+Phone: 9903210649
+Aadhaar: 390697513598
+DOB: 1980-01-31
+Location: None
+Description: Certified electrician focused on safety and quality wiring.
 -------------------------
 Name: Test User New
 Username: testuser_new_123
-Aadhaar: None
 Password: Password@123
 Role: Worker
-Location: 19.85545803969398, 73.59377026753549
-Description: No description provided.
+Phone: 9151408005
+Aadhaar: 193018309297
+DOB: 1972-12-14
+Location: None
+Description: Experienced handyman with 5+ years in local repairs.
 -------------------------
 Name: Final Test User
 Username: testuser_final_verification0
-Aadhaar: None
 Password: Password@123
 Role: Worker
-Location: 19.877016743689424, 73.7600168102862
-Description: No description provided.
+Phone: 9614644832
+Aadhaar: 603716407012
+DOB: 1975-04-10
+Location: None
+Description: Dedicated cleaner providing eco-friendly deep cleaning services.
 -------------------------
 Name: Expert User One
 Username: test_expert_user_10
-Aadhaar: 112233445566
 Password: Password@123
 Role: Worker
-Location: 19.92330333181854, 73.84395709981806
-Description: No description provided.
+Phone: 9876543210
+Aadhaar: 112233445566
+DOB: 1998-03-12
+Location: None
+Description: Experienced handyman with 5+ years in local repairs.
 -------------------------
 Name: Test Provider Name
 Username: testprovider990
-Aadhaar: 121212121212
 Password: Password@123
 Role: Job Provider
-Location: 19.912460810543298, 73.95511978885477
-Description: No description provided.
+Phone: 9494949494
+Aadhaar: 121212121212
+DOB: 1956-11-02
+Location: None
+Description: Always looking for quality workers for various home projects.
 -------------------------
 Name: Map Tester
 Username: maptest0
-Aadhaar: 123456789012
 Password: Password@123
 Role: Job Provider
-Location: 20.08269772405583, 73.93440418386773
-Description: No description provided.
+Phone: 9876543210
+Aadhaar: 123456789012
+DOB: 2005-04-05
+Location: 20.014665, 73.790391
+Description: Always looking for quality workers for various home projects.
 -------------------------
 Name: Ajinkya Pingal
 Username: ajinkya0
-Aadhaar: 956318562301
 Password: Password@123
 Role: Job Provider
-Location: 20.08000174485582, 73.90887417925993
-Description: No description provided.
+Phone: 2563897122
+Aadhaar: 956318562301
+DOB: 1978-05-23
+Location: None
+Description: Property manager looking for long-term service partnerships.
 -------------------------
 Name: Test User
 Username: testuser0
-Aadhaar: 123412341234
 Password: Password@123
 Role: Worker
-Location: 19.956892987022485, 73.81014322582715
-Description: No description provided.
+Phone: 1234567890
+Aadhaar: 123412341234
+DOB: 1969-10-18
+Location: None
+Description: HVAC specialist with expertise in all residential AC models.
 -------------------------
 Name: Manoj Singh
 Username: manoj_singh_4671
-Aadhaar: 427419471008
 Password: Password@123
 Role: Worker
-Location: 19.842015661062103, 73.74924722259951
-Description: No description provided.
+Phone: 7500166160
+Aadhaar: 427419471008
+DOB: 1993-05-01
+Location: None
+Description: Experienced handyman with 5+ years in local repairs.
 -------------------------
 Name: Amit Nair
 Username: amit_nair_6402
-Aadhaar: 749847334428
 Password: Password@123
 Role: Worker
-Location: 20.086832981712163, 73.65564687479123
-Description: No description provided.
+Phone: 7402895020
+Aadhaar: 749847334428
+DOB: 1975-10-19
+Location: None
+Description: HVAC specialist with expertise in all residential AC models.
 -------------------------
 Name: Sneha Kumar
 Username: sneha_kumar_1461
-Aadhaar: 460893573424
 Password: Password@123
 Role: Worker
-Location: 19.95161096639634, 73.73785497114855
-Description: No description provided.
+Phone: 8956446661
+Aadhaar: 460893573424
+DOB: 1998-07-27
+Location: None
+Description: Experienced handyman with 5+ years in local repairs.
 -------------------------
 Name: Sanjay Gupta
 Username: sanjay_gupta_5162
-Aadhaar: 900806211592
 Password: Password@123
 Role: Worker
-Location: 19.81531734082502, 73.97470222864888
-Description: No description provided.
+Phone: 8586417017
+Aadhaar: 900806211592
+DOB: 1973-11-27
+Location: None
+Description: Experienced handyman with 5+ years in local repairs.
 -------------------------
 Name: Sachin Gupta
 Username: sachin_gupta_9368
-Aadhaar: 840514833039
 Password: Password@123
 Role: Worker
-Location: 19.813003122238804, 73.87213895057613
-Description: No description provided.
+Phone: 7917749756
+Aadhaar: 840514833039
+DOB: 2006-04-09
+Location: None
+Description: Dedicated cleaner providing eco-friendly deep cleaning services.
 -------------------------
 Name: Aarti Gupta
 Username: aarti_gupta_4483
-Aadhaar: 948069531968
 Password: Password@123
 Role: Worker
-Location: 19.89219095695478, 73.7069773132443
-Description: No description provided.
+Phone: 8792642063
+Aadhaar: 948069531968
+DOB: 2005-01-23
+Location: None
+Description: Skillful carpenter passionate about custom furniture and repairs.
 -------------------------
 Name: Manoj Patel
 Username: manoj_patel_5220
-Aadhaar: 936655312134
 Password: Password@123
 Role: Worker
-Location: 19.991389354412448, 73.83925531761754
-Description: No description provided.
+Phone: 8803766910
+Aadhaar: 936655312134
+DOB: 1979-04-19
+Location: None
+Description: HVAC specialist with expertise in all residential AC models.
 -------------------------
 Name: Ramesh Shah
 Username: ramesh_shah_3673
-Aadhaar: 132715865765
 Password: Password@123
 Role: Worker
-Location: 20.11832172292641, 73.91961810778011
-Description: No description provided.
+Phone: 7886736584
+Aadhaar: 132715865765
+DOB: 1971-03-15
+Location: None
+Description: HVAC specialist with expertise in all residential AC models.
 -------------------------
 Name: Kiran Gupta
 Username: kiran_gupta_5527
-Aadhaar: 675875334722
 Password: Password@123
 Role: Worker
-Location: 20.094611059567608, 73.92001951689632
-Description: No description provided.
+Phone: 7028830824
+Aadhaar: 675875334722
+DOB: 1969-05-16
+Location: None
+Description: Dedicated cleaner providing eco-friendly deep cleaning services.
 -------------------------
 Name: Priya Nair
 Username: priya_nair_9673
-Aadhaar: 412864264295
 Password: Password@123
 Role: Worker
-Location: 19.92727120072143, 73.76287315588405
-Description: No description provided.
+Phone: 9497333383
+Aadhaar: 412864264295
+DOB: 2007-11-13
+Location: None
+Description: HVAC specialist with expertise in all residential AC models.
 -------------------------
 Name: Pooja Sharma
 Username: pooja_sharma_7880
-Aadhaar: 878741662688
 Password: Password@123
 Role: Job Provider
-Location: 20.10480062150708, 73.76463916225967
-Description: No description provided.
+Phone: 8765795259
+Aadhaar: 878741662688
+DOB: 1962-06-08
+Location: None
+Description: Always looking for quality workers for various home projects.
 -------------------------
 Name: Ramesh Gupta
 Username: ramesh_gupta_2077
-Aadhaar: 108712218420
 Password: Password@123
 Role: Worker
-Location: 19.850079628211653, 73.69993986153693
-Description: No description provided.
+Phone: 8916870844
+Aadhaar: 108712218420
+DOB: 1987-06-08
+Location: None
+Description: Dedicated cleaner providing eco-friendly deep cleaning services.
 -------------------------
 Name: Sanjay Verma
 Username: sanjay_verma_4272
-Aadhaar: 938231316465
 Password: Password@123
 Role: Worker
-Location: 19.808889417769507, 73.66523901160029
-Description: No description provided.
+Phone: 9383750517
+Aadhaar: 938231316465
+DOB: 2008-01-31
+Location: None
+Description: HVAC specialist with expertise in all residential AC models.
 -------------------------
 Name: Aarti Joshi
 Username: aarti_joshi_3814
-Aadhaar: 512983428915
 Password: Password@123
 Role: Worker
-Location: 19.915538643671756, 73.95426046874572
-Description: No description provided.
+Phone: 7132672018
+Aadhaar: 512983428915
+DOB: 1980-09-30
+Location: None
+Description: Certified electrician focused on safety and quality wiring.
 -------------------------
 Name: Vikram Reddy
 Username: vikram_reddy_4314
-Aadhaar: 666674698422
 Password: Password@123
 Role: Worker
-Location: 19.85958031705947, 73.68176567570086
-Description: No description provided.
+Phone: 7063604934
+Aadhaar: 666674698422
+DOB: 1967-10-04
+Location: None
+Description: Dedicated cleaner providing eco-friendly deep cleaning services.
 -------------------------
 Name: Anil Singh
 Username: anil_singh_7905
-Aadhaar: 672911523941
 Password: Password@123
 Role: Worker
-Location: 20.176638637798956, 73.94704333750875
-Description: No description provided.
+Phone: 8854496178
+Aadhaar: 672911523941
+DOB: 1967-12-24
+Location: None
+Description: Dedicated cleaner providing eco-friendly deep cleaning services.
 -------------------------
 Name: Suresh Gupta
 Username: suresh_gupta_4236
-Aadhaar: 331257121031
 Password: Password@123
 Role: Worker
-Location: 20.04512724151695, 73.73393714622053
-Description: No description provided.
+Phone: 7043913903
+Aadhaar: 331257121031
+DOB: 1998-12-18
+Location: None
+Description: Experienced handyman with 5+ years in local repairs.
 -------------------------
 Name: Arjun Reddy
 Username: arjun_reddy_9242
-Aadhaar: 221970276079
 Password: Password@123
 Role: Worker
-Location: 20.03827486897725, 73.66056773349004
-Description: No description provided.
+Phone: 7112268080
+Aadhaar: 221970276079
+DOB: 2000-10-30
+Location: None
+Description: HVAC specialist with expertise in all residential AC models.
 -------------------------
 Name: Vikram Gupta
 Username: vikram_gupta_1881
-Aadhaar: 985055440204
 Password: Password@123
 Role: Worker
-Location: 20.07449226773504, 73.78656343282347
-Description: No description provided.
+Phone: 8425410147
+Aadhaar: 985055440204
+DOB: 1991-01-19
+Location: None
+Description: Dedicated cleaner providing eco-friendly deep cleaning services.
 -------------------------
 Name: Manoj Verma
 Username: manoj_verma_1926
-Aadhaar: 608742116205
 Password: Password@123
 Role: Worker
-Location: 20.05548424935683, 73.76908984652933
-Description: No description provided.
+Phone: 7584244728
+Aadhaar: 608742116205
+DOB: 1968-12-08
+Location: None
+Description: Skillful carpenter passionate about custom furniture and repairs.
 -------------------------
 Name: Rahul Gupta
 Username: rahul_gupta_7084
-Aadhaar: 945187631535
 Password: Password@123
 Role: Worker
-Location: 19.958423796168123, 73.85088522151652
-Description: No description provided.
+Phone: 7858028827
+Aadhaar: 945187631535
+DOB: 1986-10-19
+Location: None
+Description: Dedicated cleaner providing eco-friendly deep cleaning services.
 -------------------------
 Name: Pooja Kumar
 Username: pooja_kumar_8259
-Aadhaar: 697053246353
 Password: Password@123
 Role: Job Provider
-Location: 19.817441083320713, 73.9296481332973
-Description: No description provided.
+Phone: 7114533375
+Aadhaar: 697053246353
+DOB: 1952-09-29
+Location: None
+Description: Always looking for quality workers for various home projects.
 -------------------------
 Name: Rahul Verma
 Username: rahul_verma_4210
-Aadhaar: 451920144213
 Password: Password@123
 Role: Job Provider
-Location: 20.141678622003504, 73.7689087783132
-Description: No description provided.
+Phone: 7812309648
+Aadhaar: 451920144213
+DOB: 2002-04-17
+Location: None
+Description: Always looking for quality workers for various home projects.
 -------------------------
 Name: Kavita Sharma
 Username: kavita_sharma_5800
-Aadhaar: 307848596580
 Password: Password@123
 Role: Job Provider
-Location: 19.821464539398548, 73.7574093860038
-Description: No description provided.
+Phone: 7728679221
+Aadhaar: 307848596580
+DOB: 1964-12-31
+Location: None
+Description: Property manager looking for long-term service partnerships.
 -------------------------
 Name: Deepa Kumar
 Username: deepa_kumar_2991
-Aadhaar: 961244634612
 Password: Password@123
 Role: Job Provider
-Location: 20.190891785365213, 73.59440395941319
-Description: No description provided.
+Phone: 7859359914
+Aadhaar: 961244634612
+DOB: 1986-06-03
+Location: None
+Description: Property manager looking for long-term service partnerships.
 -------------------------
 Name: Vikram Joshi
 Username: vikram_joshi_9703
-Aadhaar: 539556909191
 Password: Password@123
 Role: Job Provider
-Location: 19.85400240416501, 73.78530268182838
-Description: No description provided.
+Phone: 9265748560
+Aadhaar: 539556909191
+DOB: 2007-10-05
+Location: None
+Description: Always looking for quality workers for various home projects.
 -------------------------
 Name: Neha Reddy
 Username: neha_reddy_3548
-Aadhaar: 430599920998
 Password: Password@123
 Role: Job Provider
-Location: 20.19586585946744, 73.95400607512757
-Description: No description provided.
+Phone: 7158394971
+Aadhaar: 430599920998
+DOB: 1999-09-30
+Location: None
+Description: Local business owner looking for reliable service professionals.
 -------------------------
 Name: Neha Sharma
 Username: neha_sharma_1784
-Aadhaar: 779948610677
 Password: Password@123
 Role: Job Provider
-Location: 20.075257948245202, 73.8414327132998
-Description: No description provided.
+Phone: 8092384247
+Aadhaar: 779948610677
+DOB: 1990-01-19
+Location: None
+Description: Always looking for quality workers for various home projects.
 -------------------------
 Name: Neha Sharma
 Username: neha_sharma_9803
-Aadhaar: 557251091330
 Password: Password@123
 Role: Job Provider
-Location: 20.148553692164597, 73.76681272607848
-Description: No description provided.
+Phone: 9635386241
+Aadhaar: 557251091330
+DOB: 2011-07-08
+Location: None
+Description: Homeowner in Nashik seeking occasional maintenance help.
 -------------------------
 Name: Sneha Gupta
 Username: sneha_gupta_9990
-Aadhaar: 127233461172
 Password: Password@123
 Role: Job Provider
-Location: 19.872692204252772, 73.71881396288518
-Description: No description provided.
+Phone: 9830453502
+Aadhaar: 127233461172
+DOB: 1961-12-26
+Location: None
+Description: Homeowner in Nashik seeking occasional maintenance help.
 -------------------------
 Name: Kiran Gupta
 Username: kiran_gupta_3467
-Aadhaar: 158661584199
 Password: Password@123
 Role: Job Provider
-Location: 20.07581239114661, 73.74158199254128
-Description: No description provided.
+Phone: 9473951252
+Aadhaar: 158661584199
+DOB: 1979-10-04
+Location: None
+Description: Local business owner looking for reliable service professionals.
 -------------------------
 Name: Provider Final
 Username: prov_final_1
-Aadhaar: 123456789012
 Password: Password@123
 Role: Job Provider
+Phone: 9111222333
+Aadhaar: 123456789012
+DOB: 1961-01-14
 Location: None
 Description: No description provided.
 -------------------------
 Name: Worker Verif
 Username: worker_verif_new
-Aadhaar: 123123123123
 Password: Password@123
 Role: Worker
+Phone: 1231231234
+Aadhaar: 123123123123
+DOB: 1986-03-21
 Location: None
 Description: No description provided.
 -------------------------
 Name: Test Worker One
 Username: testw1
-Aadhaar: 123412341234
 Password: Password@123
 Role: Worker
+Phone: 9876543210
+Aadhaar: 123412341234
+DOB: 1986-03-18
 Location: None
 Description: No description provided.
 -------------------------
 Name: Test Provider One
 Username: testp1
-Aadhaar: 123412341235
 Password: Password@123
 Role: Job Provider
+Phone: 9876543211
+Aadhaar: 123412341235
+DOB: 1963-05-28
 Location: None
 Description: No description provided.
 -------------------------
 Name: Prash
 Username: prasad_kuyate
-Aadhaar: 468757657896
 Password: Password@123
 Role: Job Provider
+Phone: 9876577647
+Aadhaar: 468757657896
+DOB: 1997-02-23
 Location: None
 Description: No description provided.
 -------------------------

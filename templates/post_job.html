@@ -126,7 +126,7 @@
                     <span class="text-red-400">*</span>
                 </label>
                 <input type="text" id="title" name="title" value="{{ form_data.title|default:'' }}"
-                    placeholder="e.g. Fix kitchen plumbing leak"
+                    placeholder="e.g. Fix kitchen plumbing leak" minlength="5"
                     class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition"
                     required>
             </div>
@@ -136,7 +136,7 @@
                 <label for="description" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Description
                     <span class="text-red-400">*</span>
                 </label>
-                <textarea id="description" name="description" rows="4"
+                <textarea id="description" name="description" rows="4" minlength="20"
                     placeholder="Describe the work needed in detail — include specifics like room size, materials needed, urgency, etc."
                     class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition resize-none"
                     required>{{ form_data.description|default:'' }}</textarea>
@@ -153,7 +153,7 @@
                         <span
                             class="absolute inset-y-0 left-0 pl-4 flex items-center text-sm font-bold text-brandIcon">₹</span>
                         <input type="number" id="price" name="price" value="{{ form_data.price|default:'' }}"
-                            placeholder="e.g. 500" min="0" step="50"
+                            placeholder="e.g. 500" min="50" max="1000000" step="50"
                             class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
                     </div>
                     <p class="text-[11px] text-slate-400 mt-1 ml-1">You can negotiate with the worker later</p>
@@ -680,5 +680,16 @@
             input.removeAttribute('required');
         }
     }
+
+    // Set minimum datetime on scheduled_time to prevent past dates
+    (function () {
+        const dt = document.getElementById('scheduled_time');
+        if (dt) {
+            const now = new Date();
+            const pad = n => n.toString().padStart(2, '0');
+            const minDT = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + 'T' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+            dt.setAttribute('min', minDT);
+        }
+    })();
 </script>
 {% endblock %}

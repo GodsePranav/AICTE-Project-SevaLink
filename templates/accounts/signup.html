@@ -79,18 +79,15 @@
 
                 <!-- 1. Fields loop -->
                 <div class="space-y-3">
-                    {% for field in form %}
-                    {% if field.name != 'role' and field.name != 'profile_picture' %}
-                    <div>
+                    {% for field in form %}{% if field.name != 'role' and field.name != 'profile_picture' %}<div>
                         <label for="{{ field.id_for_label }}"
-                            class="block text-sm font-bold text-brandText mb-1.5 ml-1">{{ field.label }}</label>
+                            class="block text-sm font-bold text-brandText mb-1.5 ml-1">{{ field.label }}{% if field.field.required %} <span class="text-red-400">*</span>{% else %} <span
+                                class="text-slate-400 font-normal text-xs">(Optional)</span>{% endif %}</label>
                         {{ field }}
-                        {% if field.errors %}
-                        <p class="text-xs text-red-500 mt-1.5 font-semibold ml-1">{{ field.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                    {% endfor %}
+                        {% if field.help_text %}<p class="text-[11px] text-slate-400 mt-1 ml-1">{{ field.help_text }}
+                        </p>{% endif %}
+                        {% if field.errors %}<p class="text-xs text-red-500 mt-1.5 font-semibold ml-1">{{ field.errors.0 }}</p>{% endif %}
+                    </div>{% endif %}{% endfor %}
                 </div>
 
                 <!-- 2. Interactive Role Selection Cards -->
@@ -225,14 +222,34 @@
         }
     }
     document.addEventListener("DOMContentLoaded", function () {
-        // Style all standard text/email/password inputs
-        const textInputs = document.querySelectorAll('input[type="text"], input[type="password"], input[type="email"]');
+        // Style all standard text/email/password/tel/number inputs
+        const textInputs = document.querySelectorAll('input[type="text"], input[type="password"], input[type="email"], input[type="tel"], input[type="number"]');
         textInputs.forEach(input => {
             input.classList.add(
                 'w-full', 'bg-white/80', 'border', 'border-slate-200', 'rounded-xl',
                 'px-4', 'py-2.5', 'text-sm', 'font-medium', 'text-brandText',
                 'focus:outline-none', 'focus:ring-2', 'focus:ring-brandBlue/20', 'focus:border-brandBlue',
                 'transition-all', 'shadow-sm'
+            );
+        });
+
+        // Style date inputs (DOB)
+        document.querySelectorAll('input[type="date"], input[type="datetime-local"]').forEach(input => {
+            input.classList.add(
+                'w-full', 'bg-white/80', 'border', 'border-slate-200', 'rounded-xl',
+                'px-4', 'py-2.5', 'text-sm', 'font-semibold', 'text-brandText',
+                'focus:outline-none', 'focus:ring-2', 'focus:ring-brandBlue/20', 'focus:border-brandBlue',
+                'transition-all', 'shadow-sm', 'cursor-pointer'
+            );
+        });
+
+        // Style select dropdowns (Gender)
+        document.querySelectorAll('form select').forEach(sel => {
+            sel.classList.add(
+                'w-full', 'bg-white/80', 'border', 'border-slate-200', 'rounded-xl',
+                'px-4', 'py-2.5', 'text-sm', 'font-semibold', 'text-brandText',
+                'focus:outline-none', 'focus:ring-2', 'focus:ring-brandBlue/20', 'focus:border-brandBlue',
+                'transition-all', 'shadow-sm', 'cursor-pointer'
             );
         });
     });

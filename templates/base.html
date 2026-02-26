@@ -148,6 +148,64 @@
             background-color: #f1f5f9;
         }
 
+        /* ===== Global Date / DateTime Input Styling ===== */
+        input[type="date"],
+        input[type="datetime-local"] {
+            appearance: none;
+            -webkit-appearance: none;
+            background-color: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+
+        input[type="date"]:hover,
+        input[type="datetime-local"]:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+
+        input[type="date"]:focus,
+        input[type="datetime-local"]:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Style the empty/placeholder state */
+        input[type="date"]:invalid,
+        input[type="datetime-local"]:invalid {
+            color: #94a3b8;
+        }
+
+        /* Calendar icon color */
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            filter: invert(25%) sepia(60%) saturate(1200%) hue-rotate(200deg);
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator:hover,
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+
+        input[type="date"]:disabled,
+        input[type="datetime-local"]:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f1f5f9;
+        }
+
         /* Simple Mode Toggle Switch */
         .toggle-checkbox:checked {
             right: 0;
@@ -609,8 +667,7 @@
                     <div
                         class="absolute right-0 top-full mt-1 w-48 bg-white border border-brandBorder rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
                         <div class="p-4 border-b border-brandBorder bg-slate-50">
-                            <p class="text-sm font-bold text-brandText truncate">{{
-                                user.first_name|default:user.username }} {{ user.last_name }}</p>
+                            <p class="text-sm font-bold text-brandText truncate">{{ user.first_name|default:user.username }} {{ user.last_name }}</p>
                             <p class="text-xs text-brandIcon truncate mt-0.5">{{ user.profile.role|default:"User" }}</p>
                         </div>
                         <a href="{% url 'profile' %}"
@@ -742,7 +799,215 @@
     {% block extra_scripts %}{% endblock %}
 
     <script>
-        // Additional global scripts can go here
+        document.addEventListener('DOMContentLoaded', function () {
+            // ===== GLOBAL FIELD VALIDATION =====
+            const today = new Date();
+            const pad = n => n.toString().padStart(2, '0');
+            const todayStr = today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
+            const minDOB = (today.getFullYear() - 120) + '-01-01';
+            const nowDT = todayStr + 'T' + pad(today.getHours()) + ':' + pad(today.getMinutes());
+
+            // -- Date of Birth fields: min age based on role --
+            document.querySelectorAll('input[type="date"]').forEach(function (el) {
+                const name = el.name || el.id || '';
+                if (name.includes('date_of_birth') || name.includes('dob')) {
+                    el.setAttribute('max', todayStr);
+                    el.setAttribute('min', minDOB);
+
+                    const validateDOB = function () {
+                        if (!el.value) return;
+
+                        // Determine role if Radio exists, else assume provider context for general forms
+                        const roleInput = document.querySelector('input[name="role"]:checked');
+                        let role = roleInput ? roleInput.value : 'Job Provider';
+
+                        // If we are editing profile, the role might be static text or missing from DOM natively.
+                        // We use the strictest fallback (18) if we can't be sure, but usually we just enforce it on Signup.
+                        let minAge = 12; // Job Provider default
+                        if (role === 'Worker') minAge = 18;
+
+                        const maxDOB = (today.getFullYear() - minAge) + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
+
+                        if (el.value > todayStr) {
+                            showFieldError(el, 'Date of birth cannot be in the future.');
+                            el.value = '';
+                        } else if (el.value > maxDOB) {
+                            showFieldError(el, `You must be at least ${minAge} years old.`);
+                            el.value = '';
+                        } else {
+                            clearFieldError(el);
+                        }
+                    };
+
+                    el.addEventListener('change', validateDOB);
+
+                    // Also revalidate DOB if role changes
+                    document.querySelectorAll('input[name="role"]').forEach(r => {
+                        r.addEventListener('change', validateDOB);
+                    });
+                }
+            });
+
+            // -- Scheduled time fields: min=now --
+            document.querySelectorAll('input[type="datetime-local"]').forEach(function (el) {
+                el.setAttribute('min', nowDT);
+                el.addEventListener('change', function () {
+                    if (this.value && this.value < nowDT) {
+                        showFieldError(this, 'Date and time cannot be in the past.');
+                        this.value = '';
+                    } else {
+                        clearFieldError(this);
+                    }
+                });
+            });
+
+            // -- Phone number: digits only, exactly 10 --
+            document.querySelectorAll('input[name="phone_number"], input[name="phone"]').forEach(function (el) {
+                el.setAttribute('maxlength', '10');
+                el.setAttribute('inputmode', 'numeric');
+                el.addEventListener('input', function () {
+                    this.value = this.value.replace(/\D/g, '').slice(0, 10);
+                });
+                el.addEventListener('blur', function () {
+                    if (this.value && this.value.length !== 10) {
+                        showFieldError(this, 'Phone number must be exactly 10 digits.');
+                    } else { clearFieldError(this); }
+                });
+            });
+
+            // -- Aadhaar number: digits only, exactly 12 --
+            document.querySelectorAll('input[name="aadhaar_number"], input[name="aadhaar"]').forEach(function (el) {
+                el.setAttribute('maxlength', '12');
+                el.setAttribute('inputmode', 'numeric');
+                el.addEventListener('input', function () {
+                    this.value = this.value.replace(/\D/g, '').slice(0, 12);
+                });
+                el.addEventListener('blur', function () {
+                    if (this.value && this.value.length !== 12) {
+                        showFieldError(this, 'Aadhaar number must be exactly 12 digits.');
+                    } else { clearFieldError(this); }
+                });
+            });
+
+            // -- Full name: letters and spaces only, at least 2 words --
+            document.querySelectorAll('input[name="full_name"]').forEach(function (el) {
+                el.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+                });
+                el.addEventListener('blur', function () {
+                    var parts = this.value.trim().split(/\s+/);
+                    if (this.value && parts.length < 2) {
+                        showFieldError(this, 'Enter first and last name (at least 2 words).');
+                    } else { clearFieldError(this); }
+                });
+            });
+
+            // -- Username: valid chars only, 3-30 chars --
+            document.querySelectorAll('input[name="username"]').forEach(function (el) {
+                el.setAttribute('maxlength', '30');
+                el.setAttribute('minlength', '3');
+                el.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^\w.@+\-]/g, '');
+                });
+                el.addEventListener('blur', function () {
+                    if (this.value && this.value.length < 3) {
+                        showFieldError(this, 'Username must be at least 3 characters.');
+                    } else { clearFieldError(this); }
+                });
+            });
+
+            // -- Email: valid format --
+            document.querySelectorAll('input[type="email"], input[name="email"]').forEach(function (el) {
+                el.addEventListener('blur', function () {
+                    var emailRe = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+                    if (this.value && !emailRe.test(this.value)) {
+                        showFieldError(this, 'Please enter a valid email address.');
+                    } else { clearFieldError(this); }
+                });
+            });
+
+            // -- Budget / Price: min ₹50, multiple of 50, max 10L --
+            document.querySelectorAll('input[name="price"], input[name="budget"]').forEach(function (el) {
+                el.setAttribute('min', '50');
+                el.setAttribute('max', '1000000');
+                el.setAttribute('step', '50');
+                el.addEventListener('blur', function () {
+                    var val = parseFloat(this.value);
+                    if (!this.value) { clearFieldError(this); return; }
+                    if (isNaN(val) || val <= 0) {
+                        showFieldError(this, 'Budget must be greater than zero.');
+                        this.value = '';
+                    } else if (val < 50) {
+                        showFieldError(this, 'Minimum budget is ₹50.');
+                        this.value = '50';
+                    } else if (val % 50 !== 0) {
+                        var rounded = Math.round(val / 50) * 50;
+                        showFieldError(this, 'Budget must be a multiple of ₹50. Rounded to ₹' + rounded + '.');
+                        this.value = rounded;
+                    } else if (val > 1000000) {
+                        showFieldError(this, 'Maximum budget is ₹10,00,000.');
+                        this.value = '1000000';
+                    } else { clearFieldError(this); }
+                });
+            });
+
+            // -- Years experience: 0-60 --
+            document.querySelectorAll('input[name="years_experience"]').forEach(function (el) {
+                el.setAttribute('min', '0');
+                el.setAttribute('max', '60');
+                el.addEventListener('blur', function () {
+                    var val = parseInt(this.value);
+                    if (this.value && (isNaN(val) || val < 0 || val > 60)) {
+                        showFieldError(this, 'Experience must be between 0 and 60 years.');
+                    } else { clearFieldError(this); }
+                });
+            });
+
+            // -- Required selects: must pick a valid option --
+            document.querySelectorAll('form').forEach(function (form) {
+                form.addEventListener('submit', function (e) {
+                    var valid = true;
+                    // Check required fields
+                    form.querySelectorAll('[required]').forEach(function (el) {
+                        if (!el.value || !el.value.trim()) {
+                            showFieldError(el, 'This field is required.');
+                            valid = false;
+                        }
+                    });
+                    // Check minlength
+                    form.querySelectorAll('[minlength]').forEach(function (el) {
+                        var min = parseInt(el.getAttribute('minlength'));
+                        if (el.value && el.value.trim().length < min) {
+                            showFieldError(el, 'Minimum ' + min + ' characters required.');
+                            valid = false;
+                        }
+                    });
+                    if (!valid) {
+                        e.preventDefault();
+                        var firstErr = form.querySelector('.field-error-msg');
+                        if (firstErr) firstErr.previousElementSibling.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            });
+
+            // ===== Error display helpers =====
+            function showFieldError(el, msg) {
+                clearFieldError(el);
+                el.style.borderColor = '#ef4444';
+                el.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.12)';
+                var errEl = document.createElement('p');
+                errEl.className = 'field-error-msg';
+                errEl.style.cssText = 'color:#ef4444;font-size:11px;font-weight:700;margin-top:4px;margin-left:4px;';
+                errEl.textContent = msg;
+                el.parentNode.insertBefore(errEl, el.nextSibling);
+            }
+            function clearFieldError(el) {
+                el.style.borderColor = '';
+                el.style.boxShadow = '';
+                var existing = el.parentNode.querySelector('.field-error-msg');
+                if (existing) existing.remove();
+            }
+        });
     </script>
 </body>
 

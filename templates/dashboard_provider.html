@@ -1,6 +1,6 @@
-{%extends 'base.html' %}
+{% extends 'base.html' %}
 
-{%block content %}
+{% block content %}
 <div class="max-w-[1000px] mx-auto mt-4 pb-10 px-4">
     <!-- Header -->
     <div class="li-card p-6 mb-5">
@@ -18,7 +18,7 @@
                         class="px-4 py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-brandText transition">📊
                         Table</button>
                 </div>
-                <a href="{%url 'post_job_page' %}"
+                <a href="{% url 'post_job_page' %}"
                     class="bg-brandOrange text-white px-5 py-2.5 rounded-xl font-bold hover:bg-orange-600 transition shadow-md whitespace-nowrap">
                     + Post New Job
                 </a>
@@ -127,22 +127,22 @@
         {% endif %}
 
         <!-- Job Applications -->
-        {%if job_applications %}
+        {% if job_applications %}
         <div class="mb-6">
             <h2 class="text-lg font-bold text-brandText mb-3">Job Applications</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {%for app in job_applications %}
+                {% for app in job_applications %}
                 <div class="li-card p-4 flex flex-col border-l-4 border-brandBlue bg-white">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-brandBlue overflow-hidden">
-                                {%if app.worker.profile.profile_picture %}
+                                {% if app.worker.profile.profile_picture %}
                                 <img src="{{ app.worker.profile.profile_picture.url }}"
                                     class="w-full h-full object-cover">
-                                {%else %}
+                                {% else %}
                                 {{ app.worker.username|make_list|first|upper }}
-                                {%endif %}
+                                {% endif %}
                             </div>
                             <div>
                                 <p class="text-sm font-bold text-brandText">{{ app.worker.first_name|default:app.worker.username }} {{ app.worker.last_name }}</p>
@@ -153,33 +153,33 @@
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        <form method="POST" action="{%url 'respond_job_application' app.id %}" class="flex-1">
-                            {%csrf_token %}
+                        <form method="POST" action="{% url 'respond_job_application' app.id %}" class="flex-1">
+                            {% csrf_token %}
                             <input type="hidden" name="action" value="assign">
                             <button type="submit"
                                 class="w-full text-[11px] font-bold text-white bg-brandBlue px-3 py-1.5 rounded-lg hover:bg-blue-900 transition shadow-sm">Assign</button>
                         </form>
-                        <form method="POST" action="{%url 'respond_job_application' app.id %}" class="flex-1">
-                            {%csrf_token %}
+                        <form method="POST" action="{% url 'respond_job_application' app.id %}" class="flex-1">
+                            {% csrf_token %}
                             <input type="hidden" name="action" value="reject">
                             <button type="submit"
                                 class="w-full text-[11px] font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition border border-red-100">Reject</button>
                         </form>
-                        <a href="{%url 'inbox' %}?user={{ app.worker.id }}"
+                        <a href="{% url 'inbox' %}?user={{ app.worker.id }}"
                             class="text-[11px] font-bold text-brandText bg-slate-50 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition border border-slate-200">💬</a>
                     </div>
                 </div>
-                {%endfor %}
+                {% endfor %}
             </div>
         </div>
-        {%endif %}
+        {% endif %}
 
         <!-- Active Jobs -->
 
         <div class="mb-6">
             <h2 class="text-lg font-bold text-brandText mb-3">Active Jobs</h2>
             <div class="space-y-4">
-                {%for job in active_jobs %}
+                {% for job in active_jobs %}
                 <div class="li-card p-5 hover:shadow-md transition">
                     <div class="flex justify-between items-start">
                         <div class="flex-1 min-w-0 pr-4">
@@ -189,48 +189,48 @@
                             <p class="text-sm text-brandIcon line-clamp-2 mt-1 truncate whitespace-normal">{{ job.description }}</p>
                             <div class="flex items-center gap-3 mt-3 text-xs font-bold">
                                 <span class="bg-blue-50 text-brandBlue px-2 py-1 rounded-md">{{ job.status }}</span>
-                                {%if job.price %}<span class="text-slate-600">💰 ₹{{ job.price }}</span>{%endif %}
+                                {% if job.price %}<span class="text-slate-600">💰 ₹{{ job.price }}</span>{% endif %}
                                 <span class="text-slate-500 truncate">📍 {{ job.address }}</span>
                             </div>
                         </div>
-                        {%if job.worker %}
+                        {% if job.worker %}
                         <div class="text-right flex flex-col items-end shrink-0">
                             <span class="text-xs font-bold text-slate-500 mb-1">Assigned to:</span>
                             <div
                                 class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
                                 <div
                                     class="w-6 h-6 rounded-full bg-brandBlue/10 text-brandBlue text-xs font-bold flex items-center justify-center uppercase overflow-hidden">
-                                    {%if job.worker.profile.profile_picture %}
+                                    {% if job.worker.profile.profile_picture %}
                                     <img src="{{ job.worker.profile.profile_picture.url }}"
                                         class="w-full h-full object-cover">
-                                    {%else %}
+                                    {% else %}
                                     {{ job.worker.username|make_list|first }}
-                                    {%endif %}
+                                    {% endif %}
                                 </div>
                                 <span class="text-sm font-bold text-brandText shrink-0">
                                     {{ job.worker.first_name|default:job.worker.username }} {{ job.worker.last_name }}
                                 </span>
                             </div>
-                            <a href="{%url 'inbox' %}?user={{ job.worker.id }}"
+                            <a href="{% url 'inbox' %}?user={{ job.worker.id }}"
                                 class="mt-2 text-xs font-bold text-brandBlue hover:underline shrink-0">Message
                                 Worker</a>
                         </div>
-                        {%else %}
+                        {% else %}
                         <div class="text-right shrink-0">
                             <span
                                 class="inline-block bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap">⏳
                                 Waiting for a worker to accept</span>
                         </div>
-                        {%endif %}
+                        {% endif %}
                     </div>
                 </div>
-                {%empty %}
+                {% empty %}
                 <div class="li-card p-8 text-center bg-slate-50">
                     <p class="text-brandIcon font-bold mb-2">You have no active jobs.</p>
-                    <a href="{%url 'post_job_page' %}" class="text-brandBlue font-bold hover:underline">Post your first
+                    <a href="{% url 'post_job_page' %}" class="text-brandBlue font-bold hover:underline">Post your first
                         job</a>
                 </div>
-                {%endfor %}
+                {% endfor %}
             </div>
         </div>
 
@@ -238,7 +238,7 @@
         <div>
             <h2 class="text-lg font-bold text-brandText mb-3">Job History (Completed)</h2>
             <div class="space-y-4">
-                {%for job in completed_jobs %}
+                {% for job in completed_jobs %}
                 <div class="li-card p-5 bg-slate-50/50">
                     <div class="flex justify-between items-start">
                         <div>
@@ -253,33 +253,33 @@
                                 <span class="text-slate-500">Finished on {{ job.updated_at|date:"M d, Y h:i A" }}</span>
                             </div>
                         </div>
-                        {%if job.worker %}
+                        {% if job.worker %}
                         <div class="text-right flex flex-col items-end">
                             <span class="text-xs font-bold text-slate-500 mb-1">Completed by:</span>
                             <div
                                 class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
                                 <div
                                     class="w-6 h-6 rounded-full bg-brandBlue/10 text-brandBlue text-xs font-bold flex items-center justify-center uppercase overflow-hidden">
-                                    {%if job.worker.profile.profile_picture %}
+                                    {% if job.worker.profile.profile_picture %}
                                     <img src="{{ job.worker.profile.profile_picture.url }}"
                                         class="w-full h-full object-cover">
-                                    {%else %}
+                                    {% else %}
                                     {{ job.worker.username|make_list|first }}
-                                    {%endif %}
+                                    {% endif %}
                                 </div>
                                 <span class="text-sm font-bold text-brandText">
                                     {{ job.worker.first_name|default:job.worker.username }} {{ job.worker.last_name }}
                                 </span>
                             </div>
                         </div>
-                        {%endif %}
+                        {% endif %}
                     </div>
                 </div>
-                {%empty %}
+                {% empty %}
                 <div class="li-card p-8 text-center bg-transparent border border-dashed border-slate-300 shadow-none">
                     <p class="text-slate-400 font-bold">No completed jobs yet.</p>
                 </div>
-                {%endfor %}
+                {% endfor %}
             </div>
         </div>
     </div> <!-- Close cards-view -->

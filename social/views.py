@@ -7,6 +7,7 @@ from .models import Post, Job, Notification, ConnectionRequest
 from services.models import ServiceJob
 
 
+@login_required
 def home_view(request):
     if not request.user.is_authenticated:
         return render(request, 'home.html', {})
@@ -423,6 +424,7 @@ def business_view(request):
     return render(request, 'business.html', context)
 
 
+@login_required
 def test_login_view(request):
     from django.contrib.auth import get_user_model, login
     User = get_user_model()
