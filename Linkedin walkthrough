@@ -1,0 +1,43 @@
+# SevLink Transformation Walkthrough
+
+This document outlines the complete codebase pivot of the platform from a social network towards the "SevLink" Local Service Aggregator marketplace.
+
+We successfully maintained the existing Django project structure while entirely transforming the user experience and backend to facilitate real-time gig-economy features akin to Uber Tasker. 
+
+## Completed Objectives
+
+### 1. UI Upgrade (Deep Blue & Orange)
+* **Design Re-skin:** Completely overhauled the `base.html` and `home.html` templates to utilize a `Deep Blue (#1e3a8a)` and `Orange (#f97316)` color scheme. 
+* **Header & Navbar:** Replaced the generic logo with the new "SevLink" brand SVG. Navbar items were mapped to relevant features: Home, Find Workers, Post a Job, Nearby Map, Messages, Alerts, My Dash, and Profile.
+* **Component Revamp:** Added "Skill Quick Filters", "Simple Mode Toggle", and transformed the dashboard interface to highlight "Active Job Requests".
+
+### 2. User Role System
+* **Core Models:** Updated `accounts/models.py:Profile` with a new `role` field restricted to `['Worker', 'Job Provider', 'Both']`.
+* **Redirection Logic:** Implemented smart redirection inside `social/views.py:home_view` to route users to either the Provider or Worker dashboard paths automatically.
+
+### 3. Job Marketplace Backend
+* **Services App:** Generated a new Django application `services` to encapsulate all marketplace logic.
+* **ServiceJob Model:** Configured a robust job state machine transitioning through `Pending -> Accepted -> On the Way -> Arrived -> Completed -> Cancelled`.
+* **Marketplace API:** Developed endpoints in `services/views.py` granting Job Providers the ability to post jobs and rate workers, and allowing Workers to accept/reject and update job statuses.
+
+### 4. Real-Time Tracking Integration
+* **Haversine Utilities:** Created `utils.py` to calculate raw geographical distance and ETA.
+* **GPS Data Polling:** Added custom AJAX endpoints (`update_location` & `get_location`) for the background synchronization of the `JobTracking` model when the worker's status is `On the Way`. Updates are delayed if tracking stops via Arrived/Completed events.
+
+### 5. Nearby Exploratory Map
+* **Interactive Leaflet Map:** Developed a full-width `nearby_map.html` template. 
+* **Worker Cards:** Displayed dynamically sorted worker cards showcasing ratings, skills, and exact distance offsets computed via Javascript and coordinates in the Django context.
+
+### 6. Security Validations
+* Enforced rigid user flow access logic inside tracking view endpoints—preventing Job Providers from modifying Worker GPS coordinates and keeping Map queries contained to registered connections.
+
+## Deliverable Previews
+The UI feels incredibly premium and responsive to live actions. Here is a walkthrough of the new Application Landing Page:
+
+![Dashboard and Nav](C:\Users\Pranav\.gemini\antigravity\brain\6cf4ccc4-7c81-4feb-8ceb-b1787edb3bc3\.system_generated\click_feedback\click_feedback_1771762804737.png)
+
+*Recording of the live platform navigation:*
+![Platform Flow](C:\Users\Pranav\.gemini\antigravity\brain\6cf4ccc4-7c81-4feb-8ceb-b1787edb3bc3\verify_uber_like_marketplace_ui_1771762768804.webp)
+
+## Next Steps
+The transformation is complete on the server and front-end template layer. As a next evolutionary step, we recommend mapping robust React components to these Django templates if more advanced WebSocket states become necessary.

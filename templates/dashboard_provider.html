@@ -1,0 +1,300 @@
+{%extends 'base.html' %}
+
+{%block content %}
+<div class="max-w-[1000px] mx-auto mt-4 pb-10 px-4">
+    <!-- Header -->
+    <div class="li-card p-6 mb-5">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-extrabold text-brandText">Hiring Dashboard</h1>
+                <p class="text-sm text-brandIcon mt-1">Manage your posted jobs and hiring activity</p>
+            </div>
+            <a href="{%url 'post_job_page' %}"
+                class="bg-brandOrange text-white px-5 py-2.5 rounded-xl font-bold hover:bg-orange-600 transition shadow-md">
+                + Post New Job
+            </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-3 gap-4 mt-6">
+            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                <p class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-1">Active Jobs</p>
+                <p class="text-3xl font-black text-brandBlue">{{ active_jobs.count }}</p>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                <p class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-1">Completed</p>
+                <p class="text-3xl font-black text-brandOrange">{{ completed_jobs.count }}</p>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                <p class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-1">Total Posted</p>
+                <p class="text-3xl font-black text-brandText">{{ total_jobs_posted }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Invitations (Sent to Workers) -->
+    {% if service_requests %}
+    <div class="mb-6">
+        <h2 class="text-lg font-bold text-brandText mb-3">Task Invitations Sent</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for req in service_requests %}
+            <div
+                class="li-card p-4 flex flex-col border-l-4 {% if req.status == 'accepted' %}border-emerald-500 bg-emerald-50/20{% elif req.status == 'assigned' %}border-blue-500 bg-blue-50/10{% elif req.status == 'pending' %}border-amber-500 bg-amber-50/20{% else %}border-slate-300{% endif %}">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-brandBlue overflow-hidden shadow-sm">
+                            {% if req.worker.profile.profile_picture %}
+                            <img src="{{ req.worker.profile.profile_picture.url }}" class="w-full h-full object-cover">
+                            {% else %}
+                            {{ req.worker.username|make_list|first|upper }}
+                            {% endif %}
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-brandText">{{ req.worker.first_name|default:req.worker.username }} {{ req.worker.last_name }}</p>
+                            <p
+                                class="text-[10px] font-extrabold uppercase tracking-widest {% if req.status == 'pending' %}text-amber-600{% elif req.status == 'accepted' %}text-emerald-600{% elif req.status == 'assigned' %}text-blue-600{% else %}text-brandIcon{% endif %}">
+                                {{ req.status|upper }}
+                            </p>
+                            {% if req.job %}
+                            <p class="text-[9px] text-brandIcon font-bold truncate max-w-[150px]">Target: {{ req.job.title }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">{{ req.timestamp|timesince }} ago</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 items-center">
+                    {% if req.status == 'accepted' %}
+                    {% if not req.job %}
+                    <form onsubmit="assignWorker(event, this.job_id.value, this)" class="flex gap-2 flex-1">
+                        <input type="hidden" name="worker_id" value="{{ req.worker.id }}">
+                        <select name="job_id" required
+                            class="text-[11px] font-bold text-brandText bg-white border border-brandBorder px-2 py-1.5 rounded-lg focus:ring-1 focus:ring-brandBlue outline-none flex-1">
+                            <option value="" disabled selected>Select Job</option>
+                            {% for job in active_jobs %}
+                            {% if not job.worker %}
+                            <option value="{{ job.id }}">{{ job.title|truncatechars:15 }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                        <button type="submit"
+                            class="text-[11px] font-bold text-white bg-emerald-600 px-4 py-1.5 rounded-lg hover:bg-emerald-700 transition shadow-sm">Assign</button>
+                    </form>
+                    {% else %}
+                    <form onsubmit="assignWorker(event, '{{ req.job.id }}', this)" class="flex-1">
+                        <input type="hidden" name="worker_id" value="{{ req.worker.id }}">
+                        <button type="submit"
+                            class="w-full text-[11px] font-bold text-white bg-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition shadow-sm">Assign
+                            to "{{ req.job.title|truncatechars:10 }}"</button>
+                    </form>
+                    {% endif %}
+                    <a href="{% url 'inbox' %}?user={{ req.worker.id }}"
+                        class="text-[11px] font-bold text-brandBlue bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition border border-blue-100">💬</a>
+                    {% elif req.status == 'assigned' %}
+                    <a href="{% url 'inbox' %}?user={{ req.worker.id }}"
+                        class="w-full text-center text-[11px] font-bold text-brandBlue bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition">Message
+                        Worker</a>
+                    {% elif req.status == 'pending' %}
+                    <span
+                        class="w-full text-center text-[10px] font-bold text-amber-600 bg-amber-50 py-1.5 rounded-lg border border-amber-100">Waiting
+                        for Worker...</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Job Applications -->
+    {%if job_applications %}
+    <div class="mb-6">
+        <h2 class="text-lg font-bold text-brandText mb-3">Job Applications</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {%for app in job_applications %}
+            <div class="li-card p-4 flex flex-col border-l-4 border-brandBlue bg-white">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-brandBlue overflow-hidden">
+                            {%if app.worker.profile.profile_picture %}
+                            <img src="{{ app.worker.profile.profile_picture.url }}" class="w-full h-full object-cover">
+                            {%else %}
+                            {{ app.worker.username|make_list|first|upper }}
+                            {%endif %}
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-brandText">{{ app.worker.first_name|default:app.worker.username }} {{ app.worker.last_name }}</p>
+                            <p class="text-[10px] font-extrabold uppercase tracking-widest text-brandIcon">Applied for:
+                                {{ app.job.title|truncatechars:20 }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <form method="POST" action="{%url 'respond_job_application' app.id %}" class="flex-1">
+                        {%csrf_token %}
+                        <input type="hidden" name="action" value="assign">
+                        <button type="submit"
+                            class="w-full text-[11px] font-bold text-white bg-brandBlue px-3 py-1.5 rounded-lg hover:bg-blue-900 transition shadow-sm">Assign</button>
+                    </form>
+                    <form method="POST" action="{%url 'respond_job_application' app.id %}" class="flex-1">
+                        {%csrf_token %}
+                        <input type="hidden" name="action" value="reject">
+                        <button type="submit"
+                            class="w-full text-[11px] font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition border border-red-100">Reject</button>
+                    </form>
+                    <a href="{%url 'inbox' %}?user={{ app.worker.id }}"
+                        class="text-[11px] font-bold text-brandText bg-slate-50 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition border border-slate-200">💬</a>
+                </div>
+            </div>
+            {%endfor %}
+        </div>
+    </div>
+    {%endif %}
+
+    <!-- Active Jobs -->
+
+    <div class="mb-6">
+        <h2 class="text-lg font-bold text-brandText mb-3">Active Jobs</h2>
+        <div class="space-y-4">
+            {%for job in active_jobs %}
+            <div class="li-card p-5 hover:shadow-md transition">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1 min-w-0 pr-4">
+                        <h3 class="text-base font-bold text-brandText truncate">{{ job.title }}</h3>
+                        <p class="text-xs text-slate-500 mb-1">Posted on {{ job.created_at|date:"M d, Y" }} by You</p>
+                        <p class="text-sm text-brandIcon line-clamp-2 mt-1 truncate whitespace-normal">{{ job.description }}</p>
+                        <div class="flex items-center gap-3 mt-3 text-xs font-bold">
+                            <span class="bg-blue-50 text-brandBlue px-2 py-1 rounded-md">{{ job.status }}</span>
+                            {%if job.price %}<span class="text-slate-600">💰 ₹{{ job.price }}</span>{%endif %}
+                            <span class="text-slate-500 truncate">📍 {{ job.address }}</span>
+                        </div>
+                    </div>
+                    {%if job.worker %}
+                    <div class="text-right flex flex-col items-end shrink-0">
+                        <span class="text-xs font-bold text-slate-500 mb-1">Assigned to:</span>
+                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+                            <div
+                                class="w-6 h-6 rounded-full bg-brandBlue/10 text-brandBlue text-xs font-bold flex items-center justify-center uppercase overflow-hidden">
+                                {%if job.worker.profile.profile_picture %}
+                                <img src="{{ job.worker.profile.profile_picture.url }}"
+                                    class="w-full h-full object-cover">
+                                {%else %}
+                                {{ job.worker.username|make_list|first }}
+                                {%endif %}
+                            </div>
+                            <span class="text-sm font-bold text-brandText shrink-0">
+                                {{ job.worker.first_name|default:job.worker.username }} {{ job.worker.last_name }}
+                            </span>
+                        </div>
+                        <a href="{%url 'inbox' %}?user={{ job.worker.id }}"
+                            class="mt-2 text-xs font-bold text-brandBlue hover:underline shrink-0">Message Worker</a>
+                    </div>
+                    {%else %}
+                    <div class="text-right shrink-0">
+                        <span
+                            class="inline-block bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap">⏳
+                            Waiting for a worker to accept</span>
+                    </div>
+                    {%endif %}
+                </div>
+            </div>
+            {%empty %}
+            <div class="li-card p-8 text-center bg-slate-50">
+                <p class="text-brandIcon font-bold mb-2">You have no active jobs.</p>
+                <a href="{%url 'post_job_page' %}" class="text-brandBlue font-bold hover:underline">Post your first
+                    job</a>
+            </div>
+            {%endfor %}
+        </div>
+    </div>
+
+    <!-- Completed History -->
+    <div>
+        <h2 class="text-lg font-bold text-brandText mb-3">Job History (Completed)</h2>
+        <div class="space-y-4">
+            {%for job in completed_jobs %}
+            <div class="li-card p-5 bg-slate-50/50">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-base font-bold text-brandText line-through text-slate-500">{{ job.title }}</h3>
+                        <p class="text-xs text-slate-400 mb-1">Posted on {{ job.created_at|date:"M d, Y" }} by You</p>
+                        <div class="flex items-center gap-3 mt-2 text-xs font-bold">
+                            <span
+                                class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-1 rounded-md">✓
+                                Completed</span>
+                            <span class="text-slate-500">Finished on {{ job.updated_at|date:"M d, Y h:i A" }}</span>
+                        </div>
+                    </div>
+                    {%if job.worker %}
+                    <div class="text-right flex flex-col items-end">
+                        <span class="text-xs font-bold text-slate-500 mb-1">Completed by:</span>
+                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+                            <div
+                                class="w-6 h-6 rounded-full bg-brandBlue/10 text-brandBlue text-xs font-bold flex items-center justify-center uppercase overflow-hidden">
+                                {%if job.worker.profile.profile_picture %}
+                                <img src="{{ job.worker.profile.profile_picture.url }}"
+                                    class="w-full h-full object-cover">
+                                {%else %}
+                                {{ job.worker.username|make_list|first }}
+                                {%endif %}
+                            </div>
+                            <span class="text-sm font-bold text-brandText">
+                                {{ job.worker.first_name|default:job.worker.username }} {{ job.worker.last_name }}
+                            </span>
+                        </div>
+                    </div>
+                    {%endif %}
+                </div>
+            </div>
+            {%empty %}
+            <div class="li-card p-8 text-center bg-transparent border border-dashed border-slate-300 shadow-none">
+                <p class="text-slate-400 font-bold">No completed jobs yet.</p>
+            </div>
+            {%endfor %}
+        </div>
+    </div>
+</div>
+<script>
+    function assignWorker(event, jobId, form) {
+        event.preventDefault();
+        const workerId = form.worker_id.value;
+        if (!workerId) {
+            alert('Please select a worker first.');
+            return;
+        }
+
+        const btn = form.querySelector('button');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = 'Assigning...';
+
+        fetch(`/services/job/${jobId}/assign/${workerId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    location.reload();
+                } else {
+                    alert(data.error || 'Error assigning worker');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            })
+            .catch(e => {
+                console.error(e);
+                alert('Network error');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
+    }
+</script>
+{%endblock %}

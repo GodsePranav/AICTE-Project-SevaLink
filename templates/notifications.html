@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex flex-col md:flex-row gap-6 mt-4 pb-10 justify-center">
+    <!-- Sidebar -->
+    <aside class="w-full md:w-[250px] flex-shrink-0 flex flex-col gap-4">
+        <div class="li-card p-5">
+            <h2 class="font-bold text-base border-b border-brandBorder pb-3 mb-3 text-brandText">Manage Alerts</h2>
+            <button id="mark-all-read-btn" onclick="markAllRead()"
+                class="w-full bg-brandBlue text-white font-bold py-2.5 rounded-lg hover:bg-blue-900 transition text-xs shadow-sm">
+                ✓ Mark All as Read
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="w-full md:w-[680px] flex-shrink-0 flex flex-col gap-2">
+        <div id="notifications-container" class="li-card p-0">
+            {% for notif in notifications %}
+            <a href="{% url 'notification_redirect' notif.id %}"
+                class="notification-item p-4 border-b border-brandBorder hover:bg-slate-50 cursor-pointer flex gap-4 transition group {% if not notif.is_read %}bg-blue-50/50{% endif %}"
+                data-id="{{ notif.id }}">
+                <div
+                    class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center text-xl shadow-sm {% if notif.is_read %}bg-slate-100 border border-slate-200{% else %}bg-emerald-100 border border-emerald-200{% endif %}">
+                    🛠️
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-brandText group-hover:text-brandBlue transition">
+                        <span class="font-extrabold">{{ notif.actor }}</span> {{ notif.verb }}
+                        {% if notif.target %}{{ notif.target }}{% endif %}
+                    </p>
+                    <p class="text-xs font-semibold text-brandIcon mt-1">{{ notif.timestamp|timesince }} ago {% if not notif.is_read %}<span
+                            class="ml-2 bg-brandBlue text-white px-1.5 py-0.5 rounded text-[9px] font-bold">NEW</span>{% endif %}</p>
+                </div>
+            </a>
+            {% empty %}
+            <div class="p-12 text-center">
+                <div class="text-4xl mb-3">🔔</div>
+                <p class="text-base font-bold text-brandText mb-1">You're all caught up!</p>
+                <p class="text-sm text-brandIcon font-medium">No new alerts at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</div>
+
+<script>
+    function markAllRead() {
+        const btn = document.getElementById('mark-all-read-btn');
+        btn.disabled = true;
+        btn.textContent = 'Marking...';
+
+        fetch('{% url "mark_notifications_read" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    document.querySelectorAll('.notification-item').forEach(el => {
+                        el.classList.remove('bg-blue-50/50');
+                    });
+                    document.querySelectorAll('.notification-item span').forEach(el => {
+                        if (el.textContent === 'NEW') el.remove();
+                    });
+                    const badge = document.querySelector('a[href*="notifications"] span.bg-red-500');
+                    if (badge) badge.remove();
+                    btn.textContent = '✓ All Read';
+                    btn.classList.remove('bg-brandBlue', 'hover:bg-blue-900');
+                    btn.classList.add('bg-emerald-600');
+                }
+            })
+            .catch(() => {
+                btn.textContent = 'Error — retry';
+                btn.disabled = false;
+            });
+    }
+</script>
+{% endblock %}

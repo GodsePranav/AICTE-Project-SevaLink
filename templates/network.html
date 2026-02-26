@@ -1,0 +1,541 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_head %}
+<style>
+    .network-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: all .2s;
+        position: relative
+    }
+
+    .network-card:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, .08);
+        border-color: #c7d2fe;
+        transform: translateY(-2px)
+    }
+
+    .card-banner {
+        height: 56px;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #f97316 100%);
+        position: relative
+    }
+
+    .card-avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e3a8a;
+        background: #eff6ff;
+        margin: -36px auto 0;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+        overflow: hidden
+    }
+
+    .card-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover
+    }
+
+    .card-body {
+        padding: 8px 16px 16px;
+        text-align: center;
+        flex: 1;
+        display: flex;
+        flex-direction: column
+    }
+
+    .card-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-top: 8px;
+        line-height: 1.2
+    }
+
+    .card-role {
+        font-size: 12px;
+        font-weight: 600;
+        color: #f97316;
+        margin-top: 2px
+    }
+
+    .card-title {
+        font-size: 11px;
+        color: #64748b;
+        margin-top: 2px
+    }
+
+    .card-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-content: center;
+        margin-top: 8px
+    }
+
+    .card-skill {
+        background: #f1f5f9;
+        color: #334155;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 20px
+    }
+
+    .card-status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        margin-top: 8px;
+        font-size: 11px;
+        font-weight: 700
+    }
+
+    .card-status .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block
+    }
+
+    .card-actions {
+        margin-top: auto;
+        padding-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px
+    }
+
+    .btn-connect {
+        width: 100%;
+        padding: 8px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+        border: 2px solid #1e3a8a;
+        color: #1e3a8a;
+        background: transparent;
+        cursor: pointer;
+        transition: all .2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px
+    }
+
+    .btn-connect:hover {
+        background: #1e3a8a;
+        color: #fff
+    }
+
+    .btn-connected {
+        width: 100%;
+        padding: 8px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+        border: 2px solid #10b981;
+        color: #10b981;
+        background: #ecfdf5;
+        cursor: default
+    }
+
+    .btn-pending {
+        width: 100%;
+        padding: 8px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+        border: 2px solid #f59e0b;
+        color: #f59e0b;
+        background: #fffbeb;
+        cursor: default
+    }
+
+    .btn-message {
+        width: 100%;
+        padding: 7px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        border: 1px solid #e2e8f0;
+        color: #1e3a8a;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: all .2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        text-decoration: none
+    }
+
+    .btn-message:hover {
+        background: #1e3a8a;
+        color: #fff;
+        border-color: #1e3a8a
+    }
+
+    .btn-accept {
+        padding: 7px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        border: none;
+        color: #fff;
+        background: #1e3a8a;
+        cursor: pointer;
+        transition: all .15s;
+        flex: 1
+    }
+
+    .btn-accept:hover {
+        background: #1e40af
+    }
+
+    .btn-reject {
+        padding: 7px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+        background: #fff;
+        cursor: pointer;
+        transition: all .15s;
+        flex: 1
+    }
+
+    .btn-reject:hover {
+        background: #fef2f2;
+        color: #ef4444;
+        border-color: #fca5a5
+    }
+
+    .btn-withdraw {
+        width: 100%;
+        padding: 8px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+        border: 2px solid #fee2e2;
+        color: #ef4444;
+        background: transparent;
+        cursor: pointer;
+        transition: all .2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        margin-top: 4px;
+    }
+
+    .btn-withdraw:hover {
+        background: #fee2e2;
+    }
+
+    .tab-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 700;
+        border: none;
+        background: transparent;
+        color: #64748b;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all .2s
+    }
+
+    .tab-btn:hover {
+        color: #1e3a8a
+    }
+
+    .tab-btn.active {
+        color: #1e3a8a;
+        border-bottom-color: #f97316
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1100px] mx-auto mt-4 pb-10 px-4">
+    <!-- Search Bar -->
+    <div class="li-card p-4 mb-5">
+        <div class="flex items-center gap-3">
+            <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="w-4 h-4 text-brandIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <input type="text" id="live-search" autocomplete="off" placeholder="Search by name, skill, or role..."
+                    class="w-full pl-10 pr-10 py-2.5 rounded-lg border border-brandBorder text-sm focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue outline-none transition">
+                <button type="button" id="clear-search"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-brandIcon hover:text-red-500 transition hidden"
+                    onclick="document.getElementById('live-search').value='';filterCards();this.classList.add('hidden')">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <span id="search-count"
+                class="text-xs font-bold text-brandIcon bg-slate-100 px-3 py-1.5 rounded-full whitespace-nowrap"></span>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="li-card mb-5 flex border-b-0 overflow-hidden">
+        <a href="{% url 'network' %}?tab=all{% if search_query %}&q={{ search_query }}{% endif %}"
+            class="tab-btn {% if active_tab == 'all' %}active{% endif %}">All People</a>
+        <a href="{% url 'network' %}?tab=connections{% if search_query %}&q={{ search_query }}{% endif %}"
+            class="tab-btn {% if active_tab == 'connections' %}active{% endif %}">
+            My Connections ({{ connection_count }})
+        </a>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-4">
+            <h1 class="text-xl font-bold text-brandText">
+                {% if search_query %}
+                Results for "{{ search_query }}"
+                {% elif active_tab == 'connections' %}
+                My Connections
+                {% else %}
+                People on SevaLink
+                {% endif %}
+            </h1>
+        </div>
+        <span class="text-sm text-brandIcon font-semibold">{{ display_users|length }} people</span>
+    </div>
+
+    <!-- Incoming Requests (only on All tab) -->
+    {% if incoming_requests and active_tab == 'all' %}
+    <div class="li-card p-4 mb-5">
+        <h2 class="font-bold text-sm text-brandText mb-3 flex items-center gap-2">
+            <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            Pending Invitations ({{ incoming_requests|length }})
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {% for req in incoming_requests %}
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-amber-50/50 border border-amber-100"
+                id="req-{{ req.from_user.id }}">
+                <div
+                    class="w-12 h-12 rounded-full bg-brandBlue/10 text-brandBlue font-bold flex items-center justify-center text-lg uppercase flex-shrink-0 overflow-hidden">
+                    {% if req.from_user.profile.profile_picture %}
+                    <img src="{{ req.from_user.profile.profile_picture.url }}" class="w-full h-full object-cover">
+                    {% else %}
+                    {{ req.from_user.username|make_list|first }}
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-brandText truncate">
+                        {{ req.from_user.first_name|default:req.from_user.username }} {{ req.from_user.last_name }}
+                    </p>
+                    <p class="text-[11px] text-brandIcon font-semibold">
+                        {{ req.from_user.profile.role|default:"User" }}
+                    </p>
+                </div>
+                <div class="flex gap-1.5">
+                    <button onclick="acceptConnection({{ req.from_user.id }})" class="btn-accept">Accept</button>
+                    <button onclick="rejectConnection({{ req.from_user.id }})" class="btn-reject">Ignore</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Profile Cards Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for item in display_users %}
+        <div class="network-card" id="user-card-{{ item.user.id }}">
+            <div class="card-banner"></div>
+            <div class="card-avatar">
+                {% if item.profile.profile_picture %}
+                <img src="{{ item.profile.profile_picture.url }}" alt="{{ item.user.username }}">
+                {% else %}
+                {{ item.user.username|make_list|first|upper }}
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <a href="{% url 'user_profile' item.user.id %}"
+                    class="card-name hover:text-brandBlue hover:underline transition-colors">
+                    {{ item.user.first_name|default:item.user.username }} {{ item.user.last_name }}
+                </a>
+                <p class="card-role">{{ item.profile.role }}</p>
+                {% if item.profile.job_title %}<p class="card-title">{{ item.profile.job_title }}</p>{% endif %}
+                {% if item.profile.service_skills %}
+                <div class="card-skills">
+                    {% for skill in item.profile.service_skills_list %}{% if forloop.counter <= 3 %}<span
+                        class="card-skill">{{ skill }}</span>{% endif %}{% endfor %}
+                </div>
+                {% endif %}
+                <div class="card-status">
+                    {% if item.profile.is_available %}
+                    <span class="dot" style="background:#10b981"></span><span style="color:#10b981">Available</span>
+                    {% else %}
+                    <span class="dot" style="background:#94a3b8"></span><span style="color:#94a3b8">Busy</span>
+                    {% endif %}
+                    {% if item.profile.is_verified %}
+                    <span style="color:#3b82f6;margin-left:4px">✓ Verified</span>
+                    {% endif %}
+                </div>
+                <div class="card-actions" id="conn-actions-{{ item.user.id }}">
+                    {% if item.connection_status == 'connected' %}
+                    <button class="btn-connected">✓ Connected</button>
+                    <a href="{% url 'inbox' %}?user={{ item.user.id }}" class="btn-message">💬 Message</a>
+                    {% elif item.connection_status == 'pending_sent' %}
+                    <button class="btn-pending">⏳ Pending</button>
+                    <button onclick="cancelConnection({{ item.user.id }})" class="btn-withdraw">Withdraw</button>
+                    {% elif item.connection_status == 'pending_received' %}
+                    <div class="flex gap-2"><button onclick="acceptConnection({{ item.user.id }})"
+                            class="btn-accept">Accept</button><button onclick="rejectConnection({{ item.user.id }})"
+                            class="btn-reject">Ignore</button></div>
+                    {% else %}
+                    <button onclick="sendConnection({{ item.user.id }})" class="btn-connect">+ Connect</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="col-span-full text-center py-16" id="empty-state"
+        style="display:{% if display_users %}none{% else %}block{% endif %};">
+        <div class="text-5xl mb-4">
+            {% if active_tab == 'connections' %}🤝{% else %}👥{% endif %}
+        </div>
+        <p class="text-lg font-bold text-brandText mb-1">
+            {% if active_tab == 'connections' %}No connections yet{% else %}No people found{% endif %}
+        </p>
+        <p class="text-sm text-brandIcon">
+            {% if active_tab == 'connections' %}Connect with people on SevaLink to see them here.{% else %}No other
+            users
+            on SevaLink yet.{% endif %}
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Live search filter
+    function filterCards() {
+        const query = document.getElementById('live-search').value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.network-card');
+        const clearBtn = document.getElementById('clear-search');
+        const countEl = document.getElementById('search-count');
+        let visible = 0;
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            const match = !query || text.includes(query);
+            card.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+        clearBtn.classList.toggle('hidden', !query);
+        countEl.textContent = query ? visible + ' found' : cards.length + ' people';
+        // Show/hide empty state
+        const emptyState = document.getElementById('empty-state');
+        if (emptyState) emptyState.style.display = (visible === 0 && query) ? '' : 'none';
+    }
+    document.getElementById('live-search').addEventListener('input', filterCards);
+    window.addEventListener('load', filterCards);
+
+    function getCookie(name) {
+        let v = null;
+        if (document.cookie && document.cookie !== '') {
+            document.cookie.split(';').forEach(c => { c = c.trim(); if (c.startsWith(name + '=')) v = decodeURIComponent(c.substring(name.length + 1)); });
+        }
+        return v;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    function sendConnection(userId) {
+        const actions = document.getElementById('conn-actions-' + userId);
+        actions.innerHTML = '<button class="btn-pending">Sending...</button>';
+        fetch('/connect/' + userId + '/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+            .then(r => r.json())
+            .then(data => {
+                if (data.result === 'connected') {
+                    actions.innerHTML = '<button class="btn-connected">✓ Connected</button><a href="/messages/" class="btn-message">💬 Message</a>';
+                } else if (data.result === 'pending_sent') {
+                    actions.innerHTML = '<button class="btn-pending">⏳ Pending</button>';
+                }
+            })
+            .catch(() => { actions.innerHTML = '<button onclick="sendConnection(' + userId + ')" class="btn-connect">+ Connect</button>'; });
+    }
+
+    function updateConnectionCount(delta) {
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(tab => {
+            if (tab.textContent.includes('My Connections')) {
+                const match = tab.textContent.match(/\((\d+)\)/);
+                if (match) {
+                    const newCount = Math.max(0, parseInt(match[1]) + delta);
+                    tab.textContent = `My Connections (${newCount})`;
+                }
+            }
+        });
+    }
+
+    function acceptConnection(userId) {
+        fetch('/connect/' + userId + '/accept/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+            .then(r => r.json())
+            .then(data => {
+                if (data.result === 'connected') {
+                    const actions = document.getElementById('conn-actions-' + userId);
+                    if (actions) actions.innerHTML = '<button class="btn-connected">✓ Connected</button><a href="/messages/" class="btn-message">💬 Message</a>';
+                    const req = document.getElementById('req-' + userId);
+                    if (req) req.remove();
+                    updateConnectionCount(1);
+                }
+            });
+    }
+
+    function rejectConnection(userId) {
+        fetch('/connect/' + userId + '/reject/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+            .then(r => r.json())
+            .then(data => {
+                if (data.result === 'rejected') {
+                    const req = document.getElementById('req-' + userId);
+                    if (req) req.remove();
+                    const actions = document.getElementById('conn-actions-' + userId);
+                    if (actions) actions.innerHTML = '<button onclick="sendConnection(' + userId + ')" class="btn-connect">+ Connect</button>';
+                }
+            });
+    }
+
+    function cancelConnection(userId) {
+        const actions = document.getElementById('conn-actions-' + userId);
+        actions.innerHTML = '<button class="btn-pending">Canceling...</button>';
+        fetch('/connect/' + userId + '/cancel/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' } })
+            .then(r => r.json())
+            .then(data => {
+                if (data.result === 'cancelled') {
+                    if (actions) actions.innerHTML = '<button onclick="sendConnection(' + userId + ')" class="btn-connect">+ Connect</button>';
+                }
+            })
+            .catch(() => {
+                // Ignore silent failure, just let it stay showing pending/cancel
+            });
+    }
+</script>
+{% endblock %}

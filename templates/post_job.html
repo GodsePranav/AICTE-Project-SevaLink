@@ -1,0 +1,674 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<style>
+    #location-map {
+        height: 300px;
+        border-radius: 12px;
+        z-index: 10;
+        cursor: crosshair;
+    }
+
+    .leaflet-popup-content-wrapper {
+        border-radius: 10px;
+        font-family: inherit;
+    }
+
+    .pin-marker {
+        background: #f97316;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .search-results .result-item {
+        padding: 10px 14px;
+        cursor: pointer;
+        font-size: 13px;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+        transition: background 0.15s;
+    }
+
+    .search-results .result-item:hover {
+        background: #f8fafc;
+        color: #1e3a8a;
+    }
+
+    .search-results .result-item:last-child {
+        border-bottom: none;
+    }
+
+    .location-error {
+        animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-5px);
+        }
+
+        75% {
+            transform: translateX(5px);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-8">
+
+    <!-- Page Header -->
+    <div class="text-center mb-8">
+        <div
+            class="mx-auto w-14 h-14 bg-gradient-to-br from-brandBlue to-blue-700 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+        <h1 class="text-2xl font-extrabold text-brandText">Post a New Job</h1>
+        <p class="text-sm text-brandIcon font-medium mt-1">Describe what you need done and find skilled workers nearby
+        </p>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    {% for message in messages %}
+    <div
+        class="mb-6 p-4 rounded-xl text-sm font-semibold {% if message.tags == 'error' %}bg-red-50 text-red-600 border border-red-100{% else %}bg-emerald-50 text-emerald-600 border border-emerald-100{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Job Posting Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <form method="POST" action="{% url 'post_job_page' %}" id="post-job-form" class="p-6 sm:p-8 space-y-6">
+            {% csrf_token %}
+
+            <!-- Job Title -->
+            <div>
+                <label for="title" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Job Title
+                    <span class="text-red-400">*</span>
+                </label>
+                <input type="text" id="title" name="title" value="{{ form_data.title|default:'' }}"
+                    placeholder="e.g. Fix kitchen plumbing leak"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition"
+                    required>
+            </div>
+
+            <!-- Job Description -->
+            <div>
+                <label for="description" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Description
+                    <span class="text-red-400">*</span>
+                </label>
+                <textarea id="description" name="description" rows="4"
+                    placeholder="Describe the work needed in detail — include specifics like room size, materials needed, urgency, etc."
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition resize-none"
+                    required>{{ form_data.description|default:'' }}</textarea>
+            </div>
+
+            <!-- Budget & Category Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Budget -->
+                <div>
+                    <label for="price" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Budget (₹)
+                        <span class="text-slate-400 font-medium">— optional</span>
+                    </label>
+                    <div class="relative">
+                        <span
+                            class="absolute inset-y-0 left-0 pl-4 flex items-center text-sm font-bold text-brandIcon">₹</span>
+                        <input type="number" id="price" name="price" value="{{ form_data.price|default:'' }}"
+                            placeholder="e.g. 500" min="0" step="50"
+                            class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1 ml-1">You can negotiate with the worker later</p>
+                </div>
+                <!-- Job Category -->
+                <div>
+                    <label for="job_category" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Job
+                        Category</label>
+                    <select id="job_category" name="job_category" onchange="toggleOtherCategory()"
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
+                        <option value="">Select a category</option>
+                        <option value="Plumbing" {% if form_data.job_category == 'Plumbing' %}selected{% endif %}>🔧
+                            Plumbing</option>
+                        <option value="Electrical" {% if form_data.job_category == 'Electrical' %}selected{% endif %}>⚡
+                            Electrical</option>
+                        <option value="Carpentry" {% if form_data.job_category == 'Carpentry' %}selected{% endif %}>🪚
+                            Carpentry</option>
+                        <option value="Mechanic" {% if form_data.job_category == 'Mechanic' %}selected{% endif %}>🔩
+                            Mechanic</option>
+                        <option value="Housekeeping" {% if form_data.job_category == 'Housekeeping' %}selected{% endif %}>
+                            🧹 Housekeeping</option>
+                        <option value="Guard" {% if form_data.job_category == 'Guard' %}selected{% endif %}>🛡️ Guard /
+                            Security</option>
+                        <option value="Packing" {% if form_data.job_category == 'Packing' %}selected{% endif %}>📦 Packing
+                            / Moving</option>
+                        <option value="AC Repair" {% if form_data.job_category == 'AC Repair' %}selected{% endif %}>❄️ AC
+                            Repair</option>
+                        <option value="Painting" {% if form_data.job_category == 'Painting' %}selected{% endif %}>🎨
+                            Painting</option>
+                        <option value="Other" {% if form_data.job_category == 'Other' %}selected{% endif %}>📋 Other
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Other Category Name (Hidden by default) -->
+            <div id="other_category_container" class="{% if form_data.job_category != 'Other' %}hidden{% endif %}">
+                <label for="other_category_name" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Custom
+                    Category Name
+                    <span class="text-red-400">*</span>
+                </label>
+                <input type="text" id="other_category_name" name="other_category_name"
+                    value="{{ form_data.other_category_name|default:'' }}"
+                    placeholder="e.g. Deep Cleaning, Pool Maintenance"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
+                <p class="text-[11px] text-slate-400 mt-1 ml-1">Specify the exact service type if not in the list above
+                </p>
+            </div>
+            <div>
+                <label for="address" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Address
+                    <span class="text-slate-400 font-medium">— auto-filled from map or enter manually</span>
+                </label>
+                <input type="text" id="address" name="address" value="{{ form_data.address|default:'' }}"
+                    placeholder="e.g. 12 MG Road, Andheri West, Mumbai 400058"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
+            </div>
+
+            <!-- Scheduled Time -->
+            <div>
+                <label for="scheduled_time" class="block text-sm font-bold text-brandText mb-1.5 ml-1">When do you need
+                    this done?
+                    <span class="text-slate-400 font-medium">— leave empty for ASAP</span>
+                </label>
+                <div class="flex gap-3 items-center">
+                    <input type="datetime-local" id="scheduled_time" name="scheduled_time"
+                        value="{{ form_data.scheduled_time|default:'' }}"
+                        class="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
+                    <button type="button" onclick="document.getElementById('scheduled_time').value=''"
+                        class="px-4 py-3 rounded-xl border border-slate-200 bg-white text-xs font-bold text-brandIcon hover:text-brandBlue hover:border-brandBlue transition whitespace-nowrap">
+                        ⚡ ASAP
+                    </button>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1.5 ml-1">Leave empty if you need the service right now</p>
+            </div>
+
+            <!-- Location Section with Map -->
+            <div class="bg-slate-50 rounded-xl p-5 border border-slate-100" id="location-section">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h3 class="text-sm font-bold text-brandText flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-brandOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Job Location <span class="text-red-400 text-xs">*</span>
+                        </h3>
+                        <p class="text-xs text-brandIcon mt-0.5 ml-5.5">Search, click the map, or use GPS</p>
+                    </div>
+                    <button type="button" id="detect-location-btn"
+                        class="text-xs font-bold text-white bg-brandBlue hover:bg-blue-900 px-4 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Use My GPS
+                    </button>
+                </div>
+
+                <!-- Search Box -->
+                <div class="relative mb-3">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" id="location-search"
+                            placeholder="Search for an address, city, or landmark..." autocomplete="off"
+                            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
+                    </div>
+                    <div id="search-results" class="search-results hidden"></div>
+                </div>
+
+                <!-- GPS Error Message -->
+                <div id="gps-error"
+                    class="hidden mb-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs overflow-hidden">
+                    <div class="p-4">
+                        <div class="flex items-start gap-2 font-semibold">
+                            <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z">
+                                </path>
+                            </svg>
+                            <span id="gps-error-text">GPS detection failed.</span>
+                        </div>
+                    </div>
+                    <div id="gps-reset-instructions" class="hidden border-t border-amber-200 bg-amber-50/50 p-4">
+                        <p class="font-bold text-amber-900 text-[13px] mb-3">📍 Location permission was previously
+                            blocked. To re-enable:</p>
+                        <div class="flex items-start gap-4">
+                            <div class="flex-1 space-y-2 text-amber-700">
+                                <div class="flex items-start gap-2">
+                                    <span
+                                        class="flex-shrink-0 w-5 h-5 rounded-full bg-amber-200 text-amber-800 font-bold flex items-center justify-center text-[10px]">1</span>
+                                    <span>Click the <strong>🔒 lock / ⓘ icon</strong> in your address bar (top-left,
+                                        next to the URL)</span>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <span
+                                        class="flex-shrink-0 w-5 h-5 rounded-full bg-amber-200 text-amber-800 font-bold flex items-center justify-center text-[10px]">2</span>
+                                    <span>Click <strong>"Site settings"</strong> or find <strong>"Location"</strong> →
+                                        change to <strong>"Allow"</strong></span>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <span
+                                        class="flex-shrink-0 w-5 h-5 rounded-full bg-amber-200 text-amber-800 font-bold flex items-center justify-center text-[10px]">3</span>
+                                    <span>Come back to this tab and click <strong>"Use My GPS"</strong> again</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button type="button" onclick="window.location.reload()"
+                                class="bg-amber-600 text-white font-bold px-4 py-2 rounded-lg text-xs hover:bg-amber-700 transition flex items-center gap-1.5">
+                                🔄 Reload Page & Retry
+                            </button>
+                            <button type="button"
+                                onclick="window.open(window.location.href, '_blank', 'width=800,height=700')"
+                                class="bg-white border border-amber-300 text-amber-800 font-bold px-4 py-2 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5">
+                                🪟 Try in New Window
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-amber-400 mt-3">💡 Alternatively, just search for your address or
+                            click directly on the map below</p>
+                    </div>
+                </div>
+
+                <!-- Interactive Map -->
+                <div id="location-map" class="w-full border border-slate-200 overflow-hidden shadow-sm"></div>
+
+                <!-- Map Help -->
+                <p class="text-[10px] text-slate-400 mt-2 ml-1">💡 Click anywhere on the map to set location • Drag the
+                    marker to adjust</p>
+
+                <!-- Hidden lat/lon -->
+                <input type="hidden" id="lat" name="lat" value="{{ form_data.lat|default:'0' }}">
+                <input type="hidden" id="lon" name="lon" value="{{ form_data.lon|default:'0' }}">
+
+                <!-- Location Status -->
+                <div id="location-status" class="hidden mt-3 p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                            <span class="text-xs font-bold text-emerald-700">Location Set</span>
+                        </div>
+                        <button type="button" onclick="clearLocation()"
+                            class="text-xs font-semibold text-slate-400 hover:text-red-500 transition">✕ Clear</button>
+                    </div>
+                    <p id="location-address" class="text-xs text-emerald-600 mt-1 ml-[18px]"></p>
+                    <p id="location-coords" class="text-[10px] text-emerald-500 mt-0.5 ml-[18px]"></p>
+                </div>
+
+                <!-- Location Validation Error -->
+                <div id="location-validation-error"
+                    class="hidden mt-2 text-xs font-semibold text-red-500 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Please set the job location before posting
+                </div>
+            </div>
+
+            <!-- Submit Area -->
+            <div class="flex items-center justify-between pt-2">
+                <a href="{% url 'home' %}" class="text-sm font-bold text-brandIcon hover:text-brandText transition">←
+                    Back to Dashboard</a>
+                <button type="submit" id="submit-btn"
+                    class="bg-brandBlue hover:bg-blue-900 text-white font-bold px-8 py-3 rounded-xl shadow-sm transition-all hover:shadow-md active:scale-[0.98] flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                    Post Job
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    // ===== MAP SETUP =====
+    const prevLat = parseFloat(document.getElementById('lat').value) || 0;
+    const prevLon = parseFloat(document.getElementById('lon').value) || 0;
+    const hasPos = prevLat !== 0 && prevLon !== 0;
+
+    // Default: India center
+    const defaultCenter = [20.5937, 78.9629];
+    const defaultZoom = 5;
+
+    let locationMap = L.map('location-map', {
+        center: hasPos ? [prevLat, prevLon] : defaultCenter,
+        zoom: hasPos ? 15 : defaultZoom,
+        zoomControl: true,
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        maxZoom: 19
+    }).addTo(locationMap);
+
+    const pinIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: "<div class='pin-marker' style='width:22px;height:22px'></div>",
+        iconSize: [22, 22],
+        iconAnchor: [11, 11]
+    });
+
+    let marker = null;
+    let searchTimeout = null;
+
+    // If form already has lat/lon, show existing marker
+    if (hasPos) {
+        marker = L.marker([prevLat, prevLon], { icon: pinIcon, draggable: true }).addTo(locationMap);
+        setupDrag(marker);
+        reverseGeocode(prevLat, prevLon);
+    }
+
+    // ===== CLICK MAP TO SET LOCATION =====
+    locationMap.on('click', function (e) {
+        setLocation(e.latlng.lat, e.latlng.lng);
+        reverseGeocode(e.latlng.lat, e.latlng.lng);
+    });
+
+    function setLocation(lat, lng) {
+        if (marker) {
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng], { icon: pinIcon, draggable: true }).addTo(locationMap);
+            setupDrag(marker);
+        }
+
+        document.getElementById('lat').value = lat.toFixed(6);
+        document.getElementById('lon').value = lng.toFixed(6);
+        document.getElementById('location-coords').textContent = `${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`;
+
+        // Show status, hide errors
+        document.getElementById('location-status').classList.remove('hidden');
+        document.getElementById('location-validation-error').classList.add('hidden');
+        document.getElementById('gps-error').classList.add('hidden');
+    }
+
+    function clearLocation() {
+        if (marker) {
+            locationMap.removeLayer(marker);
+            marker = null;
+        }
+        document.getElementById('lat').value = '0';
+        document.getElementById('lon').value = '0';
+        document.getElementById('location-status').classList.add('hidden');
+        document.getElementById('location-address').textContent = '';
+        document.getElementById('location-coords').textContent = '';
+        locationMap.setView(defaultCenter, defaultZoom);
+    }
+
+    function setupDrag(m) {
+        m.on('dragend', function (e) {
+            const pos = e.target.getLatLng();
+            document.getElementById('lat').value = pos.lat.toFixed(6);
+            document.getElementById('lon').value = pos.lng.toFixed(6);
+            document.getElementById('location-coords').textContent = `${pos.lat.toFixed(4)}°N, ${pos.lng.toFixed(4)}°E`;
+            reverseGeocode(pos.lat, pos.lng);
+        });
+    }
+
+    // ===== REVERSE GEOCODE (lat/lng → address) =====
+    function reverseGeocode(lat, lng) {
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+            headers: { 'Accept-Language': 'en' }
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.display_name) {
+                    document.getElementById('location-address').textContent = '📍 ' + data.display_name;
+                    // Auto-fill the address input field
+                    const addressInput = document.getElementById('address');
+                    if (addressInput && !addressInput.value) {
+                        addressInput.value = data.display_name;
+                    }
+                }
+            })
+            .catch(() => {
+                document.getElementById('location-address').textContent = `📍 Location set at ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            });
+    }
+
+    // ===== GPS DETECTION =====
+    document.getElementById('detect-location-btn').addEventListener('click', async function () {
+        const btn = this;
+        const gpsError = document.getElementById('gps-error');
+        const errorText = document.getElementById('gps-error-text');
+        const resetInstructions = document.getElementById('gps-reset-instructions');
+
+        btn.disabled = true;
+        btn.innerHTML = '<svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Detecting...';
+        gpsError.classList.add('hidden');
+        resetInstructions.classList.add('hidden');
+
+        if (!navigator.geolocation) {
+            gpsError.classList.remove('hidden');
+            errorText.textContent = 'Your browser does not support GPS. Please search for your address or click the map.';
+            resetGPSButton(btn);
+            return;
+        }
+
+        // Check permission state BEFORE requesting (if Permissions API available)
+        if (navigator.permissions) {
+            try {
+                const permState = await navigator.permissions.query({ name: 'geolocation' });
+
+                if (permState.state === 'denied') {
+                    // Permission is already blocked — browser WON'T show prompt
+                    gpsError.classList.remove('hidden');
+                    gpsError.classList.add('location-error');
+                    setTimeout(() => gpsError.classList.remove('location-error'), 500);
+                    errorText.textContent = 'Location access is blocked for this site. Follow these steps to enable it:';
+                    resetInstructions.classList.remove('hidden');
+                    resetGPSButton(btn);
+                    return;
+                }
+                // If 'prompt' or 'granted', continue to request — browser will show dialog
+            } catch (e) {
+                // Permissions API not supported for geolocation, fall through
+            }
+        }
+
+        // Request geolocation — browser will show permission dialog if state is 'prompt'
+        navigator.geolocation.getCurrentPosition(
+            function (pos) {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                locationMap.setView([lat, lng], 16, { animate: true });
+                setLocation(lat, lng);
+                reverseGeocode(lat, lng);
+                btn.innerHTML = '✓ GPS Detected';
+                btn.classList.remove('bg-brandBlue', 'hover:bg-blue-900');
+                btn.classList.add('bg-emerald-600');
+                btn.disabled = false;
+            },
+            function (err) {
+                gpsError.classList.remove('hidden');
+                gpsError.classList.add('location-error');
+                setTimeout(() => gpsError.classList.remove('location-error'), 500);
+
+                switch (err.code) {
+                    case err.PERMISSION_DENIED:
+                        errorText.textContent = 'Location access was denied. Follow these steps to enable it:';
+                        resetInstructions.classList.remove('hidden');
+                        break;
+                    case err.POSITION_UNAVAILABLE:
+                        errorText.textContent = 'Location unavailable. Your device could not determine your position. Try searching for your address below.';
+                        break;
+                    case err.TIMEOUT:
+                        errorText.textContent = 'Location detection timed out. Please try again, search for your address, or click the map.';
+                        break;
+                    default:
+                        errorText.textContent = 'Could not detect location. Please search for your address or click directly on the map.';
+                }
+                resetGPSButton(btn);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 60000
+            }
+        );
+    });
+
+    function resetGPSButton(btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Retry GPS';
+        btn.classList.remove('bg-emerald-600');
+        btn.classList.add('bg-brandBlue', 'hover:bg-blue-900');
+    }
+
+    // ===== ADDRESS SEARCH (Nominatim — free, no API key) =====
+    const searchInput = document.getElementById('location-search');
+    const searchResults = document.getElementById('search-results');
+
+    searchInput.addEventListener('input', function () {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+
+        if (query.length < 3) {
+            searchResults.classList.add('hidden');
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5&addressdetails=1`, {
+                headers: { 'Accept-Language': 'en' }
+            })
+                .then(r => r.json())
+                .then(results => {
+                    if (results.length === 0) {
+                        searchResults.innerHTML = '<div class="result-item text-slate-400">No results found</div>';
+                        searchResults.classList.remove('hidden');
+                        return;
+                    }
+
+                    searchResults.innerHTML = results.map(r => `
+                    <div class="result-item" data-lat="${r.lat}" data-lon="${r.lon}">
+                        <span class="font-semibold">${r.display_name.split(',').slice(0, 3).join(', ')}</span>
+                        <span class="text-slate-400 block text-[11px] mt-0.5">${r.display_name}</span>
+                    </div>
+                `).join('');
+                    searchResults.classList.remove('hidden');
+
+                    // Click handlers
+                    searchResults.querySelectorAll('.result-item[data-lat]').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const lat = parseFloat(item.dataset.lat);
+                            const lon = parseFloat(item.dataset.lon);
+                            locationMap.setView([lat, lon], 16, { animate: true });
+                            setLocation(lat, lon);
+                            document.getElementById('location-address').textContent = '📍 ' + item.querySelector('span:last-child').textContent;
+                            searchInput.value = item.querySelector('span:first-child').textContent;
+                            searchResults.classList.add('hidden');
+                        });
+                    });
+                })
+                .catch(() => {
+                    searchResults.innerHTML = '<div class="result-item text-red-400">Search failed — try clicking the map</div>';
+                    searchResults.classList.remove('hidden');
+                });
+        }, 400); // debounce 400ms
+    });
+
+    // Hide search results on click outside
+    document.addEventListener('click', function (e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.classList.add('hidden');
+        }
+    });
+
+    // ===== FORM VALIDATION =====
+    document.getElementById('post-job-form').addEventListener('submit', function (e) {
+        const lat = parseFloat(document.getElementById('lat').value);
+        const lon = parseFloat(document.getElementById('lon').value);
+        const category = document.getElementById('job_category').value;
+        const otherName = document.getElementById('other_category_name').value.trim();
+
+        if (category === 'Other' && !otherName) {
+            e.preventDefault();
+            alert('Please specify the custom category name.');
+            document.getElementById('other_category_name').focus();
+            return false;
+        }
+
+        if (!lat || !lon || (lat === 0 && lon === 0)) {
+            e.preventDefault();
+            const errorEl = document.getElementById('location-validation-error');
+            errorEl.classList.remove('hidden');
+            const section = document.getElementById('location-section');
+            section.classList.add('location-error');
+            section.style.borderColor = '#fca5a5';
+            setTimeout(() => {
+                section.classList.remove('location-error');
+                section.style.borderColor = '';
+            }, 1000);
+            section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+    });
+
+    function toggleOtherCategory() {
+        const category = document.getElementById('job_category').value;
+        const container = document.getElementById('other_category_container');
+        const input = document.getElementById('other_category_name');
+
+        if (category === 'Other') {
+            container.classList.remove('hidden');
+            input.setAttribute('required', 'required');
+        } else {
+            container.classList.add('hidden');
+            input.removeAttribute('required');
+        }
+    }
+</script>
+{% endblock %}

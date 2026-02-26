@@ -1,0 +1,494 @@
+{%extends 'base.html' %}
+
+{%block extra_head %}
+<style>
+    /* Specific styles for the feed layout */
+    .profile-bg {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        height: 85px;
+    }
+
+    /* Hide scrollbar for skill pills */
+    .skill-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    .skill-scroll {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
+{%endblock %}
+
+{%block content %}
+<!-- Skill Quick Filters -->
+<div class="w-full overflow-x-auto skill-scroll mb-6 pb-2">
+    <div class="flex gap-3 min-w-max px-1">
+        <a href="{%url 'jobs' %}"
+            class="px-5 py-2 rounded-full bg-brandBlue text-white font-semibold text-sm shadow-brand hover:shadow-brandHover transition-all focus:ring-2 ring-brandOrange no-underline">All
+            Services</a>
+        <a href="{%url 'jobs' %}?filter=Electrical"
+            class="px-5 py-2 rounded-full bg-white border border-brandBorder text-brandText font-semibold text-sm hover:border-brandOrange hover:text-brandOrange transition-all shadow-sm no-underline">⚡
+            Electrical</a>
+        <a href="{%url 'jobs' %}?filter=Plumbing"
+            class="px-5 py-2 rounded-full bg-white border border-brandBorder text-brandText font-semibold text-sm hover:border-brandOrange hover:text-brandOrange transition-all shadow-sm no-underline">💧
+            Plumbing</a>
+        <a href="{%url 'jobs' %}?filter=Cleaning"
+            class="px-5 py-2 rounded-full bg-white border border-brandBorder text-brandText font-semibold text-sm hover:border-brandOrange hover:text-brandOrange transition-all shadow-sm no-underline">🧹
+            Cleaning</a>
+        <a href="{%url 'jobs' %}?filter=Carpentry"
+            class="px-5 py-2 rounded-full bg-white border border-brandBorder text-brandText font-semibold text-sm hover:border-brandOrange hover:text-brandOrange transition-all shadow-sm no-underline">🛠️
+            Carpentry</a>
+        <a href="{%url 'jobs' %}?filter=Packing"
+            class="px-5 py-2 rounded-full bg-white border border-brandBorder text-brandText font-semibold text-sm hover:border-brandOrange hover:text-brandOrange transition-all shadow-sm no-underline">📦
+            Packing/Moving</a>
+        <a href="{%url 'jobs' %}?filter=AC Repair"
+            class="px-5 py-2 rounded-full bg-white border border-brandBorder text-brandText font-semibold text-sm hover:border-brandOrange hover:text-brandOrange transition-all shadow-sm no-underline">❄️
+            AC Repair</a>
+    </div>
+</div>
+
+<div class="flex flex-col lg:flex-row gap-8 justify-center pb-12">
+
+    <!-- Left Column: Primary Job Feed -->
+    <main class="w-full lg:w-[650px] flex-shrink-0 flex flex-col gap-6 order-2 lg:order-1">
+
+        {%if request.user.profile.role == 'Job Provider' %}
+        <!-- Post Job Quick Input -->
+        <div id="post-job" class="li-card p-5 border-l-4 border-l-brandOrange bg-white scroll-mt-20">
+            <h2 class="font-bold text-lg mb-3 text-brandBlue flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Post a Job Request
+            </h2>
+            <div class="flex gap-4">
+                <div
+                    class="w-12 h-12 rounded-full bg-brandHover text-brandBlue flex items-center justify-center font-bold text-lg flex-shrink-0 uppercase">
+                    {{ request.user.username|make_list|first|default:'U' }}</div>
+                <input type="text" id="jobTitle"
+                    class="flex-grow bg-slate-50 border border-slate-200 rounded-xl px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-brandOrange transition-all"
+                    placeholder="What service do you need right now?">
+            </div>
+            <div class="flex justify-between items-center mt-4 pl-16">
+                <div class="flex gap-4">
+                    <button
+                        class="text-sm font-semibold text-brandIcon hover:text-brandBlue flex items-center gap-1.5 transition"><svg
+                            class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg> Add Location</button>
+                    <button
+                        class="text-sm font-semibold text-brandIcon hover:text-brandBlue flex items-center gap-1.5 transition"><svg
+                            class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg> Schedule Time</button>
+                </div>
+                <!-- Need CSRF token for the JS fetch -->
+                {%csrf_token %}
+                <button onclick="postJob()"
+                    class="bg-brandBlue text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-blue-900 transition shadow-md whitespace-nowrap">Post
+                    Request</button>
+            </div>
+        </div>
+        {%endif %}
+
+        <!-- Feed Controls -->
+        <div class="flex items-center justify-between mb-2">
+            <h3 class="font-bold text-xl text-brandText tracking-tight">Active Job Requests</h3>
+            <span
+                class="text-xs text-brandIcon font-semibold flex items-center cursor-pointer hover:text-brandBlue transition">Sort
+                by: <strong class="text-brandText ml-1">Nearest</strong> <svg class="w-4 h-4 ml-1" fill="currentColor"
+                    viewBox="0 0 24 24">
+                    <path d="M7 10l5 5 5-5z"></path>
+                </svg></span>
+        </div>
+
+        <!-- Feed List -->
+        <div id="service-feed" class="flex flex-col gap-5">
+
+            {%if active_jobs %}
+            <h4 class="font-bold text-lg text-brandText tracking-tight mb-2">Your Open Requests</h4>
+            {%elif assigned_jobs %}
+            <h4 class="font-bold text-lg text-brandText tracking-tight mb-2">Your Assigned Jobs</h4>
+            {%elif available_jobs %}
+            <h4 class="font-bold text-lg text-emerald-600 tracking-tight mb-2">Available Jobs Near You</h4>
+            {%else %}
+            <div class="li-card p-8 text-center bg-slate-50 border border-brandBorder shadow-sm">
+                <p class="text-sm font-semibold text-brandIcon">There are no active jobs in the feed right now.</p>
+            </div>
+            {%endif %}
+
+            {%if active_jobs %}
+            {%for job in active_jobs %}
+            <!-- Map Data to Feed Template -->
+            <div class="li-card p-5 group">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex gap-4 items-center">
+                        <div
+                            class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-2xl shadow-inner border border-slate-200">
+                            🛠️</div>
+                        <div>
+                            <span
+                                class="bg-orange-100 text-brandOrange text-[10px] px-2.5 py-1 rounded-full font-extrabold uppercase tracking-wide inline-block mb-1">{{ job.status }}</span>
+                            <h3
+                                class="font-bold text-base text-brandText group-hover:text-brandBlue transition cursor-pointer">
+                                {{ job.title }}</h3>
+                            <p class="text-xs text-brandIcon font-medium mt-0.5 flex items-center gap-1">📍 Local Area
+                                • ⏳ ASAP</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p
+                    class="text-sm text-slate-700 leading-relaxed font-medium bg-slate-50 p-3 rounded-lg border border-slate-100 mb-4">
+                    "{{ job.description|default:'No extra details provided by job poster.' }}"</p>
+
+                <div class="flex justify-between items-center mt-2">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-6 h-6 rounded-full bg-slate-300 overflow-hidden text-xs flex items-center justify-center text-white uppercase font-bold">
+                            {{ job.provider.username|make_list|first }}</div>
+                        <p class="text-xs font-semibold text-brandIcon">Posted by <span
+                                class="text-brandText cursor-pointer hover:underline">{{ job.provider.username }}</span>
+                            {{ job.created_at|timesince }} ago</p>
+                    </div>
+
+                    {%if job.status == 'Pending' and request.user.profile.role == 'Worker' %}
+                    <form method="POST" action="{%url 'accept_job' job.id %}" class="inline">
+                        {%csrf_token %}
+                        <button type="submit"
+                            class="bg-brandOrange text-white font-bold text-sm px-6 py-2.5 rounded-full hover:bg-orange-600 transition shadow-md hover:shadow-lg transform active:scale-95 text-center">Accept
+                            Job</button>
+                    </form>
+                    {%elif job.worker == request.user %}
+                    <form method="POST" action="{%url 'update_status' job.id %}" class="inline">
+                        {%csrf_token %}
+                        {%if job.status == 'Accepted' %}
+                        <input type="hidden" name="status" value="On the Way">
+                        <button type="submit"
+                            class="bg-brandBlue text-white font-bold text-sm px-6 py-2.5 rounded-full hover:bg-blue-900 transition text-center shadow-md">Mark
+                            On Way</button>
+                        {%elif job.status == 'On the Way' %}
+                        <input type="hidden" name="status" value="Arrived">
+                        <button type="submit"
+                            class="bg-amber-500 text-white font-bold text-sm px-6 py-2.5 rounded-full hover:bg-amber-600 transition text-center shadow-md">Mark
+                            Arrived</button>
+                        {%elif job.status == 'Arrived' %}
+                        <input type="hidden" name="status" value="Completed">
+                        <button type="submit"
+                            class="bg-emerald-500 text-white font-bold text-sm px-6 py-2.5 rounded-full hover:bg-emerald-600 transition text-center shadow-md">Mark
+                            Completed</button>
+                        {%endif %}
+                    </form>
+                    {%elif job.provider == request.user and job.status == 'On the Way' %}
+                    <!-- Provider Tracking View (Placeholder Action) -->
+                    <a href="{%url 'nearby_map' %}"
+                        class="bg-white border text-xs border-emerald-500 shadow-md px-4 py-2 rounded-full font-bold text-emerald-600 hover:text-white hover:bg-emerald-500 transition">Track
+                        GPS</a>
+                    {%endif %}
+                </div>
+            </div>
+            {%endfor %}
+            {%elif assigned_jobs %}
+            {%for job in assigned_jobs %}
+            <!-- Map Data to Feed Template -->
+            <div class="li-card p-5 group">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex gap-4 items-center">
+                        <div
+                            class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-2xl shadow-inner border border-slate-200">
+                            🛠️</div>
+                        <div>
+                            <span
+                                class="bg-orange-100 text-brandOrange text-[10px] px-2.5 py-1 rounded-full font-extrabold uppercase tracking-wide inline-block mb-1">{{ job.status }}</span>
+                            <h3
+                                class="font-bold text-base text-brandText group-hover:text-brandBlue transition cursor-pointer">
+                                {{ job.title }}</h3>
+                            <p class="text-xs text-brandIcon font-medium mt-0.5 flex items-center gap-1">📍 Local Area
+                                • ⏳ ASAP</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p
+                    class="text-sm text-slate-700 leading-relaxed font-medium bg-slate-50 p-3 rounded-lg border border-slate-100 mb-4">
+                    "{{ job.description|default:'No extra details provided by job poster.' }}"</p>
+
+                <div class="flex justify-between items-center mt-2">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-6 h-6 rounded-full bg-slate-300 overflow-hidden text-xs flex items-center justify-center text-white uppercase font-bold">
+                            {{ job.provider.username|make_list|first }}</div>
+                        <p class="text-xs font-semibold text-brandIcon">Posted by <span
+                                class="text-brandText cursor-pointer hover:underline">{{ job.provider.username }}</span>
+                            {{ job.created_at|timesince }} ago</p>
+                    </div>
+
+                    {%if job.status == 'Pending' and request.user.profile.role == 'Worker' %}
+                    <form method="POST" action="{%url 'accept_job' job.id %}" class="inline">
+                        {%csrf_token %}
+                        <button type="submit"
+                            class="bg-brandOrange text-white font-bold text-sm px-6 py-2.5 rounded-full hover:bg-orange-600 transition shadow-md hover:shadow-lg transform active:scale-95 text-center">Accept
+                            Job</button>
+                    </form>
+                    {%elif job.worker == request.user %}
+                    <form method="POST" action="{%url 'update_status' job.id %}" class="inline">
+                        {%csrf_token %}
+                        {%if job.status == 'Accepted' %}
+                        <input type="hidden" name="status" value="On the Way">
+                        <button type="submit"
+                            class="bg-brandBlue text-white font-bold text-sm px-6 py-2.5 rounded-full hover:bg-blue-900 transition text-center shadow-md">Mark
+                            On Way</button>
+                        {%elif job.status == 'On the Way' %}
+                        <input type="hidden" name="status" value="Arrived">
+                        <button type="submit"
+                            class="bg-amber-500 text-white font-bold text-sm px-6 py-2.5 rounded-full hover:bg-amber-600 transition text-center shadow-md">Mark
+                            Arrived</button>
+                        {%elif job.status == 'Arrived' %}
+                        <input type="hidden" name="status" value="Completed">
+                        <button type="submit"
+                            class="bg-emerald-500 text-white font-bold text-sm px-6 py-2.5 rounded-full hover:bg-emerald-600 transition text-center shadow-md">Mark
+                            Completed</button>
+                        {%endif %}
+                    </form>
+                    {%elif job.provider == request.user and job.status == 'On the Way' %}
+                    <!-- Provider Tracking View (Placeholder Action) -->
+                    <a href="{%url 'nearby_map' %}"
+                        class="bg-white border text-xs border-emerald-500 shadow-md px-4 py-2 rounded-full font-bold text-emerald-600 hover:text-white hover:bg-emerald-500 transition">Track
+                        GPS</a>
+                    {%endif %}
+                </div>
+            </div>
+            {%endfor %}
+            {%elif available_jobs and not assigned_jobs %}
+            {%for job in available_jobs %}
+            <div class="li-card p-5 group border border-emerald-200 bg-gradient-to-br from-white to-emerald-50/30">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex gap-4 items-center">
+                        <div
+                            class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl shadow-sm border border-emerald-100">
+                            🛠️</div>
+                        <div>
+                            <span
+                                class="bg-emerald-100 text-emerald-700 text-[10px] px-2.5 py-1 rounded-full font-extrabold uppercase tracking-wide inline-block mb-1">New
+                                Available
+                            </span>
+                            <h3
+                                class="font-bold text-base text-brandText group-hover:text-emerald-700 transition cursor-pointer">
+                                {{ job.title }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <p
+                    class="text-sm text-slate-700 leading-relaxed font-medium bg-white p-3 rounded-lg border border-slate-100 mb-4 shadow-sm">
+                    "{{ job.description|default:'No extra details provided by job poster.' }}"</p>
+
+                <div class="flex justify-between items-center mt-2">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-6 h-6 rounded-full bg-slate-300 overflow-hidden text-xs flex items-center justify-center text-white uppercase font-bold">
+                            {{ job.provider.username|make_list|first }}</div>
+                        <p class="text-xs font-semibold text-brandIcon">Posted by <span
+                                class="text-brandText cursor-pointer hover:underline">{{ job.provider.username }}</span>
+                            {{ job.created_at|timesince }} ago</p>
+                    </div>
+                    <form method="POST" action="{%url 'accept_job' job.id %}" class="inline">
+                        {%csrf_token %}
+                        <button type="submit"
+                            class="bg-brandOrange text-white font-bold text-sm px-6 py-2.5 rounded-full hover:bg-orange-600 transition shadow-md hover:shadow-lg transform active:scale-95 text-center">Accept
+                            Job</button>
+                    </form>
+                </div>
+            </div>
+            {%endfor %}
+            {%endif %}
+
+            <!-- If both available_jobs AND assigned_jobs exist (worker view), show available below assigned -->
+            {%if assigned_jobs and available_jobs %}
+            <h4 class="font-bold text-lg text-emerald-600 tracking-tight mt-6 mb-2">Available Jobs Near You</h4>
+            {%for job in available_jobs %}
+            <div class="li-card p-5 group border border-emerald-200 bg-gradient-to-br from-white to-emerald-50/30">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex gap-4 items-center">
+                        <div
+                            class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl shadow-sm border border-emerald-100">
+                            🛠️</div>
+                        <div>
+                            <span
+                                class="bg-emerald-100 text-emerald-700 text-[10px] px-2.5 py-1 rounded-full font-extrabold uppercase tracking-wide inline-block mb-1">New
+                                Available
+                            </span>
+                            <h3
+                                class="font-bold text-base text-brandText group-hover:text-emerald-700 transition cursor-pointer">
+                                {{ job.title }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <p
+                    class="text-sm text-slate-700 leading-relaxed font-medium bg-white p-3 rounded-lg border border-slate-100 mb-4 shadow-sm">
+                    "{{ job.description|default:'No extra details provided by job poster.' }}"</p>
+
+                <div class="flex justify-between items-center mt-2">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-6 h-6 rounded-full bg-slate-300 overflow-hidden text-xs flex items-center justify-center text-white uppercase font-bold">
+                            {{ job.provider.username|make_list|first }}</div>
+                        <p class="text-xs font-semibold text-brandIcon">Posted by <span
+                                class="text-brandText cursor-pointer hover:underline">{{ job.provider.username }}</span>
+                            {{ job.created_at|timesince }} ago</p>
+                    </div>
+                    <form method="POST" action="{%url 'accept_job' job.id %}" class="inline">
+                        {%csrf_token %}
+                        <button type="submit"
+                            class="bg-brandOrange text-white font-bold text-sm px-6 py-2.5 rounded-full hover:bg-orange-600 transition shadow-md hover:shadow-lg transform active:scale-95 text-center">Accept
+                            Job</button>
+                    </form>
+                </div>
+            </div>
+            {%endfor %}
+            {%endif %}
+
+        </div>
+    </main>
+
+    <!-- Right Column: Dashboard & Map Radar -->
+    <aside class="w-full lg:w-[350px] flex-shrink-0 flex flex-col gap-6 order-1 lg:order-2">
+
+        <!-- Role-Based Dashboard Mini-Card -->
+        <div class="li-card text-center relative advanced-ui">
+            <div class="profile-bg rounded-t-[1rem]"></div>
+
+            <div
+                class="w-20 h-20 rounded-full border-4 border-white bg-slate-100 mx-auto -mt-10 relative z-10 overflow-hidden shadow-md flex items-center justify-center text-brandBlue font-extrabold text-2xl">
+                {%if request.user.is_authenticated %}{{ request.user.username|make_list|first|upper }}{%else %}U{%endif %}
+            </div>
+
+            <div class="px-5 pb-5 pt-2">
+                <h2 class="font-bold text-xl cursor-pointer hover:underline text-brandText">
+                    {%if request.user.is_authenticated %}
+                    {{ request.user.first_name }} {{ request.user.last_name }}
+                    {%if not request.user.first_name %}{{ request.user.username }}{%endif %}
+                    {%else %}
+                    Guest
+                    {%endif %}
+                </h2>
+                <p class="text-sm text-brandOrange font-bold mt-1 tracking-wide">{%if request.user.is_authenticated %}{{ request.user.profile.role|default:"User" }}{%else %}Guest{%endif %}</p>
+
+                <div class="grid grid-cols-2 gap-3 mt-5 pt-5 border-t border-brandBorder text-left">
+                    <div>
+                        <p class="text-xs font-semibold text-brandIcon uppercase tracking-wider mb-1">Active Jobs</p>
+                        <p class="text-xl font-black text-brandText">{%if active_jobs %}{{ active_jobs.count }}{%elif assigned_jobs %}{{ assigned_jobs.count }}{%else %}0{%endif %}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-semibold text-brandIcon uppercase tracking-wider mb-1">All Available</p>
+                        <p class="text-xl font-black text-brandText">{%if available_jobs %}{{ available_jobs.count }}{%else %}0{%endif %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-Time Map Widget -->
+        <div class="li-card overflow-hidden border-2 border-transparent hover:border-brandBlue/20 transition-all">
+            <div class="px-5 py-4 border-b border-brandBorder flex justify-between items-center bg-white">
+                <div>
+                    <h3 class="font-bold text-brandText flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brandBlue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
+                        </svg>
+                        Nearby Workers Map
+                    </h3>
+                    <p class="text-[11px] font-semibold text-emerald-600 mt-1 flex items-center gap-1"><span
+                            class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> 14 Available near you
+                    </p>
+                </div>
+                <button class="bg-slate-100 hover:bg-slate-200 text-brandText p-2 rounded-lg transition"><svg
+                        class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4">
+                        </path>
+                    </svg></button>
+            </div>
+
+            <!-- Map Container (Leaflet injected via JS/CSS later, placeholder for now) -->
+            <div class="w-full h-[220px] bg-slate-200 relative">
+                <img src="https://static.vecteezy.com/system/resources/previews/000/153/588/original/vector-city-map-illustration.jpg"
+                    class="w-full h-full object-cover opacity-60 grayscale brightness-110" alt="Map">
+
+                <!-- Mock Map Markers -->
+                <div
+                    class="absolute top-1/3 left-1/4 w-4 h-4 rounded-full bg-brandBlue shadow-[0_0_0_4px_rgba(30,58,138,0.3)] animate-bounce">
+                </div>
+                <div
+                    class="absolute top-1/2 right-1/4 w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.3)]">
+                </div>
+
+                <div
+                    class="absolute inset-0 bg-gradient-to-t from-white/80 via-transparent to-transparent flex items-end justify-center pb-4">
+                    <a href="{%url 'nearby_map' %}"
+                        class="bg-white border text-xs border-brandBorder shadow-lg px-4 py-2 rounded-full font-bold text-brandText hover:text-brandOrange hover:border-brandOrange transition">View
+                        Interactive Map</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center text-xs font-semibold text-slate-400 mt-2">
+            SevaLink Platform © 2026
+        </div>
+
+    </aside>
+
+</div>
+{%endblock %}
+
+{%block extra_scripts %}
+<script>
+    function postJob() {
+        const titleInput = document.getElementById('jobTitle');
+        const title = titleInput.value.trim();
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+        if (!title) {
+            alert('Please enter a service name!');
+            return;
+        }
+
+        fetch("{%url 'post_job' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                title: title,
+                description: '',
+                lat: 0,
+                lon: 0
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    titleInput.value = '';
+                    // Reload page to show new job in feed
+                    window.location.reload();
+                } else {
+                    alert('Error posting job: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
+                alert('Could not post job. See console.');
+            });
+    }
+</script>
+{%endblock %}

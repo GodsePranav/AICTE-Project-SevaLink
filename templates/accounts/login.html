@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-64px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full li-card p-8 bg-white">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-extrabold text-brandBlue">
+                Welcome back to Sev<span class="text-brandOrange">Link</span>
+            </h2>
+            <p class="mt-2 text-sm text-brandIcon font-semibold">
+                Sign in to your account
+            </p>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div
+            class="mb-4 p-4 rounded-lg text-sm font-semibold {% if message.tags == 'error' %}bg-red-50 text-red-600 border border-red-200{% else %}bg-emerald-50 text-emerald-600 border border-emerald-200{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if form.errors and not messages %}
+        <div class="mb-4 p-4 rounded-lg text-sm font-semibold bg-red-50 text-red-600 border border-red-200">
+            Please correct the errors below.
+        </div>
+        {% endif %}
+
+        <form class="space-y-6" method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+
+            <div>
+                <label for="{{ form.username.id_for_label }}"
+                    class="block text-sm font-bold text-brandText mb-1">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <p class="text-xs text-red-500 mt-1">{{ form.username.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.password.id_for_label }}"
+                    class="block text-sm font-bold text-brandText mb-1">Password</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <p class="text-xs text-red-500 mt-1">{{ form.password.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <button type="submit"
+                    class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-brandBlue hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandBlue transition-all">
+                    Sign in
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-6 text-center">
+            <p class="text-sm text-brandIcon font-semibold">
+                Don't have an account?
+                <a href="{% url 'signup' %}" class="font-bold text-brandOrange hover:text-orange-700 transition">
+                    Sign up now
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add Tailwind classes to Django form inputs dynamically
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+        inputs.forEach(input => {
+            input.classList.add('w-full', 'bg-slate-50', 'border', 'border-slate-200', 'rounded-xl', 'px-4', 'py-2', 'text-sm', 'font-medium', 'focus:outline-none', 'focus:ring-2', 'focus:ring-brandOrange', 'focus:border-brandOrange', 'transition-all');
+        });
+    });
+</script>
+{% endblock %}

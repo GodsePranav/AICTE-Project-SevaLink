@@ -1,0 +1,576 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<style>
+    #map {
+        height: calc(100vh - 140px);
+        width: 100%;
+        border-radius: 12px;
+        z-index: 10;
+    }
+
+    .filter-panel {
+        height: calc(100vh - 140px);
+        overflow-y: auto;
+    }
+
+    .leaflet-popup-content-wrapper {
+        border-radius: 12px;
+        font-family: inherit;
+    }
+
+    .worker-marker {
+        background: #f97316;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .my-marker {
+        background: #1e3a8a;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(30, 58, 138, 0.5);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(30, 58, 138, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(30, 58, 138, 0);
+        }
+    }
+
+    .worker-card.highlighted {
+        border-color: #f97316 !important;
+        background: #fff7ed !important;
+    }
+
+    /* Custom Distance Slider */
+    .distance-slider {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 6px;
+        background: linear-gradient(to right, #f97316 var(--value, 18.36%), #e2e8f0 var(--value, 18.36%));
+        border-radius: 999px;
+        outline: none;
+        cursor: pointer;
+        transition: background 0.15s ease-out;
+    }
+
+    .distance-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #f97316;
+        cursor: pointer;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0);
+    }
+
+    .distance-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.25);
+        box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.15);
+    }
+
+    .distance-slider::-webkit-slider-thumb:active {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 8px rgba(249, 115, 22, 0.25);
+    }
+
+    .distance-slider::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #f97316;
+        cursor: pointer;
+        border: none;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0);
+    }
+
+    .distance-slider::-moz-range-thumb:hover {
+        transform: scale(1.25);
+        box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.15);
+    }
+
+    .distance-slider::-moz-range-thumb:active {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 8px rgba(249, 115, 22, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col lg:flex-row gap-6 w-full max-w-7xl mx-auto h-full">
+
+    <!-- Filters & Worker Cards Panel -->
+    <aside
+        class="w-full lg:w-[380px] flex-shrink-0 filter-panel hide-scrollbar bg-white rounded-2xl border border-brandBorder shadow-sm overflow-hidden flex flex-col">
+        <div class="p-5 border-b border-brandBorder bg-slate-50">
+            <h2 class="font-bold text-xl text-brandBlue mb-4 tracking-tight">Find Nearby Pros</h2>
+
+            <!-- Filters -->
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-semibold text-brandIcon mb-1 block">Skill / Category</label>
+                    <select id="filter-skill"
+                        class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-brandOrange outline-none">
+                        <option value="All">All Skills</option>
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Electrical">Electrical</option>
+                        <option value="Cleaning">Cleaning</option>
+                        <option value="HVAC">HVAC</option>
+                        <option value="Carpentry">Carpentry</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-xs font-semibold text-brandIcon mb-1 flex justify-between items-center">
+                        Distance Radius
+                        <div class="flex items-center gap-1">
+                            <input type="number" id="manual-radius" min="1" max="500" value="10"
+                                class="w-16 px-2 py-1 text-right text-sm font-bold text-brandText border border-slate-300 rounded-md focus:ring-1 focus:ring-brandOrange outline-none transition-all"
+                                oninput="document.getElementById('filter-radius').value = Math.min(this.value, 50); document.getElementById('filter-radius').style.setProperty('--value', (Math.min(this.value, 50) - 1) / 49 * 100 + '%');">
+                            <span class="text-brandText font-bold text-sm">km</span>
+                        </div>
+                    </label>
+                    <input type="range" id="filter-radius" min="1" max="50" value="10" class="distance-slider mt-2"
+                        style="--value: 18.36%;"
+                        oninput="document.getElementById('manual-radius').value = this.value; this.style.setProperty('--value', (this.value - this.min) / (this.max - this.min) * 100 + '%');">
+                </div>
+
+                <div class="flex gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer flex-1">
+                        <input type="checkbox" id="filter-available"
+                            class="w-4 h-4 text-brandOrange bg-slate-100 border-slate-300 rounded focus:ring-brandOrange accent-brandOrange"
+                            checked>
+                        <span class="text-sm font-semibold text-slate-700">Available Now</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer flex-1">
+                        <input type="checkbox" id="filter-toprated"
+                            class="w-4 h-4 text-brandOrange bg-slate-100 border-slate-300 rounded focus:ring-brandOrange accent-brandOrange">
+                        <span class="text-sm font-semibold text-slate-700">Top Rated 4.5+</span>
+                    </label>
+                </div>
+            </div>
+
+            <button
+                class="w-full mt-4 bg-brandBlue text-white font-bold py-2.5 rounded-xl hover:bg-blue-900 transition shadow-sm"
+                onclick="applyFilters()">Apply Filters</button>
+        </div>
+
+        <!-- Worker List Container -->
+        <div class="p-4 flex-grow overflow-y-auto space-y-3 bg-white" id="worker-list">
+            <div class="flex items-center justify-center py-8">
+                <div class="text-center">
+                    <div
+                        class="w-8 h-8 border-3 border-brandBlue border-t-transparent rounded-full animate-spin mx-auto mb-3">
+                    </div>
+                    <p class="text-sm text-brandIcon font-medium">Scanning your area...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Count -->
+        <div class="p-3 border-t border-brandBorder bg-slate-50">
+            <p class="text-xs font-semibold text-brandIcon text-center" id="results-count">Finding workers...</p>
+        </div>
+    </aside>
+
+    <!-- Map Area -->
+    <main
+        class="w-full flex-grow relative bg-slate-100 rounded-2xl overflow-hidden border border-brandBorder shadow-sm">
+        <div id="map"></div>
+
+        <!-- Map Overlay Actions -->
+        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[400] flex gap-3">
+            <button
+                class="bg-white px-5 py-2.5 rounded-full shadow-lg border border-brandBorder font-bold text-brandBlue hover:text-brandOrange hover:border-brandOrange transition flex items-center gap-2 text-sm"
+                onclick="locateMe()">
+                <svg class="w-4 h-4 text-brandOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                My Location
+            </button>
+            <button
+                class="bg-white px-5 py-2.5 rounded-full shadow-lg border border-brandBorder font-bold text-brandBlue hover:text-brandOrange hover:border-brandOrange transition flex items-center gap-2 text-sm"
+                onclick="applyFilters()">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                Search Area
+            </button>
+        </div>
+    </main>
+
+    <!-- Job Details Modal -->
+    <div id="job-details-modal"
+        class="hidden fixed inset-0 bg-slate-900/40 z-[9999] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-0 relative overflow-hidden">
+            <button onclick="document.getElementById('job-details-modal').classList.add('hidden')"
+                class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition z-10 bg-white rounded-full p-1 shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+            <div id="modal-content" class="p-6"></div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    // Initialize Map
+    let map = L.map('map').setView([20.5937, 78.9629], 5);
+    let markers = [];
+    let radiusCircle = null;
+    let allItems = [];
+    let currentFilteredItems = [];
+    let myLat = null, myLon = null;
+
+    // Modern clean tile layer
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Custom icons
+    const workerIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: "<div class='worker-marker' style='width:16px;height:16px'></div>",
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
+    });
+
+    const jobIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: "<div class='worker-marker' style='width:16px;height:16px;background:#3b82f6;'></div>",
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
+    });
+
+    const myIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: "<div class='my-marker' style='width:18px;height:18px'></div>",
+        iconSize: [18, 18],
+        iconAnchor: [9, 9]
+    });
+
+    // Haversine distance calculation (km)
+    function haversine(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    // Context Data
+    const userRole = "{{ user_role }}";
+    const serverWorkers = {{ workers_json| safe }};
+    const serverJobs = {{ jobs_json| safe }};
+
+    // Determine what to show: Workers see Jobs, Providers see Workers
+    const isShowingJobs = (userRole === 'Worker');
+    const sourceData = isShowingJobs ? serverJobs : serverWorkers;
+
+    // Update UI headers
+    document.addEventListener("DOMContentLoaded", () => {
+        if (isShowingJobs) {
+            document.querySelector("h2").innerText = "Find Nearby Jobs";
+            document.getElementById("filter-available").parentElement.style.display = 'none'; // hide available filter for jobs
+            document.getElementById("filter-toprated").parentElement.style.display = 'none'; // hide top rated filter for jobs
+        }
+    });
+
+    // Calculate distance of backend items relative to center
+    function generateItems(centerLat, centerLon) {
+        const items = [];
+        sourceData.forEach(item => {
+            const dist = haversine(centerLat, centerLon, item.lat, item.lon);
+            items.push({
+                ...item,
+                distance: dist
+            });
+        });
+        return items.sort((a, b) => a.distance - b.distance);
+    }
+
+    // Render items on map and sidebar
+    function renderItems(items, radiusFilter) {
+        // Clear old markers
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+
+        // Clear old circle
+        if (radiusCircle) {
+            map.removeLayer(radiusCircle);
+        }
+
+        // Draw new radius circle
+        if (myLat && myLon) {
+            radiusCircle = L.circle([myLat, myLon], {
+                color: '#f97316',
+                fillColor: '#f97316',
+                fillOpacity: 0.1,
+                radius: radiusFilter * 1000 // Convert km to meters
+            }).addTo(map);
+        }
+
+        const listDiv = document.getElementById('worker-list');
+        listDiv.innerHTML = '';
+
+        if (items.length === 0) {
+            const emptyType = isShowingJobs ? "jobs" : "workers";
+            listDiv.innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <p class="text-sm font-semibold text-brandIcon">No ${emptyType} match your filters</p>
+                    <p class="text-xs text-slate-400 mt-1">Try adjusting the radius or category</p>
+                </div>`;
+            document.getElementById('results-count').textContent = `0 ${emptyType} found`;
+            return;
+        }
+
+        const labelType = isShowingJobs ? "job" : "worker";
+        document.getElementById('results-count').textContent = `${items.length} ${labelType}${items.length > 1 ? 's' : ''} found`;
+
+        items.forEach((item, idx) => {
+            // Map marker
+            const iconToUse = isShowingJobs ? jobIcon : workerIcon;
+            const popupContent = isShowingJobs
+                ? `<div style="min-width:160px">
+                        <b style="color:#1e3a8a;font-size:14px">${item.title}</b><br>
+                        <span style="color:#64748b;font-size:12px">Client: ${item.provider_name}</span><br>
+                        <span style="color:#10b981;font-weight:bold">₹${item.price}</span>
+                        <span style="color:#94a3b8;margin-left:8px">${item.distance.toFixed(1)} km</span><br>
+                   </div>`
+                : `<div style="min-width:160px">
+                        <b style="color:#1e3a8a;font-size:14px">${item.name}</b><br>
+                        <span style="color:#64748b;font-size:12px">${item.skill}</span><br>
+                        <span style="color:#f97316">⭐ ${item.rating}</span>
+                        <span style="color:#94a3b8;margin-left:8px">${item.distance.toFixed(1)} km</span><br>
+                        <span style="color:${item.status === 'Available' ? '#10b981' : '#ef4444'};font-size:11px;font-weight:600">${item.status}</span>
+                   </div>`;
+
+            const marker = L.marker([item.lat, item.lon], { icon: iconToUse }).addTo(map)
+                .bindPopup(popupContent);
+            markers.push(marker);
+
+            // Sidebar card
+            if (isShowingJobs) {
+                listDiv.innerHTML += `
+                    <div class="worker-card border border-slate-200 rounded-xl p-4 hover:border-brandBlue cursor-pointer transition bg-white group shadow-sm"
+                         onclick="panToWorker(${item.lat}, ${item.lon}, ${idx})" id="worker-card-${idx}">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-brandBlue text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">${item.title[0] || 'J'}</div>
+                                <div>
+                                    <h3 class="font-bold text-brandText text-sm group-hover:text-brandBlue transition">${item.title}</h3>
+                                    <p class="text-xs text-brandIcon">Client: ${item.provider_name}</p>
+                                </div>
+                            </div>
+                            <span class="bg-blue-100 text-brandBlue font-bold px-2 py-0.5 rounded text-[10px] uppercase">₹${item.price}</span>
+                        </div>
+                        <div class="flex justify-between items-end mt-3">
+                            <span class="text-xs font-semibold text-brandIcon flex items-center gap-1">📍 ${item.distance.toFixed(1)} km away</span>
+                            <button class="bg-brandBlue text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-900 transition shadow-sm"
+                                    onclick="event.stopPropagation(); openJobDetails(${idx});">View Job</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const statusColor = item.status === 'Available'
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : 'bg-red-100 text-red-600';
+
+                listDiv.innerHTML += `
+                    <div class="worker-card border border-slate-200 rounded-xl p-4 hover:border-brandOrange cursor-pointer transition bg-white group shadow-sm"
+                         onclick="panToWorker(${item.lat}, ${item.lon}, ${idx})" id="worker-card-${idx}">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-brandOrange text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">${item.name[0]}</div>
+                                <div>
+                                    <h3 class="font-bold text-brandText text-sm group-hover:text-brandOrange transition">${item.name}</h3>
+                                    <p class="text-xs text-brandIcon">${item.skill} • ⭐ ${item.rating}</p>
+                                </div>
+                            </div>
+                            <span class="${statusColor} font-bold px-2 py-0.5 rounded text-[10px] uppercase">${item.status}</span>
+                        </div>
+                        <div class="flex justify-between items-end mt-3">
+                            <span class="text-xs font-semibold text-brandIcon flex items-center gap-1">📍 ${item.distance.toFixed(1)} km away</span>
+                            <a href="/user/${item.id}/" target="_blank" class="bg-brandBlue text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-900 transition shadow-sm"
+                                    onclick="event.stopPropagation()">View Profile</a>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    // Detect user location
+    function locateMe() {
+        const listDiv = document.getElementById('worker-list');
+        const emptyType = isShowingJobs ? "jobs" : "workers";
+        listDiv.innerHTML = `
+            <div class="flex items-center justify-center py-8">
+                <div class="text-center">
+                    <div class="w-8 h-8 border-[3px] border-brandBlue border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                    <p class="text-sm text-brandIcon font-medium">Detecting your location...</p>
+                </div>
+            </div>`;
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(position => {
+                myLat = position.coords.latitude;
+                myLon = position.coords.longitude;
+                map.setView([myLat, myLon], 14);
+
+                // My location marker
+                L.marker([myLat, myLon], { icon: myIcon }).addTo(map)
+                    .bindPopup("<b style='color:#1e3a8a'>📍 Your Location</b>").openPopup();
+
+                allItems = generateItems(myLat, myLon);
+                applyFilters();
+            }, () => {
+                // Fallback to India center
+                myLat = 20.5937;
+                myLon = 78.9629;
+                map.setView([myLat, myLon], 12);
+                allItems = generateItems(myLat, myLon);
+                applyFilters();
+            });
+        } else {
+            myLat = 20.5937;
+            myLon = 78.9629;
+            allItems = generateItems(myLat, myLon);
+            applyFilters();
+        }
+    }
+
+    // Apply filters to worker list
+    function applyFilters() {
+        const skillFilter = document.getElementById('filter-skill').value;
+        const radiusFilter = parseInt(document.getElementById('manual-radius').value) || 10;
+        const availableOnly = document.getElementById('filter-available').checked;
+        const topRatedOnly = document.getElementById('filter-toprated').checked;
+
+        let filtered = allItems.filter(item => {
+            if (isShowingJobs) {
+                // Distance filter
+                if (item.distance > radiusFilter) return false;
+                // Category rough filter by checking if word matches roughly (basic impl)
+                if (skillFilter !== 'All' && !item.category.toLowerCase().includes(skillFilter.toLowerCase())) return false;
+            } else {
+                // Skill filter
+                if (skillFilter !== 'All' && item.skill !== skillFilter) return false;
+                // Distance filter
+                if (item.distance > radiusFilter) return false;
+                // Available filter
+                if (availableOnly && item.status !== 'Available') return false;
+                // Top rated filter
+                if (topRatedOnly && item.rating < 4.5) return false;
+            }
+            return true;
+        });
+
+        currentFilteredItems = filtered;
+        renderItems(filtered, radiusFilter);
+
+        // Fit map to show all filtered markers and the circle
+        if (myLat) {
+            const bounds = L.latLngBounds([
+                [myLat - (radiusFilter / 111), myLon - (radiusFilter / 111)],
+                [myLat + (radiusFilter / 111), myLon + (radiusFilter / 111)]
+            ]); // rough bounding box for radius
+            filtered.forEach(item => bounds.extend([item.lat, item.lon]));
+            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+        }
+    }
+
+    function openJobDetails(idx) {
+        const item = currentFilteredItems[idx];
+        if (!item) return;
+
+        const modal = document.getElementById('job-details-modal');
+        const content = document.getElementById('modal-content');
+
+        content.innerHTML = `
+            <div class="flex gap-4 items-start border-b border-slate-100 pb-4 mb-4">
+                <div class="w-12 h-12 bg-brandBlue text-white rounded-full flex items-center justify-center font-bold text-xl shadow-sm flex-shrink-0">${item.title[0]}</div>
+                <div>
+                    <h2 class="font-bold text-lg text-brandText leading-tight mb-1">${item.title}</h2>
+                    <p class="text-xs font-semibold text-brandIcon">Posted by <span class="text-brandText">${item.provider_name}</span> • ${item.created_at}</p>
+                </div>
+            </div>
+            
+            <div class="space-y-4 mb-6">
+                <div>
+                    <h4 class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-1">Description</h4>
+                    <p class="text-sm text-slate-700 leading-relaxed">${item.description}</p>
+                </div>
+                
+                <div class="flex flex-wrap gap-2">
+                    <span class="text-xs font-medium bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100 text-brandIcon flex items-center gap-1">📍 ${item.distance.toFixed(1)} km away</span>
+                    <span class="text-xs font-medium bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 text-emerald-700 flex items-center gap-1">💰 ₹${item.price}</span>
+                    <span class="text-xs font-medium bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100 text-amber-700 flex items-center gap-1">🕐 ${item.scheduled_time}</span>
+                </div>
+            </div>
+            
+            <div class="flex gap-3 pt-4 border-t border-slate-100">
+                <a href="/user/${item.provider_id}/" target="_blank" class="flex-1 bg-slate-100 text-slate-700 text-center px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200 transition">View Profile</a>
+                <form method="POST" action="/services/${item.id}/accept/" class="flex-1 m-0">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <button type="submit" class="w-full bg-brandBlue text-white text-center px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-900 transition shadow-sm">Accept Job</button>
+                </form>
+            </div>
+        `;
+
+        modal.classList.remove('hidden');
+    }
+
+    // Pan to a specific worker and highlight their card
+    function panToWorker(lat, lon, idx) {
+        map.flyTo([lat, lon], 16, { animate: true, duration: 1 });
+        if (markers[idx]) markers[idx].openPopup();
+
+        // Highlight the card
+        document.querySelectorAll('.worker-card').forEach(c => c.classList.remove('highlighted'));
+        const card = document.getElementById(`worker-card-${idx}`);
+        if (card) {
+            card.classList.add('highlighted');
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    // Initialize
+    setTimeout(locateMe, 300);
+</script>
+{% endblock %}

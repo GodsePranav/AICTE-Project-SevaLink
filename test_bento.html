@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SevLink | Marketplace</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandBg: '#f8fafc',
+                        brandCard: '#ffffff',
+                        brandText: '#0f172a',
+                        brandBorder: '#e2e8f0',
+                        brandBlue: '#1e3a8a', /* Deep Blue */
+                        brandOrange: '#f97316', /* Orange Accent */
+                        brandHover: '#eff6ff',
+                        brandIcon: '#64748b'
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'brand': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'brandHover': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-y: scroll;
+        }
+
+        .li-card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            transition: box-shadow 0.2s ease-in-out;
+        }
+
+        .li-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-icon-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            padding: 0 0.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            min-width: 75px;
+            transition: all 0.2s;
+        }
+
+        .nav-icon-container:hover {
+            color: #1e3a8a;
+        }
+
+        .nav-icon-container.active {
+            color: #1e3a8a;
+            border-bottom: 3px solid #f97316;
+        }
+
+        #globe-container {
+            width: 100%;
+            height: 250px;
+            position: relative;
+            background: #fff;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Simple Mode Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #f97316;
+        }
+
+        .toggle-checkbox:checked+.toggle-label {
+            background-color: #f97316;
+        }
+    </style>
+
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    
+</head>
+
+<body class="antialiased text-sm">
+
+    <!-- Top Navbar -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-brandBorder w-full h-[64px] shadow-sm">
+        <div class="max-w-[1280px] mx-auto px-4 h-full flex items-center justify-between">
+
+            <div class="flex items-center gap-2 flex-grow max-w-[300px]">
+                <!-- Custom Service Logo -->
+                <a href="/" class="flex items-center mr-4 group">
+                    <div class="bg-brandBlue p-1.5 rounded-lg group-hover:bg-brandOrange transition-colors">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                            </path>
+                        </svg>
+                    </div>
+                    <span class="text-brandBlue font-extrabold text-xl tracking-tight ml-2 hidden lg:block">Sev<span
+                            class="text-brandOrange">Link</span></span>
+                </a>
+            </div>
+
+            <!-- Navbar Icons -->
+            <ul class="flex h-full items-center -ml-[auto] overflow-x-auto hide-scrollbar">
+                <li class="h-full">
+                    <a href="/" class="nav-icon-container active h-full flex-col hover:bg-transparent">
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                            </path>
+                        </svg>
+                        <span class="text-[11px] font-semibold hidden md:block">Home</span>
+                    </a>
+                </li>
+                <li class="h-full">
+                    <a href="/services/map/" class="nav-icon-container h-full flex-col hover:bg-transparent">
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        <span class="text-[11px] font-semibold hidden md:block">Find Workers</span>
+                    </a>
+                </li>
+                <li class="h-full">
+                    <a href="/#post-job"
+                        class="nav-icon-container h-full flex-col hover:bg-transparent text-brandOrange">
+                        <svg class="w-6 h-6 mb-1 text-brandOrange" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-[11px] font-bold text-brandOrange hidden md:block">Post a Job</span>
+                    </a>
+                </li>
+                <li class="h-full">
+                    <a href="/services/map/" class="nav-icon-container h-full flex-col hover:bg-transparent">
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
+                            </path>
+                        </svg>
+                        <span class="text-[11px] font-semibold hidden md:block">Nearby Map</span>
+                    </a>
+                </li>
+                <li class="h-full">
+                    <a href="/messages/"
+                        class="nav-icon-container h-full flex-col hover:bg-transparent relative">
+                        <span
+                            class="absolute top-2 right-4 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold border-2 border-white">2</span>
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                            </path>
+                        </svg>
+                        <span class="text-[11px] font-semibold hidden md:block">Messages</span>
+                    </a>
+                </li>
+                <li class="h-full">
+                    <a href="/notifications/" class="nav-icon-container h-full flex-col hover:bg-transparent">
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                            </path>
+                        </svg>
+                        <span class="text-[11px] font-semibold hidden md:block">Alerts</span>
+                    </a>
+                </li>
+                <li class="h-full hidden lg:block border-l border-brandBorder ml-2 pl-2">
+                    <a href="/business/" class="nav-icon-container h-full flex-col hover:bg-transparent">
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
+                        </svg>
+                        <span class="text-[11px] font-semibold flex items-center">My Dash</span>
+                    </a>
+                </li>
+                <li class="h-full ml-1 pr-2 border-r border-brandBorder relative group">
+                    
+                    <a href="/profile/" class="nav-icon-container h-full flex-col hover:bg-transparent">
+                        <div
+                            class="w-7 h-7 rounded-full bg-brandBlue text-white flex items-center justify-center mb-1 overflow-hidden shadow-sm">
+                            <span class="text-xs font-bold">T</span>
+                        </div>
+                        <span class="text-[11px] font-semibold hidden md:flex items-center">Profile <svg
+                                class="w-3 h-3 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M7 10l5 5 5-5z"></path>
+                            </svg></span>
+                    </a>
+                    <!-- Dropdown Menu -->
+                    <div
+                        class="absolute right-0 top-full mt-1 w-48 bg-white border border-brandBorder rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 overflow-hidden">
+                        <div class="p-4 border-b border-brandBorder bg-slate-50">
+                            <p class="text-sm font-bold text-brandText truncate">{{
+                                user.first_name|default:user.username }}</p>
+                            <p class="text-xs text-brandIcon truncate mt-0.5">Worker</p>
+                        </div>
+                        <a href="/accounts/logout/"
+                            class="block px-4 py-3 text-sm text-red-600 hover:bg-red-50 font-bold transition flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                </path>
+                            </svg>
+                            Log out
+                        </a>
+                    </div>
+                    
+                </li>
+            </ul>
+
+            <!-- Simple Mode Toggle -->
+            <div class="hidden lg:flex items-center ml-4 pl-2">
+                <span class="text-xs font-semibold mr-2 text-brandIcon">Simple Mode</span>
+                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                    <input type="checkbox" name="toggle" id="simple-toggle"
+                        class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-brandBorder z-10 top-[-2px] -left-1 transition-all duration-300" />
+                    <label for="simple-toggle"
+                        class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-[1280px] mx-auto pt-8 px-4">
+        
+<div class="flex flex-col md:flex-row gap-6 mt-4 pb-10 justify-center px-4">
+    <main class="w-full xl:w-[1100px] lg:w-[900px] md:w-[700px] flex-shrink-0 flex flex-col gap-4">
+
+        <div>
+            <h2 class="font-extrabold text-3xl text-brandBlue mb-6 border-b border-brandBorder pb-4">
+                Edit Your Profile
+            </h2>
+
+            
+
+            <form method="POST" action="/profile/edit/">
+                <input type="hidden" name="csrfmiddlewaretoken" value="o4Evvprfo6XpaLPT2DM6D1Z3tkp9FlvqD4jsf9R6uc8jlPDjwdxns9EAJXeQYzZO">
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                    <!-- Identity & Verification -->
+                    <div
+                        class="bg-white border border-brandBorder rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-5 bg-gradient-to-b from-white to-slate-50">
+                        <h3
+                            class="text-lg font-bold text-brandText border-b border-brandBorder pb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brandBlue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2">
+                                </path>
+                            </svg>
+                            Identity Verification
+                        </h3>
+
+                        
+                        
+                        <div>
+                            <div class="block text-sm font-bold text-brandText mb-1">
+                                <label for="id_first_name">First name:</label>
+                            </div>
+                            <input type="text" name="first_name" value="NewFirst" maxlength="30" required id="id_first_name">
+                            
+                        </div>
+                        
+                        
+                        
+                        <div>
+                            <div class="block text-sm font-bold text-brandText mb-1">
+                                <label for="id_last_name">Last name:</label>
+                            </div>
+                            <input type="text" name="last_name" value="NewLast" maxlength="30" required id="id_last_name">
+                            
+                        </div>
+                        
+                        
+                        
+                        
+
+                        
+                        
+                        
+                        
+                        <div>
+                            <div class="block text-sm font-bold text-brandText mb-1 flex items-center justify-between">
+                                <label for="id_full_name">Full Name (Must match Aadhaar):</label>
+                                
+                                <span
+                                    class="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200 font-bold flex items-center gap-1 shadow-sm">
+                                    🔒 Verified & Locked
+                                </span>
+                                
+                            </div>
+                            <input type="text" name="full_name" value="Fullname Test" maxlength="255" disabled aria-describedby="id_full_name_helptext" id="id_full_name">
+                            <p class="text-[11px] text-brandIcon mt-1 font-medium">{{
+                                field.help_text }}</p>
+                            
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        <div>
+                            <div class="block text-sm font-bold text-brandText mb-1 flex items-center justify-between">
+                                <label for="id_aadhaar_number">12-Digit Aadhaar Number:</label>
+                                
+                                <span
+                                    class="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200 font-bold flex items-center gap-1 shadow-sm">
+                                    🔒 Verified & Locked
+                                </span>
+                                
+                            </div>
+                            <input type="number" name="aadhaar_number" min="-9223372036854775808" max="9223372036854775807" disabled aria-describedby="id_aadhaar_number_helptext" id="id_aadhaar_number">
+                            <p class="text-[11px] text-brandIcon mt-1 font-medium">{{
+                                field.help_text }}</p>
+                            
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div
+                        class="bg-white border border-brandBorder rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-5 bg-gradient-to-b from-white to-slate-50">
+                        <h3
+                            class="text-lg font-bold text-brandText border-b border-brandBorder pb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brandBlue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            Contact & Location
+                        </h3>
+
+                        
+                        
+                        
+                        
+                        
+                        
+                        <div>
+                            <div class="block text-sm font-bold text-brandText mb-1">
+                                <label for="id_email">Email:</label>
+                            </div>
+                            <input type="email" name="email" value="new@mail.com" maxlength="254" required id="id_email">
+                            
+                        </div>
+                        
+                        
+
+                        
+                        
+                        
+                        
+                        
+                        
+                        <div>
+                            <div class="block text-sm font-bold text-brandText mb-1">
+                                <label for="id_phone_number">Phone Number (For OTP Verification):</label>
+                            </div>
+                            <input type="number" name="phone_number" min="-9223372036854775808" max="9223372036854775807" aria-describedby="id_phone_number_helptext" id="id_phone_number">
+                            <p class="text-[11px] text-brandIcon mt-1 font-medium">{{
+                                field.help_text }}</p>
+                            
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <div class="mt-2">
+                            <div class="block text-sm font-bold text-brandText mb-1">
+                                <label for="id_live_location">Service Area / Live Location:</label>
+                            </div>
+                            <textarea name="live_location" cols="40" rows="2" placeholder="{&quot;lat&quot;: 0.0, &quot;lon&quot;: 0.0} (or empty)" aria-describedby="id_live_location_helptext" id="id_live_location">
+null</textarea>
+                            <p class="text-[11px] text-brandIcon mt-1 font-medium">{{
+                                field.help_text }}</p>
+                            
+                        </div>
+                        
+                        
+                    </div>
+
+                    <!-- Professional Details -->
+                    <div
+                        class="bg-white border border-brandBorder rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4 bg-gradient-to-b from-white to-slate-50">
+                        <h3
+                            class="text-lg font-bold text-brandText border-b border-brandBorder pb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brandBlue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            Professional Profile
+                        </h3>
+
+                        
+                        
+                        <div>
+                            <div class="block text-sm font-bold text-brandText mb-1">
+                                <label for="id_role">Your Role:</label>
+                            </div>
+                            <select name="role" id="id_role">
+  <option value="Worker" selected>Worker</option>
+
+  <option value="Job Provider">Job Provider</option>
+
+  <option value="Both">Both</option>
+
+</select>
+                            
+                            
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <div>
+                            <div class="block text-sm font-bold text-brandText mb-1">
+                                <label for="id_primary_category">Work Category:</label>
+                            </div>
+                            <select name="primary_category" id="id_primary_category">
+  <option value="" selected>---------</option>
+
+  <option value="Professional">Professional</option>
+
+  <option value="Skilled Trade">Skilled Trade</option>
+
+  <option value="General Labor">General Labor</option>
+
+</select>
+                            
+                            
+                        </div>
+                        
+                        
+                        
+                        <div>
+                            <div class="block text-sm font-bold text-brandText mb-1">
+                                <label for="id_job_title">Job Title / Specific Trade:</label>
+                            </div>
+                            <input type="text" name="job_title" maxlength="100" aria-describedby="id_job_title_helptext" id="id_job_title">
+                            <p class="text-[11px] text-brandIcon mt-1 font-medium">{{
+                                field.help_text }}</p>
+                            
+                        </div>
+                        
+                        
+                        
+                        <div>
+                            <div class="block text-sm font-bold text-brandText mb-1">
+                                <label for="id_service_skills">Service Skills:</label>
+                            </div>
+                            <textarea name="service_skills" cols="40" rows="3" aria-describedby="id_service_skills_helptext" id="id_service_skills">
+</textarea>
+                            <p class="text-[11px] text-brandIcon mt-1 font-medium">{{
+                                field.help_text }}</p>
+                            
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        
+
+                        <!-- Availability Toggle -->
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <div
+                            class="flex items-center gap-3 bg-white p-4 rounded-xl border border-brandBorder mt-2 shadow-sm">
+                            <div class="flex items-center h-5">
+                                <input type="checkbox" name="is_available" aria-describedby="id_is_available_helptext" id="id_is_available" checked>
+                            </div>
+                            <div class="ml-2 text-sm">
+                                <div class="font-bold text-brandText"><label for="id_is_available">Work Availability Status:</label></div>
+                                <p class="text-[11px] text-brandIcon font-medium mt-0.5">{{
+                                    field.help_text }}</p>
+                            </div>
+                            
+                        </div>
+                        
+                        
+                        
+                        
+                    </div>
+
+                </div> <!-- End Bento Grid -->
+
+                <div class="pt-8 pb-4 flex gap-4 justify-end mt-4">
+                    <a href="/profile/"
+                        class="bg-white border border-brandBorder text-brandText font-bold px-8 py-3 rounded-full hover:bg-slate-50 transition shadow-sm text-center">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                        class="bg-brandOrange text-white font-bold px-8 py-3 rounded-full hover:bg-orange-600 transition shadow-md hover:shadow-lg">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    // Add Tailwind classes to Django form inputs dynamically
+    document.addEventListener("DOMContentLoaded", function () {
+        // Text inputs
+        const textInputs = document.querySelectorAll('input[type="text"], input[type="email"], textarea');
+        textInputs.forEach(input => {
+            input.classList.add('w-full', 'bg-slate-50', 'border', 'border-slate-200', 'rounded-xl', 'px-4', 'py-2', 'text-sm', 'font-medium', 'focus:outline-none', 'focus:ring-2', 'focus:ring-brandBlue', 'focus:border-brandBlue', 'transition-all');
+        });
+
+        // Select inputs
+        const selectInputs = document.querySelectorAll('select');
+        selectInputs.forEach(input => {
+            input.classList.add('w-full', 'bg-slate-50', 'border', 'border-slate-200', 'rounded-xl', 'px-4', 'py-2', 'text-sm', 'font-semibold', 'focus:outline-none', 'focus:ring-2', 'focus:ring-brandBlue', 'focus:border-brandBlue', 'transition-all');
+        });
+
+        // Checkboxes
+        const checkInputs = document.querySelectorAll('input[type="checkbox"]');
+        checkInputs.forEach(input => {
+            input.classList.add('w-5', 'h-5', 'text-brandBlue', 'bg-slate-50', 'border-slate-300', 'rounded', 'focus:ring-brandOrange', 'focus:ring-2');
+        });
+    });
+</script>
+
+    </main>
+
+    
+
+    <script>
+        // Simple Mode Toggle Logic (Hides advanced elements if checked)
+        document.getElementById('simple-toggle')?.addEventListener('change', function (e) {
+            const isSimple = e.target.checked;
+            document.querySelectorAll('.advanced-ui').forEach(el => {
+                if (isSimple) {
+                    el.classList.add('hidden');
+                } else {
+                    el.classList.remove('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

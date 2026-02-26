@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex flex-col md:flex-row gap-6 mt-4 pb-10 justify-center">
+    <main class="w-full md:w-[700px] flex-shrink-0 flex flex-col gap-4">
+        <!-- Profile Card -->
+        <div class="li-card relative pb-5">
+            <div class="bg-gradient-to-r from-brandBlue to-blue-600 h-[150px] rounded-t-[0.8rem]"></div>
+
+            <div
+                class="w-32 h-32 rounded-full border-4 border-white bg-slate-200 ml-6 -mt-16 relative z-10 overflow-hidden shadow-sm">
+                <svg class="w-full h-full text-slate-400 mt-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </div>
+
+            <div class="px-6 mt-3">
+                <h2 class="font-bold text-2xl text-brandText">
+                    {% if request.user.is_authenticated %}
+                    {{ request.user.first_name }} {{ request.user.last_name }}
+                    {% if not request.user.first_name %}{{ request.user.username }}{% endif %}
+                    {% else %}
+                    Guest User
+                    {% endif %}
+                </h2>
+                <div class="mt-2 flex items-center gap-2">
+                    {% if request.user.profile.role == 'Worker' %}
+                    <span
+                        class="bg-brandOrange text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm uppercase tracking-wide">Worker</span>
+                    {% endif %}
+                    {% if request.user.profile.role == 'Job Provider' %}
+                    <span
+                        class="bg-brandBlue text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm uppercase tracking-wide">Job
+                        Provider</span>
+                    {% endif %}
+                    {% if request.user.profile.role not in "Worker,Job Provider" %}
+                    <span
+                        class="bg-slate-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm uppercase tracking-wide">User</span>
+                    {% endif %}
+                    <span class="text-sm font-medium text-slate-500">• SevaLink Member</span>
+                </div>
+                <p class="text-sm font-semibold text-brandIcon mt-1">Joined {{ request.user.date_joined|date:"M Y" }} •
+                    <span class="text-brandBlue font-bold">{{ request.user.email }}</span>
+                </p>
+
+                <div class="flex gap-3 mt-4 flex-wrap">
+                    <a href="{% url 'edit_profile' %}"
+                        class="bg-brandBlue text-white font-bold px-5 py-2 rounded-full hover:bg-blue-900 transition shadow-sm text-sm">
+                        ✏️ Edit Profile
+                    </a>
+                    <a href="{% url 'post_job_page' %}"
+                        class="border border-brandBlue text-brandBlue font-bold px-5 py-2 rounded-full hover:bg-slate-50 transition shadow-sm text-sm">
+                        + Post a Job
+                    </a>
+                    <form method="POST" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="border border-red-500 text-red-500 font-bold px-5 py-2 rounded-full hover:bg-red-50 transition shadow-sm text-sm">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="li-card p-6">
+            <h2 class="font-bold text-lg mb-4 text-brandText">Activity Summary</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-blue-50 rounded-xl p-4 text-center border border-blue-100">
+                    <p class="text-2xl font-bold text-brandBlue">{{ jobs_posted }}</p>
+                    <p class="text-xs font-semibold text-brandIcon mt-1">Jobs Posted</p>
+                </div>
+                <div class="bg-emerald-50 rounded-xl p-4 text-center border border-emerald-100">
+                    <p class="text-2xl font-bold text-emerald-600">{{ jobs_completed }}</p>
+                    <p class="text-xs font-semibold text-brandIcon mt-1">Jobs Completed</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="li-card p-6">
+            <h2 class="font-bold text-lg mb-4 text-brandText">Contact Information</h2>
+            <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-lg">📧</span>
+                    <div>
+                        <p class="text-xs font-bold text-brandIcon">Email</p>
+                        <p class="text-sm font-semibold text-brandText">{{ request.user.email|default:"Not set" }}</p>
+                    </div>
+                </div>
+                {% if request.user.profile.phone_number %}
+                <div class="flex items-center gap-3">
+                    <span class="text-lg">📱</span>
+                    <div>
+                        <p class="text-xs font-bold text-brandIcon">Phone</p>
+                        <p class="text-sm font-semibold text-brandText">{{ request.user.profile.phone_number }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% if request.user.profile.job_title %}
+                <div class="flex items-center gap-3">
+                    <span class="text-lg">💼</span>
+                    <div>
+                        <p class="text-xs font-bold text-brandIcon">Job Title</p>
+                        <p class="text-sm font-semibold text-brandText">{{ request.user.profile.job_title }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Service Skills -->
+        <div class="li-card p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-bold text-lg text-brandText">Service Skills</h2>
+                <button id="edit-skills-btn" onclick="toggleSkillsEditor()"
+                    class="text-xs font-bold text-brandBlue hover:text-blue-900 transition px-3 py-1 rounded-lg border border-brandBlue/20 hover:border-brandBlue/50">
+                    ✏️ Edit Skills
+                </button>
+            </div>
+
+            <!-- Skills Display (pills) -->
+            <div id="skills-display" class="flex flex-wrap gap-2 min-h-[40px]">
+                {% if request.user.profile.service_skills %}
+                <!-- Skills will be rendered as pills by JS on page load -->
+                {% endif %}
+                <p id="no-skills-msg"
+                    class="text-sm font-medium text-slate-400 {% if request.user.profile.service_skills %}hidden{% endif %}">
+                    No skills listed yet. Click "Edit Skills" to add your expertise.
+                </p>
+            </div>
+
+            <!-- Skills Editor (hidden by default) -->
+            <div id="skills-editor" class="hidden mt-4 pt-4 border-t border-slate-100">
+                <div class="flex gap-2 mb-3">
+                    <input type="text" id="new-skill-input" placeholder="Type a skill (e.g. Plumbing, Electrical)"
+                        class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition"
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill();}">
+                    <button onclick="addSkill()"
+                        class="bg-brandBlue text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-blue-900 transition shadow-sm whitespace-nowrap">
+                        + Add
+                    </button>
+                </div>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <span class="text-[11px] font-semibold text-slate-400">Quick add:</span>
+                    <button type="button" onclick="addSkillDirect('Electrical')"
+                        class="text-[11px] font-bold text-brandBlue hover:underline">Electrical</button>
+                    <button type="button" onclick="addSkillDirect('Plumbing')"
+                        class="text-[11px] font-bold text-brandBlue hover:underline">Plumbing</button>
+                    <button type="button" onclick="addSkillDirect('Cleaning')"
+                        class="text-[11px] font-bold text-brandBlue hover:underline">Cleaning</button>
+                    <button type="button" onclick="addSkillDirect('Carpentry')"
+                        class="text-[11px] font-bold text-brandBlue hover:underline">Carpentry</button>
+                    <button type="button" onclick="addSkillDirect('AC Repair')"
+                        class="text-[11px] font-bold text-brandBlue hover:underline">AC Repair</button>
+                    <button type="button" onclick="addSkillDirect('Painting')"
+                        class="text-[11px] font-bold text-brandBlue hover:underline">Painting</button>
+                    <button type="button" onclick="addSkillDirect('Packing')"
+                        class="text-[11px] font-bold text-brandBlue hover:underline">Packing</button>
+                </div>
+                <button onclick="saveSkills()"
+                    class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl hover:bg-emerald-700 transition text-sm shadow-sm"
+                    id="save-skills-btn">
+                    💾 Save Skills
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sidebar -->
+    <aside class="w-full md:w-[280px] flex-shrink-0 flex flex-col gap-4">
+        <div class="li-card p-5">
+            <h3 class="font-bold text-sm text-brandText mb-3">Quick Links</h3>
+            <ul class="space-y-2">
+                <li><a href="{% url 'edit_profile' %}"
+                        class="text-sm font-semibold text-brandIcon hover:text-brandBlue transition block">✏️ Edit
+                        Profile</a></li>
+                <li><a href="{% url 'business' %}"
+                        class="text-sm font-semibold text-brandIcon hover:text-brandBlue transition block">📊
+                        Dashboard</a></li>
+                <li><a href="{% url 'nearby_map' %}"
+                        class="text-sm font-semibold text-brandIcon hover:text-brandBlue transition block">🗺️ Nearby
+                        Map</a></li>
+                <li><a href="{% url 'inbox' %}"
+                        class="text-sm font-semibold text-brandIcon hover:text-brandBlue transition block">💬
+                        Messages</a></li>
+            </ul>
+        </div>
+        <div class="li-card p-5">
+            <h3 class="font-bold text-sm text-brandText">Verification</h3>
+            <p
+                class="text-xs font-semibold mt-2 {% if request.user.profile.is_verified %}text-emerald-600{% else %}text-amber-600{% endif %}">
+                {% if request.user.profile.is_verified %}✅ Verified Account{% else %}⏳ Pending Verification{% endif %}
+            </p>
+        </div>
+        <div class="li-card p-5 border-l-4 border-l-red-500">
+            <h3 class="font-bold text-sm text-red-600 mb-2">Danger Zone</h3>
+            <p class="text-xs text-slate-500 mb-4 font-medium">Permanently delete your account and all associated data.
+            </p>
+            <a href="{% url 'delete_account' %}"
+                class="block text-center w-full bg-red-50 text-red-600 font-bold py-2 rounded-lg hover:bg-red-100 transition text-sm">Delete
+                Account</a>
+        </div>
+    </aside>
+</div>
+
+<script>
+    // Skills management
+    let currentSkills = [];
+
+    // Initialize from server data
+    (function initSkills() {
+        const raw = `{{ request.user.profile.service_skills|escapejs }}`;
+        if (raw.trim()) {
+            currentSkills = raw.split(',').map(s => s.trim()).filter(Boolean);
+        }
+        renderSkills();
+    })();
+
+    function renderSkills() {
+        const container = document.getElementById('skills-display');
+        const noMsg = document.getElementById('no-skills-msg');
+
+        // Clear existing pills (but keep the no-skills msg)
+        container.querySelectorAll('.skill-pill').forEach(el => el.remove());
+
+        if (currentSkills.length === 0) {
+            noMsg.classList.remove('hidden');
+            return;
+        }
+
+        noMsg.classList.add('hidden');
+        currentSkills.forEach(skill => {
+            const pill = document.createElement('span');
+            pill.className = 'skill-pill inline-flex items-center gap-1.5 bg-brandBlue/10 text-brandBlue px-3 py-1.5 rounded-full text-xs font-bold border border-brandBlue/20';
+            pill.innerHTML = `🛠️ ${skill} <button onclick="removeSkill('${skill.replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 ml-1 text-sm leading-none">&times;</button>`;
+            container.insertBefore(pill, noMsg);
+        });
+    }
+
+    function toggleSkillsEditor() {
+        const editor = document.getElementById('skills-editor');
+        const btn = document.getElementById('edit-skills-btn');
+        editor.classList.toggle('hidden');
+        btn.textContent = editor.classList.contains('hidden') ? '✏️ Edit Skills' : '✕ Close';
+    }
+
+    function addSkill() {
+        const input = document.getElementById('new-skill-input');
+        const skill = input.value.trim();
+        if (skill && !currentSkills.includes(skill)) {
+            currentSkills.push(skill);
+            renderSkills();
+        }
+        input.value = '';
+        input.focus();
+    }
+
+    function addSkillDirect(skill) {
+        if (!currentSkills.includes(skill)) {
+            currentSkills.push(skill);
+            renderSkills();
+        }
+    }
+
+    function removeSkill(skill) {
+        currentSkills = currentSkills.filter(s => s !== skill);
+        renderSkills();
+    }
+
+    function saveSkills() {
+        const btn = document.getElementById('save-skills-btn');
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        fetch('{% url "update_skills" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ skills: currentSkills.join(', ') })
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    btn.textContent = '✅ Saved!';
+                    btn.classList.remove('bg-emerald-600');
+                    btn.classList.add('bg-emerald-500');
+                    setTimeout(() => {
+                        btn.textContent = '💾 Save Skills';
+                        btn.classList.remove('bg-emerald-500');
+                        btn.classList.add('bg-emerald-600');
+                        btn.disabled = false;
+                    }, 2000);
+                }
+            })
+            .catch(() => {
+                btn.textContent = 'Error — retry';
+                btn.disabled = false;
+            });
+    }
+</script>
+{% endblock %}

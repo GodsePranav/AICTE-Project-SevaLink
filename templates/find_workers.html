@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<style>
+    .worker-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.2s;
+        height: 100%;
+    }
+
+    .worker-card:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border-color: #cbd5e1;
+    }
+
+    .card-banner {
+        height: 60px;
+        background: linear-gradient(135deg, #1e3a8a 0%, #f97316 100%);
+    }
+
+    .card-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 4px solid #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: 800;
+        color: #1e3a8a;
+        background: #eff6ff;
+        margin: -40px auto 0;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .card-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-body {
+        padding: 12px 16px 16px;
+        text-align: center;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-name {
+        font-size: 16px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-top: 4px;
+    }
+
+    .card-role {
+        font-size: 13px;
+        font-weight: 700;
+        color: #f97316;
+        margin-top: 2px;
+    }
+
+    .card-tag {
+        font-size: 11px;
+        color: #64748b;
+        margin-top: 2px;
+        font-weight: 600;
+    }
+
+    .card-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .skill-pill {
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 20px;
+    }
+
+    .card-actions {
+        margin-top: auto;
+        padding-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .job-select {
+        width: 100%;
+        padding: 8px;
+        font-size: 12px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        outline: none;
+    }
+
+    .btn-ask {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 800;
+        background: #1e3a8a;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-ask:hover {
+        background: #1e40af;
+    }
+
+    .btn-ask:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        display: flex;
+        gap: 4px;
+        width: 100%;
+    }
+
+    .btn-msg,
+    .btn-view {
+        flex: 1;
+        padding: 8px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-msg {
+        background: #f8fafc;
+        color: #1e3a8a;
+    }
+
+    .btn-msg:hover {
+        background: #eff6ff;
+    }
+
+    .btn-view {
+        background: #fff;
+        color: #64748b;
+    }
+
+    .btn-view:hover {
+        background: #f8fafc;
+        color: #0f172a;
+    }
+
+    .filter-pill {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .filter-pill:hover,
+    .filter-pill.active {
+        background: #1e3a8a;
+        color: white;
+        border-color: #1e3a8a;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1200px] mx-auto mt-4 pb-20 px-4">
+    <!-- Top Section -->
+    <div class="li-card p-6 mb-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-extrabold text-brandText">Find Workers</h1>
+                <p class="text-sm text-brandIcon font-semibold">Browse and connect with service providers nearby</p>
+            </div>
+            <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100">
+                <span class="text-2xl">👷</span>
+                <div>
+                    <p class="text-xs font-bold text-brandIcon uppercase">Total Professionals</p>
+                    <p class="text-lg font-black text-brandBlue">{{ total_workers }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="mt-6 relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-4 h-4 text-brandIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            <input type="text" id="live-search" placeholder="Search by name, skill, or category..."
+                class="w-full pl-10 pr-4 py-3 rounded-xl border border-brandBorder text-sm focus:ring-2 focus:ring-brandBlue/20 focus:border-brandBlue outline-none transition shadow-sm">
+        </div>
+
+        <!-- Categorical Filters -->
+        <div class="flex flex-wrap gap-2 mt-4">
+            <a href="{% url 'jobs' %}" class="filter-pill {% if not current_filter %}active{% endif %}">All</a>
+            <a href="{% url 'jobs' %}?filter=Plumber"
+                class="filter-pill {% if current_filter == 'Plumber' %}active{% endif %}">Plumber</a>
+            <a href="{% url 'jobs' %}?filter=Electrician"
+                class="filter-pill {% if current_filter == 'Electrician' %}active{% endif %}">Electrician</a>
+            <a href="{% url 'jobs' %}?filter=Carpenter"
+                class="filter-pill {% if current_filter == 'Carpenter' %}active{% endif %}">Carpenter</a>
+            <a href="{% url 'jobs' %}?filter=Mechanic"
+                class="filter-pill {% if current_filter == 'Mechanic' %}active{% endif %}">Mechanic</a>
+            <a href="{% url 'jobs' %}?filter=Guard"
+                class="filter-pill {% if current_filter == 'Guard' %}active{% endif %}">Guard</a>
+            <a href="{% url 'jobs' %}?filter=Housekeeping"
+                class="filter-pill {% if current_filter == 'Housekeeping' %}active{% endif %}">Housekeeping</a>
+        </div>
+    </div>
+
+    <!-- Results Grid -->
+    <div class="flex items-center justify-between mb-4 px-1">
+        <h2 class="font-bold text-lg text-brandText">
+            {% if current_filter %}{{ current_filter }} Experts{% else %}Global Talent Pool{% endif %}
+        </h2>
+        <span id="search-count" class="text-xs font-bold text-brandIcon"></span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="workers-list">
+        {% for w in workers %}
+        <div class="worker-card"
+            data-search="{{ w.user.first_name|default:w.user.username }} {{ w.user.last_name }} {{ w.job_title }} {{ w.primary_category }}">
+            <div class="card-banner"></div>
+            <div class="card-avatar">
+                {% if w.profile_picture %}
+                <img src="{{ w.profile_picture.url }}" alt="{{ w.user.username }}">
+                {% else %}
+                {{ w.user.username|make_list|first|upper }}
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <p class="card-name">{{ w.user.first_name|default:w.user.username }} {{ w.user.last_name }}</p>
+                <p class="card-role">{{ w.primary_category|default:"Worker" }}</p>
+                {% if w.job_title %}<p class="card-tag">{{ w.job_title }}</p>{% endif %}
+
+                <div class="card-actions">
+                    {% if request.user.profile.role == 'Job Provider' %}
+                    {% if provider_jobs %}
+                    <select id="job-select-{{ w.user.id }}" class="job-select">
+                        <option value="">General Request</option>
+                        {% for pj in provider_jobs %}
+                        <option value="{{ pj.id }}">{{ pj.title|truncatechars:20 }}</option>
+                        {% endfor %}
+                    </select>
+                    {% endif %}
+                    <button onclick="sendTaskRequest('{{ w.user.id }}', this)" class="btn-ask">📝 Ask to do
+                        tasks</button>
+                    {% endif %}
+                    <div class="btn-secondary">
+                        <a href="{% url 'inbox' %}?user={{ w.user.id }}" class="btn-msg">Message</a>
+                        <a href="{% url 'user_profile' w.user.id %}" class="btn-view">Profile</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-20 text-center li-card">
+            <p class="text-3xl mb-2">🔍</p>
+            <p class="font-bold text-brandIcon">No workers found matching your criteria.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function sendTaskRequest(workerId, btn) {
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = 'Sending...';
+        const jobSelect = document.getElementById(`job-select-${workerId}`);
+        const jobId = jobSelect ? jobSelect.value : null;
+
+        fetch(`/services/request/send/${workerId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ job_id: jobId })
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    btn.innerHTML = '✓ Sent';
+                    btn.classList.add('bg-emerald-600');
+                    btn.classList.remove('bg-1e3a8a');
+                } else {
+                    alert(data.error || 'Error sending request');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            })
+            .catch(e => {
+                alert('Network error');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
+    }
+
+    function filterWorkers() {
+        const q = document.getElementById('live-search').value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.worker-card');
+        const countEl = document.getElementById('search-count');
+        let vis = 0;
+        cards.forEach(c => {
+            const d = (c.getAttribute('data-search') || '').toLowerCase();
+            const ok = !q || d.includes(q);
+            c.style.display = ok ? '' : 'none';
+            if (ok) vis++;
+        });
+        countEl.textContent = q ? `${vis} results` : '';
+    }
+    document.getElementById('live-search').addEventListener('input', filterWorkers);
+</script>
+{% endblock %}

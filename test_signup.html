@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SevLink | Marketplace</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandBg: '#f8fafc',
+                        brandCard: '#ffffff',
+                        brandText: '#0f172a',
+                        brandBorder: '#e2e8f0',
+                        brandBlue: '#1e3a8a', /* Deep Blue */
+                        brandOrange: '#f97316', /* Orange Accent */
+                        brandHover: '#eff6ff',
+                        brandIcon: '#64748b'
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'brand': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'brandHover': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            overflow-y: scroll;
+        }
+
+        .li-card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            transition: box-shadow 0.2s ease-in-out;
+        }
+
+        .li-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-icon-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            padding: 0 0.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            min-width: 75px;
+            transition: all 0.2s;
+        }
+
+        .nav-icon-container:hover {
+            color: #1e3a8a;
+        }
+
+        .nav-icon-container.active {
+            color: #1e3a8a;
+            border-bottom: 3px solid #f97316;
+        }
+
+        #globe-container {
+            width: 100%;
+            height: 250px;
+            position: relative;
+            background: #fff;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Simple Mode Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #f97316;
+        }
+
+        .toggle-checkbox:checked+.toggle-label {
+            background-color: #f97316;
+        }
+    </style>
+
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    
+</head>
+
+<body class="antialiased text-sm">
+
+    <!-- Top Navbar -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-brandBorder w-full h-[64px] shadow-sm">
+        <div class="max-w-[1280px] mx-auto px-4 h-full flex items-center justify-between">
+
+            <div class="flex items-center gap-2 flex-grow max-w-[300px]">
+                <!-- Custom Service Logo -->
+                <a href="/" class="flex items-center mr-4 group">
+                    <div class="bg-brandBlue p-1.5 rounded-lg group-hover:bg-brandOrange transition-colors">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                            </path>
+                        </svg>
+                    </div>
+                    <span class="text-brandBlue font-extrabold text-xl tracking-tight ml-2 hidden lg:block">Sev<span
+                            class="text-brandOrange">Link</span></span>
+                </a>
+            </div>
+
+            <!-- Navbar Icons -->
+            <ul class="flex h-full items-center -ml-[auto] overflow-x-auto hide-scrollbar">
+                <li class="h-full">
+                    <a href="/" class="nav-icon-container active h-full flex-col hover:bg-transparent">
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                            </path>
+                        </svg>
+                        <span class="text-[11px] font-semibold hidden md:block">Home</span>
+                    </a>
+                </li>
+                <li class="h-full">
+                    <a href="/services/map/" class="nav-icon-container h-full flex-col hover:bg-transparent">
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        <span class="text-[11px] font-semibold hidden md:block">Find Workers</span>
+                    </a>
+                </li>
+                <li class="h-full">
+                    <a href="/#post-job"
+                        class="nav-icon-container h-full flex-col hover:bg-transparent text-brandOrange">
+                        <svg class="w-6 h-6 mb-1 text-brandOrange" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-[11px] font-bold text-brandOrange hidden md:block">Post a Job</span>
+                    </a>
+                </li>
+                <li class="h-full">
+                    <a href="/services/map/" class="nav-icon-container h-full flex-col hover:bg-transparent">
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
+                            </path>
+                        </svg>
+                        <span class="text-[11px] font-semibold hidden md:block">Nearby Map</span>
+                    </a>
+                </li>
+                <li class="h-full">
+                    <a href="/messages/"
+                        class="nav-icon-container h-full flex-col hover:bg-transparent relative">
+                        <span
+                            class="absolute top-2 right-4 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold border-2 border-white">2</span>
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                            </path>
+                        </svg>
+                        <span class="text-[11px] font-semibold hidden md:block">Messages</span>
+                    </a>
+                </li>
+                <li class="h-full">
+                    <a href="/notifications/" class="nav-icon-container h-full flex-col hover:bg-transparent">
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                            </path>
+                        </svg>
+                        <span class="text-[11px] font-semibold hidden md:block">Alerts</span>
+                    </a>
+                </li>
+                <li class="h-full hidden lg:block border-l border-brandBorder ml-2 pl-2">
+                    <a href="/business/" class="nav-icon-container h-full flex-col hover:bg-transparent">
+                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
+                        </svg>
+                        <span class="text-[11px] font-semibold flex items-center">My Dash</span>
+                    </a>
+                </li>
+                <li class="h-full ml-1 pr-2 border-r border-brandBorder relative group">
+                    
+                    <a href="/accounts/login/" class="nav-icon-container h-full flex-col hover:bg-transparent">
+                        <div
+                            class="w-7 h-7 rounded-full bg-slate-100 text-brandIcon flex items-center justify-center mb-1 overflow-hidden shadow-sm border border-slate-200">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                            </svg>
+                        </div>
+                        <span class="text-[11px] font-bold text-brandBlue hidden md:flex items-center">Sign In</span>
+                    </a>
+                    
+                </li>
+            </ul>
+
+            <!-- Simple Mode Toggle -->
+            <div class="hidden lg:flex items-center ml-4 pl-2">
+                <span class="text-xs font-semibold mr-2 text-brandIcon">Simple Mode</span>
+                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                    <input type="checkbox" name="toggle" id="simple-toggle"
+                        class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-brandBorder z-10 top-[-2px] -left-1 transition-all duration-300" />
+                    <label for="simple-toggle"
+                        class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-[1280px] mx-auto pt-8 px-4">
+        
+<div class="min-h-[calc(100vh-64px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full li-card p-8 bg-white">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-extrabold text-brandBlue">
+                Join Sev<span class="text-brandOrange">Link</span>
+            </h2>
+            <p class="mt-2 text-sm text-brandIcon font-semibold">
+                Create a new account
+            </p>
+        </div>
+
+        
+
+        
+
+        <form class="space-y-4" method="POST" action="/accounts/signup/">
+            <input type="hidden" name="csrfmiddlewaretoken" value="dO3DdDsu5cGBROIi2E6hAKZGJPB08t0ycGmmZVVz5QeDKulgFG3dqw7J0G29PMyU">
+
+            
+            <div>
+                <label for="id_username" class="block text-sm font-bold text-brandText mb-1">{{ field.label
+                    }}</label>
+                <input type="text" name="username" maxlength="150" autofocus required aria-describedby="id_username_helptext" id="id_username">
+                
+                <p class="text-[11px] text-brandIcon mt-1 font-semibold">Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.</p>
+                
+                
+            </div>
+            
+            <div>
+                <label for="id_first_name" class="block text-sm font-bold text-brandText mb-1">{{ field.label
+                    }}</label>
+                <input type="text" name="first_name" maxlength="30" required aria-describedby="id_first_name_helptext" id="id_first_name">
+                
+                <p class="text-[11px] text-brandIcon mt-1 font-semibold">Required.</p>
+                
+                
+            </div>
+            
+            <div>
+                <label for="id_last_name" class="block text-sm font-bold text-brandText mb-1">{{ field.label
+                    }}</label>
+                <input type="text" name="last_name" maxlength="30" required aria-describedby="id_last_name_helptext" id="id_last_name">
+                
+                <p class="text-[11px] text-brandIcon mt-1 font-semibold">Required.</p>
+                
+                
+            </div>
+            
+            <div>
+                <label for="id_email" class="block text-sm font-bold text-brandText mb-1">{{ field.label
+                    }}</label>
+                <input type="email" name="email" maxlength="254" required aria-describedby="id_email_helptext" id="id_email">
+                
+                <p class="text-[11px] text-brandIcon mt-1 font-semibold">Required. Inform a valid email address.</p>
+                
+                
+            </div>
+            
+            <div>
+                <label for="id_phone_number" class="block text-sm font-bold text-brandText mb-1">{{ field.label
+                    }}</label>
+                <input type="text" name="phone_number" pattern="\d{10}" maxlength="10" minlength="10" title="Must be exactly 10 digits" required id="id_phone_number">
+                
+                
+            </div>
+            
+            <div>
+                <label for="id_aadhaar_number" class="block text-sm font-bold text-brandText mb-1">{{ field.label
+                    }}</label>
+                <input type="text" name="aadhaar_number" pattern="\d{12}" maxlength="12" minlength="12" title="Must be exactly 12 digits" required id="id_aadhaar_number">
+                
+                
+            </div>
+            
+            <div>
+                <label for="id_full_name" class="block text-sm font-bold text-brandText mb-1">{{ field.label
+                    }}</label>
+                <input type="text" name="full_name" maxlength="255" required id="id_full_name">
+                
+                
+            </div>
+            
+            <div>
+                <label for="id_role" class="block text-sm font-bold text-brandText mb-1">{{ field.label
+                    }}</label>
+                <select name="role" aria-describedby="id_role_helptext" id="id_role">
+  <option value="Worker">Worker</option>
+
+  <option value="Job Provider">Job Provider</option>
+
+  <option value="Both">Both</option>
+
+</select>
+                
+                <p class="text-[11px] text-brandIcon mt-1 font-semibold">Select your role on SevLink.</p>
+                
+                
+            </div>
+            
+            <div>
+                <label for="id_password1" class="block text-sm font-bold text-brandText mb-1">{{ field.label
+                    }}</label>
+                <input type="password" name="password1" autocomplete="new-password" required aria-describedby="id_password1_helptext" id="id_password1">
+                
+                <p class="text-[11px] text-brandIcon mt-1 font-semibold"><ul><li>Your password can’t be too similar to your other personal information.</li><li>Your password must contain at least 8 characters.</li><li>Your password can’t be a commonly used password.</li><li>Your password can’t be entirely numeric.</li></ul></p>
+                
+                
+            </div>
+            
+            <div>
+                <label for="id_password2" class="block text-sm font-bold text-brandText mb-1">{{ field.label
+                    }}</label>
+                <input type="password" name="password2" autocomplete="new-password" required aria-describedby="id_password2_helptext" id="id_password2">
+                
+                <p class="text-[11px] text-brandIcon mt-1 font-semibold">Enter the same password as before, for verification.</p>
+                
+                
+            </div>
+            
+
+            <div class="pt-4">
+                <button type="submit"
+                    class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-brandOrange hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandOrange transition-all">
+                    Create Account
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-6 text-center">
+            <p class="text-sm text-brandIcon font-semibold">
+                Already have an account?
+                <a href="/accounts/login/" class="font-bold text-brandBlue hover:text-blue-900 transition">
+                    Sign in here
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add Tailwind classes to Django form inputs dynamically
+    document.addEventListener("DOMContentLoaded", function () {
+        const textInputs = document.querySelectorAll('input[type="text"], input[type="password"], input[type="email"]');
+        textInputs.forEach(input => {
+            input.classList.add('w-full', 'bg-slate-50', 'border', 'border-slate-200', 'rounded-xl', 'px-4', 'py-2', 'text-sm', 'font-medium', 'focus:outline-none', 'focus:ring-2', 'focus:ring-brandOrange', 'focus:border-brandOrange', 'transition-all');
+        });
+
+        const selectInputs = document.querySelectorAll('select');
+        selectInputs.forEach(input => {
+            input.classList.add('w-full', 'bg-slate-50', 'border', 'border-slate-200', 'rounded-xl', 'px-4', 'py-2', 'text-sm', 'font-semibold', 'text-brandText', 'focus:outline-none', 'focus:ring-2', 'focus:ring-brandOrange', 'focus:border-brandOrange', 'transition-all', 'appearance-none');
+            // Adding a custom dropdown arrow is possible, but default appearance-none removes the standard one.
+            // Let's remove appearance-none so the arrow remains for simplicity.
+            input.classList.remove('appearance-none');
+        });
+    });
+</script>
+
+    </main>
+
+    
+
+    <script>
+        // Simple Mode Toggle Logic (Hides advanced elements if checked)
+        document.getElementById('simple-toggle')?.addEventListener('change', function (e) {
+            const isSimple = e.target.checked;
+            document.querySelectorAll('.advanced-ui').forEach(el => {
+                if (isSimple) {
+                    el.classList.add('hidden');
+                } else {
+                    el.classList.remove('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
