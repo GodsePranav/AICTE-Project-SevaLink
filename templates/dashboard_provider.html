@@ -316,10 +316,27 @@
                             <td class="p-4"><span
                                     class="bg-blue-50 text-brandBlue px-2.5 py-1 rounded-md text-[11px] font-bold">{{ job.status }}</span></td>
                             <td class="p-4 font-bold text-brandText whitespace-nowrap">{% if job.worker %}{{ job.worker.first_name|default:job.worker.username }} {{ job.worker.last_name }}{% else %}<span class="text-amber-600 text-xs">Unassigned</span>{% endif %}</td>
-                            <td class="p-4">
-                                <a href="{% url 'job_detail' job.id %}"
-                                    class="bg-white border border-brandBorder text-brandText px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition shadow-sm whitespace-nowrap">View
-                                    Job</a>
+                            <td class="p-4 whitespace-nowrap">
+                                <div class="flex gap-2 items-center">
+                                    <a href="{% url 'job_detail' job.id %}"
+                                        class="bg-white border border-brandBorder text-brandText px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition shadow-sm">View</a>
+                                    {% if job.status == 'Pending Approval' %}
+                                    <form method="POST" action="{% url 'approve_completion' job.id %}" class="inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit"
+                                            class="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-600 transition shadow-sm whitespace-nowrap">✓
+                                            Approve</button>
+                                    </form>
+                                    <form method="POST" action="{% url 'approve_completion' job.id %}" class="inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit"
+                                            class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-600 transition shadow-sm whitespace-nowrap">✗
+                                            Reject</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                         {% empty %}
@@ -359,13 +376,16 @@
                             <td class="p-4 text-slate-600 font-semibold whitespace-nowrap">📍 {{ job.address|truncatechars:15 }}<br>{% if job.price %}💰 ₹{{ job.price }}{% else %}-{% endif %}</td>
                             <td class="p-4"><span
                                     class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded-md text-[11px] font-bold">Completed</span><br><span
-                                    class="text-[10px] text-slate-400 font-medium">{{ job.updated_at|date:"M d, Y h:i A" }}</span>
-                            </td>
+                                    class="text-[10px] text-slate-400 font-medium">{{ job.updated_at|date:"M d, Y h:i A" }}</span></td>
                             <td class="p-4 font-bold text-slate-600 whitespace-nowrap">{% if job.worker %}{{ job.worker.first_name|default:job.worker.username }} {{ job.worker.last_name }}{% else %}-{% endif %}</td>
-                            <td class="p-4">
-                                <a href="{% url 'job_detail' job.id %}"
-                                    class="bg-white border border-brandBorder text-slate-500 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition shadow-sm whitespace-nowrap">View
-                                    Record</a>
+                            <td class="p-4 whitespace-nowrap">
+                                <div class="flex gap-2">
+                                    <a href="{% url 'job_detail' job.id %}"
+                                        class="bg-white border border-brandBorder text-slate-500 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition shadow-sm">View</a>
+                                    <a href="{% url 'job_detail' job.id %}#feedback"
+                                        class="bg-brandOrange text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-orange-600 transition shadow-sm whitespace-nowrap">⭐
+                                        Feedback</a>
+                                </div>
                             </td>
                         </tr>
                         {% empty %}
@@ -407,7 +427,12 @@
                             <td class="p-4 font-bold text-brandBlue text-xs">{{ app.job.title|truncatechars:25 }}</td>
                             <td class="p-4"><span class="text-amber-600 font-bold text-xs uppercase">{{ app.status }}</span></td>
                             <td class="p-4"><a href="{% url 'inbox' %}?user={{ app.worker.id }}"
-                                    class="text-brandBlue font-bold text-xs hover:underline">💬 Chat</a></td>
+                                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:from-indigo-600 hover:to-purple-700 transition shadow-sm"><svg
+                                        class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                        </path>
+                                    </svg>Chat</a></td>
                         </tr>
                         {% endfor %}
                         {% for req in service_requests %}
@@ -425,7 +450,12 @@
                                 </span>
                             </td>
                             <td class="p-4"><a href="{% url 'inbox' %}?user={{ req.worker.id }}"
-                                    class="text-brandBlue font-bold text-xs hover:underline">💬 Chat</a></td>
+                                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:from-indigo-600 hover:to-purple-700 transition shadow-sm"><svg
+                                        class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                        </path>
+                                    </svg>Chat</a></td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -465,42 +495,43 @@
             }
         });
     </script>
-    function assignWorker(event, jobId, form) {
-    event.preventDefault();
-    const workerId = form.worker_id.value;
-    if (!workerId) {
-    alert('Please select a worker first.');
-    return;
-    }
+    <script>
+        function assignWorker(event, jobId, form) {
+            event.preventDefault();
+            const workerId = form.worker_id.value;
+            if (!workerId) {
+                alert('Please select a worker first.');
+                return;
+            }
 
-    const btn = form.querySelector('button');
-    const originalText = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = 'Assigning...';
+            const btn = form.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Assigning...';
 
-    fetch(`/services/job/${jobId}/assign/${workerId}/`, {
-    method: 'POST',
-    headers: {
-    'X-CSRFToken': '{{ csrf_token }}',
-    'Content-Type': 'application/json'
-    }
-    })
-    .then(r => r.json())
-    .then(data => {
-    if (data.status === 'ok') {
-    location.reload();
-    } else {
-    alert(data.error || 'Error assigning worker');
-    btn.disabled = false;
-    btn.innerHTML = originalText;
-    }
-    })
-    .catch(e => {
-    console.error(e);
-    alert('Network error');
-    btn.disabled = false;
-    btn.innerHTML = originalText;
-    });
-    }
+            fetch(`/services/job/${jobId}/assign/${workerId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        location.reload();
+                    } else {
+                        alert(data.error || 'Error assigning worker');
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
+                })
+                .catch(e => {
+                    console.error(e);
+                    alert('Network error');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                });
+        }
     </script>
-    {%endblock %}
+    {% endblock %}

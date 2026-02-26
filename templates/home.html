@@ -73,7 +73,7 @@
             </div>
             <div class="flex justify-between items-center mt-4 pl-16">
                 <div class="flex gap-4">
-                    <button
+                    <a href="{% url 'post_job_page' %}"
                         class="text-sm font-semibold text-brandIcon hover:text-brandBlue flex items-center gap-1.5 transition"><svg
                             class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -81,13 +81,13 @@
                             </path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg> Add Location</button>
-                    <button
+                        </svg> Add Location</a>
+                    <a href="{% url 'post_job_page' %}"
                         class="text-sm font-semibold text-brandIcon hover:text-brandBlue flex items-center gap-1.5 transition"><svg
                             class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg> Schedule Time</button>
+                        </svg> Schedule Time</a>
                 </div>
                 <!-- Need CSRF token for the JS fetch -->
                 {%csrf_token %}
@@ -101,12 +101,18 @@
         <!-- Feed Controls -->
         <div class="flex items-center justify-between mb-2">
             <h3 class="font-bold text-xl text-brandText tracking-tight">Active Job Requests</h3>
-            <span
-                class="text-xs text-brandIcon font-semibold flex items-center cursor-pointer hover:text-brandBlue transition">Sort
-                by: <strong class="text-brandText ml-1">Nearest</strong> <svg class="w-4 h-4 ml-1" fill="currentColor"
-                    viewBox="0 0 24 24">
-                    <path d="M7 10l5 5 5-5z"></path>
-                </svg></span>
+            <div class="relative">
+                <select id="sortSelect" onchange="window.location.href='?sort=' + this.value"
+                    class="appearance-none w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/20 focus:border-brandBlue cursor-pointer transition bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat pr-10">
+                    <option value="newest" {% if request.GET.sort == 'newest' or not request.GET.sort %}selected{% endif %}>🕐 Newest First</option>
+                    <option value="oldest" {% if request.GET.sort == 'oldest' %}selected{% endif %}>📅 Oldest First
+                    </option>
+                    <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>💰 Price:
+                        High-Low</option>
+                    <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>💰 Price:
+                        Low-High</option>
+                </select>
+            </div>
         </div>
 
         <!-- Feed List -->

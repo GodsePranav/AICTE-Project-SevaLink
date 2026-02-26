@@ -47,6 +47,21 @@ class CustomUserCreationForm(UserCreationForm):
         label="User Type",
         widget=forms.RadioSelect(attrs={'class': 'peer hidden'})
     )
+    gender = forms.ChoiceField(
+        choices=[('', '-- Select --'), ('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')],
+        required=False,
+        label='Gender'
+    )
+    date_of_birth = forms.DateField(
+        required=False,
+        label='Date of Birth',
+        widget=forms.DateInput(attrs={'type': 'date'})
+    )
+    profile_picture = forms.ImageField(
+        required=False,
+        label='Profile Picture (Optional)',
+        widget=forms.ClearableFileInput(attrs={'accept': 'image/*'})
+    )
 
     class Meta(UserCreationForm.Meta):
         model = User
@@ -72,13 +87,20 @@ class CustomUserCreationForm(UserCreationForm):
 
         if commit:
             user.save()
-            Profile.objects.create(
+            profile = Profile.objects.create(
                 user=user,
                 role=self.cleaned_data.get('role'),
                 full_name=self.cleaned_data.get('full_name'),
                 phone_number=self.cleaned_data.get('phone_number'),
-                aadhaar_number=self.cleaned_data.get('aadhaar_number')
+                aadhaar_number=self.cleaned_data.get('aadhaar_number'),
+                gender=self.cleaned_data.get('gender') or '',
+                date_of_birth=self.cleaned_data.get('date_of_birth')
             )
+            # Save optional profile picture
+            pic = self.cleaned_data.get('profile_picture')
+            if pic:
+                profile.profile_picture = pic
+                profile.save()
         return user
 
 class UserEditForm(forms.ModelForm):
@@ -126,6 +148,8 @@ class ProfileEditForm(forms.ModelForm):
             'full_name',
             'phone_number',
             'aadhaar_number',
+            'gender',
+            'date_of_birth',
             'primary_category',
             'job_title',
             'service_skills',
@@ -137,6 +161,8 @@ class ProfileEditForm(forms.ModelForm):
             'full_name': 'Full Name (Must match Aadhaar)',
             'phone_number': 'Phone Number (For OTP Verification)',
             'aadhaar_number': '12-Digit Aadhaar Number',
+            'gender': 'Gender',
+            'date_of_birth': 'Date of Birth',
             'primary_category': 'Work Category',
             'job_title': 'Job Title / Specific Trade',
             'service_skills': 'Service Skills',
@@ -158,6 +184,9 @@ class ProfileEditForm(forms.ModelForm):
                 'maxlength': '10',
                 'minlength': '10',
                 'title': 'Must be exactly 10 digits',
+            }),
+            'date_of_birth': forms.DateInput(attrs={
+                'type': 'date',
             }),
         }
 

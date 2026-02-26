@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import ServiceJob, JobTracking, ServiceRequest, JobApplication
+from .models import ServiceJob, JobTracking, ServiceRequest, JobApplication, Review
 from social.models import Notification
 from django.views.decorators.http import require_POST
 from django.contrib import messages
@@ -422,22 +422,80 @@ def update_status(request, job_id):
     job = get_object_or_404(ServiceJob, id=job_id)
     if request.user == job.worker:
         new_status = request.POST.get('status')
+        
+        # If worker marks as Completed, set to Pending Approval instead
+        if new_status == 'Completed':
+            new_status = 'Pending Approval'
+        
         if new_status in dict(ServiceJob.STATUS_CHOICES).keys():
             job.status = new_status
             job.save()
             
-            Notification.objects.create(
-                user=job.provider,
-                actor=f"{request.user.first_name or request.user.username} {request.user.last_name}".strip(),
-                verb=f'updated job status to {new_status}:',
-                target=job.title
-            )
+            if new_status == 'Pending Approval':
+                Notification.objects.create(
+                    user=job.provider,
+                    actor=f"{request.user.first_name or request.user.username} {request.user.last_name}".strip(),
+                    verb='has marked the job as completed. Please verify and approve:',
+                    target=job.title,
+                    redirect_url=f'/services/job/{job.id}/detail/'
+                )
+            else:
+                Notification.objects.create(
+                    user=job.provider,
+                    actor=f"{request.user.first_name or request.user.username} {request.user.last_name}".strip(),
+                    verb=f'updated job status to {new_status}:',
+                    target=job.title
+                )
             
             # If "On the Way", initialize tracking
             if new_status == 'On the Way' and job.lat and job.lon:
                 tracking, created = JobTracking.objects.get_or_create(job=job)
                 
     return redirect('worker_dashboard')
+
+
+@login_required
+@require_POST
+def approve_completion(request, job_id):
+    """Provider approves or rejects the worker's completion claim."""
+    job = get_object_or_404(ServiceJob, id=job_id)
+    
+    if request.user != job.provider:
+        messages.error(request, "Only the job provider can approve or reject completion.")
+        return redirect('job_detail', job_id=job.id)
+    
+    if job.status != 'Pending Approval':
+        messages.info(request, "This job is not pending approval.")
+        return redirect('job_detail', job_id=job.id)
+    
+    action = request.POST.get('action')  # 'approve' or 'reject'
+    
+    if action == 'approve':
+        job.status = 'Completed'
+        job.save()
+        messages.success(request, f'Job "{job.title}" has been approved as completed!')
+        
+        Notification.objects.create(
+            user=job.worker,
+            actor=f"{request.user.first_name or request.user.username} {request.user.last_name}".strip(),
+            verb='approved your job completion for:',
+            target=job.title,
+            redirect_url=f'/services/job/{job.id}/detail/'
+        )
+    elif action == 'reject':
+        job.status = 'Arrived'  # Revert back to Arrived status
+        job.save()
+        messages.info(request, f'Completion for "{job.title}" has been rejected. The worker has been notified.')
+        
+        Notification.objects.create(
+            user=job.worker,
+            actor=f"{request.user.first_name or request.user.username} {request.user.last_name}".strip(),
+            verb='rejected your completion claim. Please revisit the work for:',
+            target=job.title,
+            redirect_url=f'/services/job/{job.id}/detail/'
+        )
+    
+    return redirect('job_detail', job_id=job.id)
 
 @login_required
 @require_POST
@@ -571,11 +629,70 @@ def job_detail(request, job_id):
         return redirect('home')
 
     applications = JobApplication.objects.filter(job=job).select_related('worker', 'worker__profile').order_by('-timestamp')
+    reviews = Review.objects.filter(job=job).select_related('reviewer', 'reviewee')
+    user_has_reviewed = reviews.filter(reviewer=request.user).exists()
     
     context = {
         'job': job,
         'applications': applications,
+        'reviews': reviews,
+        'user_has_reviewed': user_has_reviewed,
         'is_provider': request.user == job.provider,
         'is_worker': request.user == job.worker,
     }
     return render(request, 'job_detail.html', context)
+
+@login_required
+@require_POST
+def submit_review(request, job_id):
+    """Submit a review for a completed job."""
+    job = get_object_or_404(ServiceJob, id=job_id)
+    
+    if job.status != 'Completed':
+        messages.error(request, "You can only review completed jobs.")
+        return redirect('job_detail', job_id=job.id)
+    
+    # Determine reviewer and reviewee
+    if request.user == job.provider:
+        reviewee = job.worker
+    elif request.user == job.worker:
+        reviewee = job.provider
+    else:
+        messages.error(request, "You are not authorized to review this job.")
+        return redirect('job_detail', job_id=job.id)
+    
+    if not reviewee:
+        messages.error(request, "Cannot submit a review — no counterparty found.")
+        return redirect('job_detail', job_id=job.id)
+    
+    # Check if already reviewed
+    if Review.objects.filter(job=job, reviewer=request.user).exists():
+        messages.info(request, "You have already submitted a review for this job.")
+        return redirect('job_detail', job_id=job.id)
+    
+    try:
+        rating = int(request.POST.get('rating', 3))
+        professionalism = int(request.POST.get('professionalism', 3))
+        communication = int(request.POST.get('communication', 3))
+        timeliness = int(request.POST.get('timeliness', 3))
+    except (ValueError, TypeError):
+        rating = professionalism = communication = timeliness = 3
+    
+    comment = request.POST.get('comment', '').strip()
+    would_recommend = request.POST.get('would_recommend') == 'on'
+    
+    Review.objects.create(
+        job=job,
+        reviewer=request.user,
+        reviewee=reviewee,
+        rating=min(max(rating, 1), 5),
+        professionalism=min(max(professionalism, 1), 5),
+        communication=min(max(communication, 1), 5),
+        timeliness=min(max(timeliness, 1), 5),
+        comment=comment,
+        would_recommend=would_recommend
+    )
+    
+    messages.success(request, "Your review has been submitted. Thank you!")
+    return redirect('job_detail', job_id=job.id)
+

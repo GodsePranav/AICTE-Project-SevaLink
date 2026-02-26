@@ -32,6 +32,15 @@ class Profile(models.Model):
     primary_category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=True, null=True)
     job_title = models.CharField(max_length=100, blank=True, null=True, help_text="e.g., 'Python Developer', 'House Guard'")
     phone_number = models.BigIntegerField(null=True, blank=True, help_text="Essential for OTP")
+    
+    GENDER_CHOICES = (
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('Other', 'Other'),
+    )
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
+    date_of_birth = models.DateField(null=True, blank=True, help_text="Date of birth")
+    
     live_location = models.JSONField(null=True, blank=True, help_text="For Map/3D globe pins")
     is_available = models.BooleanField(default=True, help_text="Toggle: 'Available Now' vs 'Busy'")
     is_verified = models.BooleanField(default=False)

@@ -145,7 +145,7 @@
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for field in profile_form %}
-        {% if field.name in "full_name,phone_number,aadhaar_number" %}
+        {% if field.name == "full_name" or field.name == "phone_number" or field.name == "aadhaar_number" or field.name == "gender" or field.name == "date_of_birth" %}
         <div>
           <label class="form-label">{{ field.label }}</label>
           {{ field }}
@@ -155,16 +155,19 @@
       </div>
     </div>
 
-    <!-- Professional Details (Visible only to Workers) -->
-    {% if request.user.profile.role != 'Job Provider' %}
+    <!-- Professional Details (Workers) / Business Details (Job Providers) -->
     <div class="nit-card p-6 mb-6">
       <div class="section-header">
         <div class="header-icon">&#128188;</div>
+        {% if request.user.profile.role == 'Job Provider' %}
+        <h3 class="text-base font-black text-brandBlue uppercase">Business Details</h3>
+        {% else %}
         <h3 class="text-base font-black text-brandBlue uppercase">Professional Info</h3>
+        {% endif %}
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for field in profile_form %}
-        {% if field.name not in "full_name,phone_number,aadhaar_number,live_location,profile_picture" %}
+        {% if field.name != "full_name" and field.name != "phone_number" and field.name != "aadhaar_number" and field.name != "gender" and field.name != "date_of_birth" and field.name != "live_location" and field.name != "profile_picture" %}
         <div>
           <label class="form-label">{{ field.label }}</label>
           {{ field }}
@@ -173,7 +176,6 @@
         {% endfor %}
       </div>
     </div>
-    {% endif %}
     <div class="nit-card p-6 mb-6">
       <div class="section-header">
         <div class="header-icon">&#128205;</div>
@@ -244,7 +246,7 @@
     var me = document.getElementById("location-map");
     if (typeof L !== "undefined" && me) {
       var lat = 28.6139, lon = 77.209, zm = 11;
-      if (loc && loc.value) { try { var d = JSON.parse(loc.value); lat = d.lat; lon = d.lon; zm = 14; } catch (e) { }}
+      if (loc && loc.value) { try { var d = JSON.parse(loc.value); lat = d.lat; lon = d.lon; zm = 14; } catch (e) { } }
       var map = L.map("location-map").setView([lat, lon], zm);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
       var mk = L.marker([lat, lon], { draggable: true }).addTo(map);

@@ -14,12 +14,22 @@ def home_view(request):
     from services.models import ServiceJob
     context = {}
     
+    # Determine sort order from query parameter
+    sort_param = request.GET.get('sort', 'newest')
+    sort_map = {
+        'newest': '-created_at',
+        'oldest': 'created_at',
+        'price_high': '-price',
+        'price_low': 'price',
+    }
+    order = sort_map.get(sort_param, '-created_at')
+    
     try:
         role = request.user.profile.role
         if role == 'Job Provider':
-            context['active_jobs'] = ServiceJob.objects.filter(provider=request.user).exclude(status__in=['Completed', 'Cancelled']).order_by('-created_at')
+            context['active_jobs'] = ServiceJob.objects.filter(provider=request.user).exclude(status__in=['Completed', 'Cancelled']).order_by(order)
         if role == 'Worker':
-            context['available_jobs'] = ServiceJob.objects.filter(status='Pending', worker__isnull=True).order_by('-created_at')
+            context['available_jobs'] = ServiceJob.objects.filter(status='Pending', worker__isnull=True).order_by(order)
     except Exception:
         pass
 

@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class ServiceJob(models.Model):
     STATUS_CHOICES = (
@@ -7,6 +8,7 @@ class ServiceJob(models.Model):
         ('Accepted', 'Accepted'),
         ('On the Way', 'On the Way'),
         ('Arrived', 'Arrived'),
+        ('Pending Approval', 'Pending Approval'),
         ('Completed', 'Completed'),
         ('Cancelled', 'Cancelled'),
     )
@@ -88,3 +90,35 @@ class JobTracking(models.Model):
 
     def __str__(self):
         return f"Tracking for Job #{self.job.id}"
+
+
+class Review(models.Model):
+    """Post-job feedback from Client-to-Worker or Worker-to-Client."""
+    job = models.ForeignKey(ServiceJob, related_name='reviews', on_delete=models.CASCADE)
+    reviewer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='reviews_given', on_delete=models.CASCADE)
+    reviewee = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='reviews_received', on_delete=models.CASCADE)
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        help_text="Rating from 1 to 5"
+    )
+    professionalism = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        default=3, help_text="Professionalism rating 1-5"
+    )
+    communication = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        default=3, help_text="Communication rating 1-5"
+    )
+    timeliness = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        default=3, help_text="Timeliness rating 1-5"
+    )
+    comment = models.TextField(blank=True, help_text="Written feedback")
+    would_recommend = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('job', 'reviewer')  # One review per user per job
+
+    def __str__(self):
+        return f"Review by {self.reviewer.username} for {self.reviewee.username} on Job #{self.job.id}"

@@ -74,13 +74,13 @@
             </div>
             {% endif %}
 
-            <form class="space-y-6" method="POST" action="{% url 'signup' %}">
+            <form class="space-y-6" method="POST" action="{% url 'signup' %}" enctype="multipart/form-data">
                 {% csrf_token %}
 
                 <!-- 1. Fields loop -->
                 <div class="space-y-3">
                     {% for field in form %}
-                    {% if field.name != 'role' %}
+                    {% if field.name != 'role' and field.name != 'profile_picture' %}
                     <div>
                         <label for="{{ field.id_for_label }}"
                             class="block text-sm font-bold text-brandText mb-1.5 ml-1">{{ field.label }}</label>
@@ -165,6 +165,27 @@
                     {% endif %}
                 </div>
 
+                <!-- 3. Optional Profile Picture Upload -->
+                <div class="pt-2">
+                    <label class="block text-sm font-bold text-brandText mb-3 ml-1">Profile Picture <span
+                            class="text-brandIcon font-normal">(Optional)</span></label>
+                    <div class="flex items-center gap-4">
+                        <div id="signup-avatar-preview"
+                            class="w-16 h-16 rounded-full bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 overflow-hidden flex-shrink-0">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <input type="file" name="profile_picture" id="id_profile_picture" accept="image/*"
+                                class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-brandBlue hover:file:bg-blue-100 transition cursor-pointer"
+                                onchange="previewSignupAvatar(this)">
+                            <p class="text-[10px] text-brandIcon mt-1 ml-1">You can always add or change this later.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="pt-4">
                     <button type="submit"
                         class="w-full flex justify-center items-center gap-2 py-3.5 px-4 rounded-xl shadow-[0_4px_14px_0_rgb(234,88,12,0.39)] text-sm font-bold text-white bg-brandOrange hover:bg-orange-600 hover:shadow-[0_6px_20px_rgba(234,88,12,0.23)] hover:-translate-y-0.5 transition-all">
@@ -193,6 +214,16 @@
 </div>
 
 <script>
+    function previewSignupAvatar(input) {
+        const preview = document.getElementById('signup-avatar-preview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.innerHTML = '<img src="' + e.target.result + '" class="w-full h-full object-cover">';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
     document.addEventListener("DOMContentLoaded", function () {
         // Style all standard text/email/password inputs
         const textInputs = document.querySelectorAll('input[type="text"], input[type="password"], input[type="email"]');

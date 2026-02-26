@@ -163,7 +163,7 @@
                     <label for="job_category" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Job
                         Category</label>
                     <select id="job_category" name="job_category" onchange="toggleOtherCategory()"
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
+                        class="appearance-none w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/20 focus:border-brandBlue cursor-pointer transition bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat pr-10">
                         <option value="">Select a category</option>
                         <option value="Plumbing" {% if form_data.job_category == 'Plumbing' %}selected{% endif %}>🔧
                             Plumbing</option>
