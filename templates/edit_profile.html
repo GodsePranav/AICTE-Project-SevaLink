@@ -5,133 +5,147 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <style>
   .nit-card {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
+    background: #ffffff;
     border: 1px solid rgba(226, 232, 240, 0.8);
-    border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
   }
 
   .nit-card:hover {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05)
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.07);
+    border-color: rgba(37, 99, 235, 0.15);
   }
 
   .premium-input {
     width: 100%;
     background: #f8fafc;
-    border: 2px solid #f1f5f9;
-    border-radius: 12px;
-    padding: 10px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 12px 16px 12px 44px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     color: #1e293b;
     transition: all 0.2s;
-    outline: none
+    outline: none;
   }
 
   .premium-input:focus {
     background: #fff;
-    border-color: #1e3a8a;
-    box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.08)
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
   }
 
   .form-label {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 800;
     color: #475569;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    margin-left: 4px;
     display: block;
     text-transform: uppercase;
-    letter-spacing: 0.025em
+    letter-spacing: 0.05em;
   }
 
   #location-map {
-    height: 280px;
-    border-radius: 12px;
-    border: 2px solid #f1f5f9;
-    overflow: hidden
+    height: 300px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
   }
 
   .section-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #f8fafc
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1.5px solid #f1f5f9;
   }
 
   .header-icon {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     background: #eff6ff;
-    color: #1e3a8a;
-    border-radius: 10px;
+    color: #2563eb;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px
+    font-size: 18px;
   }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="max-w-[1000px] mx-auto py-8 px-4">
-  <div class="mb-4">
+  <div class="mb-5">
     <a href="javascript:history.back()"
-      class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-brandBlue transition">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-      </svg>
+      class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-brandBlue transition no-underline bg-white border border-slate-200/60 px-4 py-2 rounded-2xl shadow-sm">
+      <i data-lucide="arrow-left" class="w-4 h-4 text-slate-500"></i>
       Back
     </a>
   </div>
   <div class="mb-8 text-center">
-    <h1 class="text-3xl font-black text-brandBlue mb-1">Edit Profile</h1>
-    <p class="text-brandIcon text-sm font-medium">Keep your profile up to date.</p>
+    <h1 class="text-3xl font-black text-brandText tracking-tight">Edit Profile</h1>
+    <p class="text-brandIcon text-sm font-semibold mt-1">Keep your profile credentials up to date.</p>
   </div>
   {% if messages %}
   <div class="max-w-3xl mx-auto mb-6">
     {% for message in messages %}
-    <div class="p-4 rounded-xl font-bold text-sm border bg-emerald-50 text-emerald-700">{{ message }}</div>
+    <div class="p-4 rounded-2xl font-bold text-xs border bg-emerald-50 text-emerald-700 border-emerald-100 flex items-center gap-2">
+      <i data-lucide="check-circle" class="w-4 h-4"></i>
+      {{ message }}
+    </div>
     {% endfor %}
   </div>
   {% endif %}
   <form method="POST" action="{% url 'edit_profile' %}" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-      <div class="nit-card p-6 flex flex-col items-center text-center">
+      <div class="nit-card p-6 flex flex-col items-center text-center justify-center">
         <div class="relative group mb-4 cursor-pointer" onclick="document.getElementById('id_profile_picture').click()">
           <div
-            class="w-28 h-28 rounded-2xl border-4 border-white bg-blue-50 flex items-center justify-center overflow-hidden shadow-lg relative">
+            class="w-28 h-28 rounded-3xl border-4 border-white bg-slate-50 flex items-center justify-center overflow-hidden shadow-premium relative group-hover:border-brandOrange transition-all duration-300">
             {% if user.profile.profile_picture %}
             <img src="{{ user.profile.profile_picture.url }}" class="w-full h-full object-cover" id="pic-preview">
             {% else %}
-            <span class="text-4xl font-black text-brandBlue" id="pic-initial">{{ user.username|make_list|first|upper }}</span>
+            <span class="text-4xl font-black text-brandBlue uppercase" id="pic-initial">{{ user.username|make_list|first }}</span>
             <img src="" class="w-full h-full object-cover hidden" id="pic-preview">
             {% endif %}
             <div
               class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center transition-all">
-              <span class="text-white tracking-widest text-[10px] font-black uppercase">Change</span>
+              <span class="text-white tracking-widest text-[9px] font-black uppercase">Change</span>
             </div>
           </div>
         </div>
-        <h3 class="text-lg font-black text-brandText">{{ user.first_name|default:user.username }} {{ user.last_name }}
-        </h3>
-        <p class="text-brandIcon text-xs font-bold mt-1">{{ user.profile.role }}</p>
+        <h3 class="text-base font-extrabold text-brandText tracking-tight">{{ user.first_name|default:user.username }} {{ user.last_name }}</h3>
+        <p class="text-brandIcon text-xs font-bold mt-1 bg-slate-50 px-3 py-1 rounded-full border border-slate-200/60 uppercase tracking-wider">{{ user.profile.role }}</p>
         <input type="file" name="profile_picture" accept="image/*" id="id_profile_picture" class="hidden">
       </div>
       <div class="lg:col-span-2 nit-card p-6">
         <div class="section-header">
-          <div class="header-icon">&#128295;</div>
-          <h3 class="text-base font-black text-brandBlue uppercase">Personal Details</h3>
+          <div class="header-icon">
+            <i data-lucide="user" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-sm font-extrabold text-brandText uppercase tracking-wider">Personal Details</h3>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           {% for field in user_form %}
           <div>
             <label class="form-label">{{ field.label }}</label>
-            {{ field }}
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brandIcon">
+                {% if field.name == 'username' %}
+                <i data-lucide="user" class="w-4 h-4"></i>
+                {% elif field.name == 'email' %}
+                <i data-lucide="mail" class="w-4 h-4"></i>
+                {% else %}
+                <i data-lucide="edit" class="w-4 h-4"></i>
+                {% endif %}
+              </span>
+              {{ field }}
+            </div>
           </div>
           {% endfor %}
         </div>
@@ -140,15 +154,34 @@
     <!-- Identity & Contact Details (Visible to all users) -->
     <div class="nit-card p-6 mb-6">
       <div class="section-header">
-        <div class="header-icon">&#128100;</div>
-        <h3 class="text-base font-black text-brandBlue uppercase">Identity Verification</h3>
+        <div class="header-icon">
+          <i data-lucide="shield-check" class="w-5 h-5 text-brandTeal"></i>
+        </div>
+        <h3 class="text-sm font-extrabold text-brandText uppercase tracking-wider">Identity Verification</h3>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for field in profile_form %}
         {% if field.name == "full_name" or field.name == "phone_number" or field.name == "aadhaar_number" or field.name == "gender" or field.name == "date_of_birth" %}
         <div>
           <label class="form-label">{{ field.label }}</label>
-          {{ field }}
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brandIcon">
+              {% if field.name == 'full_name' %}
+              <i data-lucide="user-check" class="w-4 h-4"></i>
+              {% elif field.name == 'phone_number' %}
+              <i data-lucide="phone" class="w-4 h-4"></i>
+              {% elif field.name == 'aadhaar_number' %}
+              <i data-lucide="credit-card" class="w-4 h-4"></i>
+              {% elif field.name == 'gender' %}
+              <i data-lucide="users" class="w-4 h-4"></i>
+              {% elif field.name == 'date_of_birth' %}
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              {% else %}
+              <i data-lucide="edit" class="w-4 h-4"></i>
+              {% endif %}
+            </span>
+            {{ field }}
+          </div>
         </div>
         {% endif %}
         {% endfor %}
@@ -158,11 +191,13 @@
     <!-- Professional Details (Workers) / Business Details (Job Providers) -->
     <div class="nit-card p-6 mb-6">
       <div class="section-header">
-        <div class="header-icon">&#128188;</div>
+        <div class="header-icon">
+          <i data-lucide="briefcase" class="w-5 h-5 text-brandOrange"></i>
+        </div>
         {% if request.user.profile.role == 'Job Provider' %}
-        <h3 class="text-base font-black text-brandBlue uppercase">Business Details</h3>
+        <h3 class="text-sm font-extrabold text-brandText uppercase tracking-wider">Business Details</h3>
         {% else %}
-        <h3 class="text-base font-black text-brandBlue uppercase">Professional Info</h3>
+        <h3 class="text-sm font-extrabold text-brandText uppercase tracking-wider">Professional Info</h3>
         {% endif %}
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -170,7 +205,22 @@
         {% if field.name != "full_name" and field.name != "phone_number" and field.name != "aadhaar_number" and field.name != "gender" and field.name != "date_of_birth" and field.name != "live_location" and field.name != "profile_picture" %}
         <div>
           <label class="form-label">{{ field.label }}</label>
-          {{ field }}
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brandIcon">
+              {% if field.name == 'job_title' %}
+              <i data-lucide="briefcase" class="w-4 h-4"></i>
+              {% elif field.name == 'primary_category' %}
+              <i data-lucide="grid" class="w-4 h-4"></i>
+              {% elif field.name == 'service_skills' %}
+              <i data-lucide="wrench" class="w-4 h-4"></i>
+              {% elif field.name == 'years_experience' %}
+              <i data-lucide="award" class="w-4 h-4"></i>
+              {% else %}
+              <i data-lucide="edit" class="w-4 h-4"></i>
+              {% endif %}
+            </span>
+            {{ field }}
+          </div>
         </div>
         {% endif %}
         {% endfor %}
@@ -178,15 +228,26 @@
     </div>
     <div class="nit-card p-6 mb-6">
       <div class="section-header">
-        <div class="header-icon">&#128205;</div>
-        <h3 class="text-base font-black text-brandBlue uppercase">Service Area</h3>
+        <div class="header-icon">
+          <i data-lucide="map-pin" class="w-5 h-5 text-brandOrange animate-bounce"></i>
+        </div>
+        <h3 class="text-sm font-extrabold text-brandText uppercase tracking-wider">Service Area</h3>
       </div>
-      <div class="flex flex-col md:flex-row gap-3 mb-4">
-        <input type="text" id="manual-address" placeholder="Search location..." class="premium-input flex-1">
+      <div class="flex flex-col md:flex-row gap-3 mb-4 flex-1 w-full">
+        <div class="relative flex-grow">
+          <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </span>
+          <input type="text" id="manual-address" placeholder="Search location area..." class="premium-input">
+        </div>
         <button type="button" id="search-address-btn"
-          class="px-6 py-2 bg-brandBlue text-white font-bold text-xs rounded-xl">SEARCH</button>
+          class="px-5 py-3 bg-brandBlue hover:bg-blue-700 text-white font-bold text-xs rounded-2xl transition duration-200 flex items-center justify-center gap-1 shadow-md shadow-blue-500/10 whitespace-nowrap">
+          <i data-lucide="search" class="w-3.5 h-3.5"></i> SEARCH
+        </button>
         <button type="button" id="gps-location-btn"
-          class="px-6 py-2 bg-orange-500 text-white font-bold text-xs rounded-xl">GPS</button>
+          class="px-5 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-2xl transition duration-200 flex items-center justify-center gap-1 shadow-md shadow-orange-500/10 whitespace-nowrap">
+          <i data-lucide="navigation" class="w-3.5 h-3.5"></i> GPS
+        </button>
       </div>
       <div id="location-map" class="shadow-inner"></div>
       {% for field in profile_form %}
@@ -194,13 +255,14 @@
       <div class="hidden">{{ field }}</div>
       {% endif %}
       {% endfor %}
-      <p class="mt-3 text-xs font-bold text-brandIcon uppercase text-center">Drag the marker to your location.</p>
+      <p class="mt-3 text-[10px] font-bold text-brandIcon uppercase text-center tracking-wider">Drag the marker to your location.</p>
     </div>
     <div class="flex justify-end gap-4 pt-2 pb-8">
       <a href="{% url 'profile' %}"
-        class="bg-white text-slate-600 font-bold px-8 py-3 rounded-xl border-2 border-slate-100 text-sm">Discard</a>
-      <button type="submit" class="bg-brandBlue text-white font-extrabold px-8 py-3 rounded-xl shadow-md text-sm">Save
-        Profile</button>
+        class="bg-white text-slate-600 font-bold px-8 py-3.5 rounded-2xl border border-slate-200 text-xs no-underline flex items-center justify-center transition hover:bg-slate-50">Discard</a>
+      <button type="submit" class="bg-brandBlue hover:bg-blue-700 text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-md shadow-blue-500/10 text-xs flex items-center justify-center gap-1 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
+        <i data-lucide="save" class="w-4 h-4"></i> Save Profile
+      </button>
     </div>
   </form>
 </div>
@@ -248,11 +310,14 @@
       var lat = 28.6139, lon = 77.209, zm = 11;
       if (loc && loc.value) { try { var d = JSON.parse(loc.value); lat = d.lat; lon = d.lon; zm = 14; } catch (e) { } }
       var map = L.map("location-map").setView([lat, lon], zm);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        maxZoom: 19
+      }).addTo(map);
       var mk = L.marker([lat, lon], { draggable: true }).addTo(map);
       function upd(a, o) { if (loc) loc.value = JSON.stringify({ lat: parseFloat(a.toFixed(6)), lon: parseFloat(o.toFixed(6)) }); }
       mk.on("dragend", function (e) { var p = e.target.getLatLng(); upd(p.lat, p.lng); });
-      map.on("click", function (e) { mk.setLatLng(e.latlng); upd(e.latlng.lat, e.latlng.lng); });
+      map.on("click", function (e) { mk.setLatLng(e.target ? e.target.getLatLng() : e.latlng); upd(e.latlng.lat, e.latlng.lng); });
       document.getElementById("search-address-btn").addEventListener("click", function () {
         var q = document.getElementById("manual-address").value;
         if (!q) return;
@@ -271,6 +336,9 @@
           map.setView([lt, ln], 14); mk.setLatLng([lt, ln]); upd(lt, ln);
         });
       });
+    }
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
     }
   });
 </script>

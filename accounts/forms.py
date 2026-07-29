@@ -264,16 +264,22 @@ class ProfileEditForm(forms.ModelForm):
         return name
 
     def clean_phone_number(self):
-        phone = self.cleaned_data.get('phone_number', '').strip()
+        val = self.cleaned_data.get('phone_number')
+        if val is None:
+            return None
+        phone = str(val).strip()
         if phone and not re.match(r'^\d{10}$', phone):
             raise forms.ValidationError("Phone number must be exactly 10 digits.")
-        return phone
+        return int(phone) if phone else None
 
     def clean_aadhaar_number(self):
-        aadhaar = self.cleaned_data.get('aadhaar_number', '').strip()
+        val = self.cleaned_data.get('aadhaar_number')
+        if val is None:
+            return None
+        aadhaar = str(val).strip()
         if aadhaar and not re.match(r'^\d{12}$', aadhaar):
             raise forms.ValidationError("Aadhaar number must be exactly 12 digits.")
-        return aadhaar
+        return int(aadhaar) if aadhaar else None
 
     def clean_date_of_birth(self):
         dob = self.cleaned_data.get('date_of_birth')

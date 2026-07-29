@@ -1,0 +1,3 @@
+LOGIN POST RECEIVED: {'csrfmiddlewaretoken': ['yz8WP8P9kAs0P0lvMfBUdUMlbKhnCeah6zVarHENSnIoOfDoXcVmRAinloItpWl3'], 'username': ['ajinkya0'], 'password': ['9876aj@P']}
+FORM ERRORS: {'__all__': ['Please enter a correct username and password. Note that both fields may be case-sensitive.']}
+NON FIELD ERRORS: <ul class="errorlist nonfield"><li>Please enter a correct username and password. Note that both fields may be case-sensitive.</li></ul>

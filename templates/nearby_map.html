@@ -6,54 +6,60 @@
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <style>
     #map {
-        height: calc(100vh - 140px);
+        height: calc(100vh - 160px);
         width: 100%;
-        border-radius: 12px;
+        border-radius: 24px;
         z-index: 10;
     }
 
     .filter-panel {
-        height: calc(100vh - 140px);
+        height: calc(100vh - 160px);
         overflow-y: auto;
     }
 
     .leaflet-popup-content-wrapper {
-        border-radius: 12px;
+        border-radius: 20px;
         font-family: inherit;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border: 1px solid #e2e8f0;
     }
 
     .worker-marker {
         background: #f97316;
-        border: 3px solid #fff;
+        border: 2.5px solid #fff;
         border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .my-marker {
-        background: #1e3a8a;
-        border: 3px solid #fff;
+        background: #2563eb;
+        border: 2.5px solid #fff;
         border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        animation: pulse 2s infinite;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: pulse-ring 2s infinite;
     }
 
-    @keyframes pulse {
+    @keyframes pulse-ring {
         0% {
-            box-shadow: 0 0 0 0 rgba(30, 58, 138, 0.5);
+            box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.5);
         }
-
         70% {
-            box-shadow: 0 0 0 10px rgba(30, 58, 138, 0);
+            box-shadow: 0 0 0 12px rgba(37, 99, 235, 0);
         }
-
         100% {
-            box-shadow: 0 0 0 0 rgba(30, 58, 138, 0);
+            box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
         }
+    }
+
+    .worker-card {
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .worker-card.highlighted {
-        border-color: #f97316 !important;
-        background: #fff7ed !important;
+        border-color: #2563eb !important;
+        background: #f0f7ff !important;
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.05);
     }
 
     /* Custom Distance Slider */
@@ -61,7 +67,7 @@
         -webkit-appearance: none;
         width: 100%;
         height: 6px;
-        background: linear-gradient(to right, #f97316 var(--value, 18.36%), #e2e8f0 var(--value, 18.36%));
+        background: linear-gradient(to right, #2563eb var(--value, 18.36%), #e2e8f0 var(--value, 18.36%));
         border-radius: 999px;
         outline: none;
         cursor: pointer;
@@ -74,77 +80,58 @@
         width: 18px;
         height: 18px;
         border-radius: 50%;
-        background: #f97316;
+        background: #2563eb;
         cursor: pointer;
         transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
-        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0);
     }
 
     .distance-slider::-webkit-slider-thumb:hover {
         transform: scale(1.25);
-        box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.15);
+        box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.15);
     }
 
     .distance-slider::-webkit-slider-thumb:active {
         transform: scale(0.9);
-        box-shadow: 0 0 0 8px rgba(249, 115, 22, 0.25);
-    }
-
-    .distance-slider::-moz-range-thumb {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: #f97316;
-        cursor: pointer;
-        border: none;
-        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
-        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0);
-    }
-
-    .distance-slider::-moz-range-thumb:hover {
-        transform: scale(1.25);
-        box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.15);
-    }
-
-    .distance-slider::-moz-range-thumb:active {
-        transform: scale(0.9);
-        box-shadow: 0 0 0 8px rgba(249, 115, 22, 0.25);
+        box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.25);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="flex flex-col lg:flex-row gap-6 w-full max-w-7xl mx-auto h-full">
+<div class="flex flex-col lg:flex-row gap-6 w-full max-w-[1250px] mx-auto px-4 mt-4 h-full">
 
     <!-- Filters & Worker Cards Panel -->
     <aside
-        class="w-full lg:w-[380px] flex-shrink-0 filter-panel hide-scrollbar bg-white rounded-2xl border border-brandBorder shadow-sm overflow-hidden flex flex-col">
-        <div class="p-5 border-b border-brandBorder bg-slate-50">
-            <h2 class="font-bold text-xl text-brandBlue mb-4 tracking-tight">Find Nearby Pros</h2>
+        class="w-full lg:w-[380px] flex-shrink-0 filter-panel hide-scrollbar bg-white rounded-3xl border border-brandBorder shadow-premium overflow-hidden flex flex-col">
+        <div class="p-6 border-b border-brandBorder bg-slate-50/55">
+            <h2 class="font-black text-xl text-brandText mb-4 tracking-tight flex items-center gap-2">
+                <i data-lucide="map-pin" class="w-5 h-5 text-brandBlue"></i> Find Nearby Pros
+            </h2>
 
             <!-- Filters -->
             <div class="space-y-4">
                 <div>
-                    <label class="text-xs font-semibold text-brandIcon mb-1 block">Skill / Category</label>
+                    <label class="text-[10px] font-bold text-slate-500 mb-1.5 block uppercase tracking-wide">Skill / Category</label>
                     <select id="filter-skill"
-                        class="appearance-none w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/20 focus:border-brandBlue cursor-pointer transition bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat pr-10">
+                        class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue cursor-pointer transition">
                         <option value="All">All Skills</option>
-                        <option value="Plumbing">Plumbing</option>
-                        <option value="Electrical">Electrical</option>
-                        <option value="Cleaning">Cleaning</option>
-                        <option value="HVAC">HVAC</option>
-                        <option value="Carpentry">Carpentry</option>
+                        <option value="Plumbing"><i data-lucide="droplet" class="w-4 h-4 text-blue-500"></i> Plumbing</option>
+                        <option value="Electrical"><i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> Electrical</option>
+                        <option value="Cleaning">🧹 Cleaning</option>
+                        <option value="HVAC">❄️ HVAC</option>
+                        <option value="Carpentry"><i data-lucide="hammer" class="w-4 h-4 text-amber-600"></i> Carpentry</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="text-xs font-semibold text-brandIcon mb-1 flex justify-between items-center">
+                    <label class="text-[10px] font-bold text-slate-500 mb-1.5 flex justify-between items-center uppercase tracking-wide">
                         Distance Radius
                         <div class="flex items-center gap-1">
                             <input type="number" id="manual-radius" min="1" max="500" value="10"
-                                class="w-16 px-2 py-1 text-right text-sm font-bold text-brandText border border-slate-300 rounded-md focus:ring-1 focus:ring-brandOrange outline-none transition-all"
+                                class="w-14 px-2 py-1 text-center text-xs font-extrabold text-brandText border border-slate-200 rounded-lg focus:ring-4 focus:ring-blue-50 focus:border-brandBlue outline-none transition"
                                 oninput="document.getElementById('filter-radius').value = Math.min(this.value, 50); document.getElementById('filter-radius').style.setProperty('--value', (Math.min(this.value, 50) - 1) / 49 * 100 + '%');">
-                            <span class="text-brandText font-bold text-sm">km</span>
+                            <span class="text-slate-650 font-bold text-xs">km</span>
                         </div>
                     </label>
                     <input type="range" id="filter-radius" min="1" max="50" value="10" class="distance-slider mt-2"
@@ -152,69 +139,63 @@
                         oninput="document.getElementById('manual-radius').value = this.value; this.style.setProperty('--value', (this.value - this.min) / (this.max - this.min) * 100 + '%');">
                 </div>
 
-                <div class="flex gap-4">
-                    <label class="flex items-center gap-2 cursor-pointer flex-1">
+                <div class="flex gap-4 pt-1">
+                    <label class="flex items-center gap-2.5 cursor-pointer flex-1">
                         <input type="checkbox" id="filter-available"
-                            class="w-4 h-4 text-brandOrange bg-slate-100 border-slate-300 rounded focus:ring-brandOrange accent-brandOrange"
+                            class="w-4 h-4 text-brandBlue bg-slate-100 border-slate-350 rounded focus:ring-brandBlue accent-brandBlue"
                             checked>
-                        <span class="text-sm font-semibold text-slate-700">Available Now</span>
+                        <span class="text-xs font-bold text-slate-700">Available</span>
                     </label>
-                    <label class="flex items-center gap-2 cursor-pointer flex-1">
+                    <label class="flex items-center gap-2.5 cursor-pointer flex-1">
                         <input type="checkbox" id="filter-toprated"
-                            class="w-4 h-4 text-brandOrange bg-slate-100 border-slate-300 rounded focus:ring-brandOrange accent-brandOrange">
-                        <span class="text-sm font-semibold text-slate-700">Top Rated 4.5+</span>
+                            class="w-4 h-4 text-brandBlue bg-slate-100 border-slate-350 rounded focus:ring-brandBlue accent-brandBlue">
+                        <span class="text-xs font-bold text-slate-700">Top Rated 4.5+</span>
                     </label>
                 </div>
             </div>
 
             <button
-                class="w-full mt-4 bg-brandBlue text-white font-bold py-2.5 rounded-xl hover:bg-blue-900 transition shadow-sm"
-                onclick="applyFilters()">Apply Filters</button>
+                class="w-full mt-5 bg-brandBlue text-white font-extrabold py-3.5 rounded-2xl hover:bg-blue-700 transition duration-200 text-xs shadow-md shadow-blue-500/10 flex items-center justify-center gap-1.5 border-0 cursor-pointer"
+                onclick="applyFilters()">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Apply Filters
+            </button>
         </div>
 
         <!-- Worker List Container -->
         <div class="p-4 flex-grow overflow-y-auto space-y-3 bg-white" id="worker-list">
-            <div class="flex items-center justify-center py-8">
+            <div class="flex items-center justify-center py-12">
                 <div class="text-center">
                     <div
                         class="w-8 h-8 border-3 border-brandBlue border-t-transparent rounded-full animate-spin mx-auto mb-3">
                     </div>
-                    <p class="text-sm text-brandIcon font-medium">Scanning your area...</p>
+                    <p class="text-xs text-brandIcon font-bold">Scanning your area...</p>
                 </div>
             </div>
         </div>
 
         <!-- Results Count -->
-        <div class="p-3 border-t border-brandBorder bg-slate-50">
-            <p class="text-xs font-semibold text-brandIcon text-center" id="results-count">Finding workers...</p>
+        <div class="p-4 border-t border-brandBorder bg-slate-50/50">
+            <p class="text-xs font-bold text-brandIcon text-center" id="results-count">Finding workers...</p>
         </div>
     </aside>
 
     <!-- Map Area -->
     <main
-        class="w-full flex-grow relative bg-slate-100 rounded-2xl overflow-hidden border border-brandBorder shadow-sm">
+        class="w-full flex-grow relative bg-slate-100 rounded-3xl overflow-hidden border border-brandBorder shadow-premium">
         <div id="map"></div>
 
         <!-- Map Overlay Actions -->
         <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[400] flex gap-3">
             <button
-                class="bg-white px-5 py-2.5 rounded-full shadow-lg border border-brandBorder font-bold text-brandBlue hover:text-brandOrange hover:border-brandOrange transition flex items-center gap-2 text-sm"
+                class="bg-white border-0 px-5 py-3 rounded-full shadow-lg border border-slate-200/50 font-extrabold text-brandBlue hover:text-blue-700 transition flex items-center gap-2 text-xs cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
                 onclick="locateMe()">
-                <svg class="w-4 h-4 text-brandOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
+                <i data-lucide="crosshair" class="w-4 h-4 text-brandOrange"></i>
                 My Location
             </button>
             <button
-                class="bg-white px-5 py-2.5 rounded-full shadow-lg border border-brandBorder font-bold text-brandBlue hover:text-brandOrange hover:border-brandOrange transition flex items-center gap-2 text-sm"
+                class="bg-white border-0 px-5 py-3 rounded-full shadow-lg border border-slate-200/50 font-extrabold text-brandBlue hover:text-blue-700 transition flex items-center gap-2 text-xs cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
                 onclick="applyFilters()">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
+                <i data-lucide="search" class="w-4 h-4 text-brandBlue"></i>
                 Search Area
             </button>
         </div>
@@ -222,14 +203,11 @@
 
     <!-- Job Details Modal -->
     <div id="job-details-modal"
-        class="hidden fixed inset-0 bg-slate-900/40 z-[9999] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl p-0 relative overflow-hidden">
+        class="hidden fixed inset-0 bg-slate-900/60 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl p-0 relative overflow-hidden">
             <button onclick="document.getElementById('job-details-modal').classList.add('hidden')"
-                class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition z-10 bg-white rounded-full p-1 shadow-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
+                class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition z-10 bg-white rounded-full p-2 border border-slate-200/60 shadow-sm cursor-pointer">
+                <i data-lucide="x" class="w-4 h-4"></i>
             </button>
             <div id="modal-content" class="p-6"></div>
         </div>
@@ -302,9 +280,10 @@
     // Update UI headers
     document.addEventListener("DOMContentLoaded", () => {
         if (isShowingJobs) {
-            document.querySelector("h2").innerText = "Find Nearby Jobs";
+            document.querySelector("h2").innerHTML = '<i data-lucide="map" class="w-5 h-5 text-brandBlue"></i> Find Nearby Jobs';
             document.getElementById("filter-available").parentElement.style.display = 'none'; // hide available filter for jobs
             document.getElementById("filter-toprated").parentElement.style.display = 'none'; // hide top rated filter for jobs
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
     });
 
@@ -335,9 +314,9 @@
         // Draw new radius circle
         if (myLat && myLon) {
             radiusCircle = L.circle([myLat, myLon], {
-                color: '#f97316',
-                fillColor: '#f97316',
-                fillOpacity: 0.1,
+                color: '#2563eb',
+                fillColor: '#2563eb',
+                fillOpacity: 0.05,
                 radius: radiusFilter * 1000 // Convert km to meters
             }).addTo(map);
         }
@@ -348,14 +327,15 @@
         if (items.length === 0) {
             const emptyType = isShowingJobs ? "jobs" : "workers";
             listDiv.innerHTML = `
-                <div class="text-center py-8">
-                    <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    <p class="text-sm font-semibold text-brandIcon">No ${emptyType} match your filters</p>
-                    <p class="text-xs text-slate-400 mt-1">Try adjusting the radius or category</p>
+                <div class="text-center py-12">
+                    <div class="w-12 h-12 bg-slate-50 border border-slate-150 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="search-code" class="w-5 h-5 text-slate-450"></i>
+                    </div>
+                    <p class="text-xs font-bold text-brandIcon">No ${emptyType} match your filters</p>
+                    <p class="text-[10px] text-slate-400 mt-1 font-semibold">Try adjusting the radius or category</p>
                 </div>`;
             document.getElementById('results-count').textContent = `0 ${emptyType} found`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
             return;
         }
 
@@ -367,17 +347,17 @@
             const iconToUse = isShowingJobs ? jobIcon : workerIcon;
             const popupContent = isShowingJobs
                 ? `<div style="min-width:160px">
-                        <b style="color:#1e3a8a;font-size:14px">${item.title}</b><br>
-                        <span style="color:#64748b;font-size:12px">Client: ${item.provider_name}</span><br>
-                        <span style="color:#10b981;font-weight:bold">₹${item.price}</span>
+                        <b style="color:#0f172a;font-size:14px;font-weight:900">${item.title}</b><br>
+                        <span style="color:#64748b;font-size:11px;font-weight:600">Client: ${item.provider_name}</span><br>
+                        <span style="color:#10b981;font-weight:900">₹${item.price}</span>
                         <span style="color:#94a3b8;margin-left:8px">${item.distance.toFixed(1)} km</span><br>
                    </div>`
                 : `<div style="min-width:160px">
-                        <b style="color:#1e3a8a;font-size:14px">${item.name}</b><br>
-                        <span style="color:#64748b;font-size:12px">${item.skill}</span><br>
-                        <span style="color:#f97316">⭐ ${item.rating}</span>
+                        <b style="color:#0f172a;font-size:14px;font-weight:900">${item.name}</b><br>
+                        <span style="color:#64748b;font-size:11px;font-weight:600">${item.skill}</span><br>
+                        <span style="color:#f97316;font-weight:700">⭐ ${item.rating}</span>
                         <span style="color:#94a3b8;margin-left:8px">${item.distance.toFixed(1)} km</span><br>
-                        <span style="color:${item.status === 'Available' ? '#10b981' : '#ef4444'};font-size:11px;font-weight:600">${item.status}</span>
+                        <span style="color:${item.status === 'Available' ? '#10b981' : '#ef4444'};font-size:11px;font-weight:800">${item.status}</span>
                    </div>`;
 
             const marker = L.marker([item.lat, item.lon], { icon: iconToUse }).addTo(map)
@@ -387,52 +367,53 @@
             // Sidebar card
             if (isShowingJobs) {
                 listDiv.innerHTML += `
-                    <div class="worker-card border border-slate-200 rounded-xl p-4 hover:border-brandBlue cursor-pointer transition bg-white group shadow-sm"
+                    <div class="worker-card rounded-2xl p-4 cursor-pointer bg-white group shadow-sm"
                          onclick="panToWorker(${item.lat}, ${item.lon}, ${idx})" id="worker-card-${idx}">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-brandBlue text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">${item.title[0] || 'J'}</div>
+                                <div class="w-10 h-10 bg-blue-50 text-brandBlue rounded-full flex items-center justify-center font-black text-base shadow-inner uppercase">${item.title[0] || 'J'}</div>
                                 <div>
-                                    <h3 class="font-bold text-brandText text-sm group-hover:text-brandBlue transition">${item.title}</h3>
-                                    <p class="text-xs text-brandIcon">Client: ${item.provider_name}</p>
+                                    <h3 class="font-extrabold text-brandText text-xs group-hover:text-brandBlue transition">${item.title}</h3>
+                                    <p class="text-[10px] font-bold text-brandIcon">Client: ${item.provider_name}</p>
                                 </div>
                             </div>
-                            <span class="bg-blue-100 text-brandBlue font-bold px-2 py-0.5 rounded text-[10px] uppercase">₹${item.price}</span>
+                            <span class="bg-emerald-50 border border-emerald-100 text-brandTeal font-extrabold px-2.5 py-1 rounded-xl text-[10px] uppercase">₹${item.price}</span>
                         </div>
                         <div class="flex justify-between items-end mt-3">
-                            <span class="text-xs font-semibold text-brandIcon flex items-center gap-1">📍 ${item.distance.toFixed(1)} km away</span>
-                            <button class="bg-brandBlue text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-900 transition shadow-sm"
+                            <span class="text-[10px] font-bold text-brandIcon flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-brandOrange"></i> ${item.distance.toFixed(1)} km away</span>
+                            <button class="bg-brandBlue text-white px-3.5 py-2 rounded-xl text-[10px] font-extrabold hover:bg-blue-700 transition shadow-sm border-0 cursor-pointer"
                                     onclick="event.stopPropagation(); openJobDetails(${idx});">View Job</button>
                         </div>
                     </div>
                 `;
             } else {
                 const statusColor = item.status === 'Available'
-                    ? 'bg-emerald-100 text-emerald-700'
-                    : 'bg-red-100 text-red-600';
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                    : 'bg-red-50 text-red-650 border-red-100';
 
                 listDiv.innerHTML += `
-                    <div class="worker-card border border-slate-200 rounded-xl p-4 hover:border-brandOrange cursor-pointer transition bg-white group shadow-sm"
+                    <div class="worker-card rounded-2xl p-4 cursor-pointer bg-white group shadow-sm"
                          onclick="panToWorker(${item.lat}, ${item.lon}, ${idx})" id="worker-card-${idx}">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-brandOrange text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">${item.name[0]}</div>
+                                <div class="w-10 h-10 bg-orange-55 text-brandOrange rounded-full flex items-center justify-center font-black text-base shadow-inner uppercase">${item.name[0]}</div>
                                 <div>
-                                    <h3 class="font-bold text-brandText text-sm group-hover:text-brandOrange transition">${item.name}</h3>
-                                    <p class="text-xs text-brandIcon">${item.skill} • ⭐ ${item.rating}</p>
+                                    <h3 class="font-extrabold text-brandText text-xs group-hover:text-brandOrange transition">${item.name}</h3>
+                                    <p class="text-[10px] font-bold text-brandIcon">${item.skill} • ⭐ ${item.rating}</p>
                                 </div>
                             </div>
-                            <span class="${statusColor} font-bold px-2 py-0.5 rounded text-[10px] uppercase">${item.status}</span>
+                            <span class="${statusColor} border font-bold px-2 py-0.5 rounded-lg text-[10px] uppercase">${item.status}</span>
                         </div>
                         <div class="flex justify-between items-end mt-3">
-                            <span class="text-xs font-semibold text-brandIcon flex items-center gap-1">📍 ${item.distance.toFixed(1)} km away</span>
-                            <button class="bg-brandBlue text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-900 transition shadow-sm"
+                            <span class="text-[10px] font-bold text-brandIcon flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-brandOrange"></i> ${item.distance.toFixed(1)} km away</span>
+                            <button class="bg-brandBlue text-white px-3.5 py-2 rounded-xl text-[10px] font-extrabold hover:bg-blue-700 transition shadow-sm border-0 cursor-pointer"
                                     onclick="event.stopPropagation(); openWorkerDetails(${idx});">View Worker</button>
                         </div>
                     </div>
                 `;
             }
         });
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     // Detect user location
@@ -440,10 +421,10 @@
         const listDiv = document.getElementById('worker-list');
         const emptyType = isShowingJobs ? "jobs" : "workers";
         listDiv.innerHTML = `
-            <div class="flex items-center justify-center py-8">
+            <div class="flex items-center justify-center py-12">
                 <div class="text-center">
                     <div class="w-8 h-8 border-[3px] border-brandBlue border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                    <p class="text-sm text-brandIcon font-medium">Detecting your location...</p>
+                    <p class="text-xs text-brandIcon font-bold">Detecting your location...</p>
                 </div>
             </div>`;
 
@@ -455,7 +436,7 @@
 
                 // My location marker
                 L.marker([myLat, myLon], { icon: myIcon }).addTo(map)
-                    .bindPopup("<b style='color:#1e3a8a'>📍 Your Location</b>").openPopup();
+                    .bindPopup("<b style='color:#2563eb;font-weight:900'>📍 Your Location</b>").openPopup();
 
                 allItems = generateItems(myLat, myLon);
                 applyFilters();
@@ -486,7 +467,7 @@
             if (isShowingJobs) {
                 // Distance filter
                 if (item.distance > radiusFilter) return false;
-                // Category rough filter by checking if word matches roughly (basic impl)
+                // Category rough filter
                 if (skillFilter !== 'All' && !item.category.toLowerCase().includes(skillFilter.toLowerCase())) return false;
             } else {
                 // Skill filter
@@ -509,7 +490,7 @@
             const bounds = L.latLngBounds([
                 [myLat - (radiusFilter / 111), myLon - (radiusFilter / 111)],
                 [myLat + (radiusFilter / 111), myLon + (radiusFilter / 111)]
-            ]); // rough bounding box for radius
+            ]); 
             filtered.forEach(item => bounds.extend([item.lat, item.lon]));
             map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
         }
@@ -524,36 +505,37 @@
 
         content.innerHTML = `
             <div class="flex gap-4 items-start border-b border-slate-100 pb-4 mb-4">
-                <div class="w-12 h-12 bg-brandBlue text-white rounded-full flex items-center justify-center font-bold text-xl shadow-sm flex-shrink-0">${item.title[0]}</div>
+                <div class="w-12 h-12 bg-blue-50 border border-blue-100 text-brandBlue rounded-full flex items-center justify-center font-black text-xl shadow-inner flex-shrink-0 uppercase">${item.title[0]}</div>
                 <div>
-                    <h2 class="font-bold text-lg text-brandText leading-tight mb-1">${item.title}</h2>
-                    <p class="text-xs font-semibold text-brandIcon">Posted by <span class="text-brandText">${item.provider_name}</span> • ${item.created_at}</p>
+                    <h2 class="font-extrabold text-base text-brandText leading-tight mb-1">${item.title}</h2>
+                    <p class="text-[10px] font-bold text-brandIcon">Posted by <span class="text-slate-800">${item.provider_name}</span> • ${item.created_at}</p>
                 </div>
             </div>
             
             <div class="space-y-4 mb-6">
                 <div>
-                    <h4 class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-1">Description</h4>
-                    <p class="text-sm text-slate-700 leading-relaxed">${item.description}</p>
+                    <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Description</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed font-semibold">${item.description}</p>
                 </div>
                 
-                <div class="flex flex-wrap gap-2">
-                    <span class="text-xs font-medium bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100 text-brandIcon flex items-center gap-1">📍 ${item.distance.toFixed(1)} km away</span>
-                    <span class="text-xs font-medium bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 text-emerald-700 flex items-center gap-1">💰 ₹${item.price}</span>
-                    <span class="text-xs font-medium bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100 text-amber-700 flex items-center gap-1">🕐 ${item.scheduled_time}</span>
+                <div class="flex flex-wrap gap-2 pt-1">
+                    <span class="text-[10px] font-bold bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200/60 text-brandIcon flex items-center gap-1">📍 ${item.distance.toFixed(1)} km away</span>
+                    <span class="text-[10px] font-bold bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-100 text-emerald-700 flex items-center gap-1">💰 ₹${item.price}</span>
+                    <span class="text-[10px] font-bold bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-100 text-amber-700 flex items-center gap-1">🕐 ${item.scheduled_time}</span>
                 </div>
             </div>
             
             <div class="flex gap-3 pt-4 border-t border-slate-100">
-                <a href="/user/${item.provider_id}/" target="_blank" class="flex-1 bg-slate-100 text-slate-700 text-center px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200 transition">View Profile</a>
+                <a href="/user/${item.provider_id}/" class="flex-1 bg-slate-50 border border-slate-200 text-slate-700 text-center px-4 py-3 rounded-2xl text-xs font-extrabold hover:bg-slate-100 transition no-underline">View Profile</a>
                 <form method="POST" action="/services/${item.id}/accept/" class="flex-1 m-0">
                     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                    <button type="submit" class="w-full bg-brandBlue text-white text-center px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-900 transition shadow-sm">Apply for Job</button>
+                    <button type="submit" class="w-full bg-brandBlue text-white text-center px-4 py-3 rounded-2xl text-xs font-extrabold hover:bg-blue-700 transition shadow-md shadow-blue-500/10 border-0 cursor-pointer">Apply for Job</button>
                 </form>
             </div>
         `;
 
         modal.classList.remove('hidden');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     function openWorkerDetails(idx) {
@@ -565,26 +547,27 @@
 
         content.innerHTML = `
             <div class="flex gap-4 items-start border-b border-slate-100 pb-4 mb-4">
-                <div class="w-12 h-12 bg-brandOrange text-white rounded-full flex items-center justify-center font-bold text-xl shadow-sm flex-shrink-0">${item.name[0]}</div>
+                <div class="w-12 h-12 bg-orange-55 text-brandOrange rounded-full flex items-center justify-center font-black text-xl shadow-inner flex-shrink-0 uppercase">${item.name[0]}</div>
                 <div>
-                    <h2 class="font-bold text-lg text-brandText leading-tight mb-1">${item.name}</h2>
-                    <p class="text-xs font-semibold text-brandIcon">${item.skill} • ⭐ ${item.rating}</p>
+                    <h2 class="font-extrabold text-base text-brandText leading-tight mb-1">${item.name}</h2>
+                    <p class="text-[10px] font-bold text-brandIcon">${item.skill} • ⭐ ${item.rating}</p>
                 </div>
             </div>
             
             <div class="space-y-4 mb-6">
                 <div class="flex flex-wrap gap-2">
-                    <span class="text-xs font-medium bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100 text-brandIcon flex items-center gap-1">📍 ${item.distance.toFixed(1)} km away</span>
-                    <span class="text-xs font-medium ${item.status === 'Available' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-600 border-red-100'} px-2.5 py-1 rounded-lg border flex items-center gap-1">${item.status}</span>
+                    <span class="text-[10px] font-bold bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200/60 text-brandIcon flex items-center gap-1">📍 ${item.distance.toFixed(1)} km away</span>
+                    <span class="text-[10px] font-bold ${item.status === 'Available' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-650 border-red-100'} px-2.5 py-1.5 rounded-lg border flex items-center gap-1">${item.status}</span>
                 </div>
             </div>
             
             <div class="flex gap-3 pt-4 border-t border-slate-100">
-                <a href="/user/${item.id}/" target="_blank" class="flex-1 bg-brandBlue text-white text-center px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-900 transition shadow-sm">View Full Profile</a>
+                <a href="/user/${item.id}/" class="w-full bg-brandBlue text-white text-center px-4 py-3 rounded-2xl text-xs font-extrabold hover:bg-blue-700 transition shadow-md shadow-blue-500/10 border-0 no-underline">View Full Profile</a>
             </div>
         `;
 
         modal.classList.remove('hidden');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     // Pan to a specific worker and highlight their card

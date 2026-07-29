@@ -1,40 +1,41 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-[800px] mx-auto mt-4 pb-10 px-4">
+<div class="max-w-[900px] mx-auto mt-4 pb-20 px-4">
     <!-- Back Button -->
-    <a href="javascript:history.back()"
-        class="inline-flex items-center gap-2 text-brandIcon hover:text-brandBlue font-bold text-sm mb-4 transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
-            </path>
-        </svg>
-        Back to Dashboard
-    </a>
+    <div class="mb-4">
+        <a href="javascript:history.back()"
+            class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-brandBlue transition no-underline bg-white border border-slate-200/60 px-4 py-2 rounded-2xl shadow-sm">
+            <i data-lucide="arrow-left" class="w-4 h-4 text-slate-500"></i>
+            Back to Dashboard
+        </a>
+    </div>
 
     <!-- Job Header Card -->
-    <div class="li-card p-6 md:p-8 mb-6 relative overflow-hidden">
+    <div class="bg-white border border-brandBorder rounded-3xl p-6 md:p-8 mb-6 relative overflow-hidden shadow-premium hover:shadow-premiumHover transition-all duration-300">
         <!-- Background Decoration -->
         <div class="absolute -top-20 -right-20 w-64 h-64 bg-brandBlue/5 rounded-full blur-3xl"></div>
 
         <div
-            class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-brandBorder pb-6 mb-6">
+            class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 pb-6 mb-6 gap-4">
             <div>
-                <div class="flex items-center gap-3 mb-2">
+                <div class="flex items-center gap-2 mb-2">
                     <span
-                        class="bg-blue-50 text-brandBlue px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider">{{ job.category }}</span>
-                    <span class="text-xs font-bold text-brandIcon">JobID #{{ job.id }}</span>
+                        class="bg-blue-50 border border-blue-100 text-brandBlue px-3 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider">{{ job.category }}</span>
+                    <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wide">JobID #{{ job.id }}</span>
                 </div>
-                <h1 class="text-2xl md:text-3xl font-extrabold text-brandText">{{ job.title }}</h1>
-                <p class="text-sm text-slate-500 font-medium mt-1">Posted on {{ job.created_at|date:"M d, Y" }} at {{ job.created_at|time:"h:i A" }}</p>
+                <h1 class="text-2xl md:text-3xl font-black text-brandText tracking-tight">{{ job.title }}</h1>
+                <p class="text-xs text-slate-400 font-bold mt-1.5 flex items-center gap-1">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i> Posted on {{ job.created_at|date:"M d, Y" }} at {{ job.created_at|time:"h:i A" }}
+                </p>
             </div>
-            <div class="mt-4 md:mt-0 text-left md:text-right">
-                <p class="text-[10px] font-black tracking-widest text-brandIcon uppercase mb-1">Current Status</p>
-                <span class="inline-block px-4 py-2 rounded-xl text-sm font-bold shadow-sm 
-                    {% if job.status == 'Pending' %}bg-amber-100 text-amber-700 border border-amber-200
-                    {% elif job.status == 'Accepted' %}bg-blue-100 text-blue-700 border border-blue-200
-                    {% elif job.status == 'Completed' %}bg-emerald-100 text-emerald-700 border border-emerald-200
-                    {% else %}bg-slate-100 text-slate-700 border border-slate-200{% endif %}">
+            <div class="flex flex-col items-start md:items-end">
+                <p class="text-[9px] font-extrabold tracking-widest text-slate-400 uppercase mb-1.5">Current Status</p>
+                <span class="inline-block px-4 py-2 rounded-xl text-xs font-extrabold shadow-sm uppercase tracking-wider border
+                    {% if job.status == 'Pending' %}bg-amber-50 text-amber-700 border-amber-200/60
+                    {% elif job.status == 'Accepted' %}bg-blue-50 text-blue-700 border-blue-200/60
+                    {% elif job.status == 'Completed' %}bg-emerald-50 text-emerald-700 border-emerald-200/60
+                    {% else %}bg-slate-50 text-slate-700 border-slate-200/60{% endif %}">
                     {{ job.status }}
                 </span>
             </div>
@@ -42,118 +43,92 @@
 
         <div class="relative z-10 space-y-6">
             <!-- Details Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    <div class="flex items-start gap-3">
-                        <div class="text-2xl mt-0.5">💰</div>
-                        <div>
-                            <p class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-0.5">Offered Price
-                            </p>
-                            <p class="text-lg font-black text-emerald-600">{% if job.price %}₹{{ job.price }}{% else %}Negotiable{% endif %}</p>
-                        </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100/70 shadow-inner flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-extrabold shadow-inner flex-shrink-0">
+                        <i data-lucide="indian-rupee" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Offered Price</p>
+                        <p class="text-base font-black text-emerald-600 mt-0.5">{% if job.price %}₹{{ job.price }}{% else %}Negotiable{% endif %}</p>
                     </div>
                 </div>
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    <div class="flex items-start gap-3">
-                        <div class="text-2xl mt-0.5">📍</div>
-                        <div>
-                            <p class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-0.5">Location</p>
-                            <p class="text-sm font-bold text-brandText">{{ job.address|default:"Not specified" }}</p>
-                        </div>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100/70 shadow-inner flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-orange-500/10 text-brandOrange flex items-center justify-center font-extrabold shadow-inner flex-shrink-0">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Location</p>
+                        <p class="text-xs font-bold text-brandText mt-1">{{ job.address|default:"Not specified" }}</p>
                     </div>
                 </div>
             </div>
 
             <!-- Description -->
             <div>
-                <h3 class="text-sm font-bold text-brandIcon uppercase tracking-wider mb-2">Detailed Description</h3>
-                <p class="text-brandText text-sm leading-relaxed whitespace-pre-line">{{ job.description }}</p>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">Detailed Description</h3>
+                <p class="text-slate-650 text-sm leading-relaxed whitespace-pre-line font-medium">{{ job.description }}</p>
             </div>
         </div>
     </div>
 
     <!-- Quick Action Bar -->
     {% if is_worker or is_provider %}
-    <div class="li-card p-4 mb-6">
+    <div class="bg-white border border-brandBorder rounded-3xl p-5 mb-6 shadow-premium">
         <div class="flex flex-wrap items-center gap-3">
-            <span class="text-xs font-black text-brandIcon uppercase tracking-wider mr-2">Quick Actions</span>
+            <span class="text-xs font-extrabold text-slate-450 uppercase tracking-wider mr-2">Quick Actions</span>
 
             {% if is_worker %}
             {% if job.status == 'Accepted' %}
-            <form method="POST" action="{% url 'update_status' job.id %}" class="inline">
+            <form method="POST" action="{% url 'update_status' job.id %}" class="inline m-0">
                 {% csrf_token %}
                 <input type="hidden" name="status" value="On the Way">
                 <button type="submit"
-                    class="inline-flex items-center gap-2 bg-brandBlue text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-900 transition shadow-md">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                    </svg>
-                    Mark On the Way
+                    class="inline-flex items-center gap-2 bg-brandBlue hover:bg-blue-700 text-white px-5 py-2.5 rounded-2xl text-xs font-extrabold transition shadow-md shadow-blue-500/10 border-0 cursor-pointer hover:-translate-y-0.5 active:translate-y-0">
+                    <i data-lucide="navigation" class="w-4 h-4"></i> Mark On the Way
                 </button>
             </form>
             {% elif job.status == 'On the Way' %}
-            <form method="POST" action="{% url 'update_status' job.id %}" class="inline">
+            <form method="POST" action="{% url 'update_status' job.id %}" class="inline m-0">
                 {% csrf_token %}
                 <input type="hidden" name="status" value="Arrived">
                 <button type="submit"
-                    class="inline-flex items-center gap-2 bg-amber-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-amber-600 transition shadow-md">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                        </path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    Mark Arrived
+                    class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-2xl text-xs font-extrabold transition shadow-md shadow-amber-500/10 border-0 cursor-pointer hover:-translate-y-0.5 active:translate-y-0">
+                    <i data-lucide="map-pin" class="w-4 h-4"></i> Mark Arrived
                 </button>
             </form>
             {% elif job.status == 'Arrived' %}
-            <form method="POST" action="{% url 'update_status' job.id %}" class="inline">
+            <form method="POST" action="{% url 'update_status' job.id %}" class="inline m-0">
                 {% csrf_token %}
                 <input type="hidden" name="status" value="Completed">
                 <button type="submit"
-                    class="inline-flex items-center gap-2 bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-600 transition shadow-md">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Mark as Complete
+                    class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-2xl text-xs font-extrabold transition shadow-md shadow-emerald-500/10 border-0 cursor-pointer hover:-translate-y-0.5 active:translate-y-0">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i> Mark as Complete
                 </button>
             </form>
             {% elif job.status == 'Pending Approval' %}
             <span
-                class="inline-flex items-center gap-2 bg-purple-50 text-purple-600 border border-purple-200 px-5 py-2.5 rounded-xl text-sm font-bold">
-                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                </svg>
-                Awaiting Client Approval
+                class="inline-flex items-center gap-2 bg-purple-50 text-purple-600 border border-purple-100 px-4 py-2 rounded-2xl text-xs font-extrabold">
+                <i data-lucide="loader" class="w-4 h-4 animate-spin text-purple-600"></i> Awaiting Client Approval
             </span>
             {% endif %}
             {% endif %}
 
             {% if is_provider and job.status == 'Pending Approval' %}
-            <form method="POST" action="{% url 'approve_completion' job.id %}" class="inline">
+            <form method="POST" action="{% url 'approve_completion' job.id %}" class="inline m-0">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="approve">
                 <button type="submit"
-                    class="inline-flex items-center gap-2 bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-600 transition shadow-md">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Approve Completion
+                    class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-2xl text-xs font-extrabold transition shadow-md shadow-emerald-500/10 border-0 cursor-pointer hover:-translate-y-0.5 active:translate-y-0">
+                    <i data-lucide="check" class="w-4 h-4"></i> Approve Completion
                 </button>
             </form>
-            <form method="POST" action="{% url 'approve_completion' job.id %}" class="inline">
+            <form method="POST" action="{% url 'approve_completion' job.id %}" class="inline m-0">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="reject">
                 <button type="submit"
-                    class="inline-flex items-center gap-2 bg-red-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-red-600 transition shadow-md">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                    Reject
+                    class="inline-flex items-center gap-2 bg-red-650 hover:bg-red-700 text-white px-5 py-2.5 rounded-2xl text-xs font-extrabold transition shadow-md border-0 cursor-pointer hover:-translate-y-0.5 active:translate-y-0">
+                    <i data-lucide="x" class="w-4 h-4"></i> Reject
                 </button>
             </form>
             {% endif %}
@@ -162,107 +137,94 @@
             <div class="ml-auto">
                 {% if is_worker %}
                 <a href="{% url 'inbox' %}?user={{ job.provider.id }}"
-                    class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:from-indigo-600 hover:to-purple-700 transition shadow-md">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                        </path>
-                    </svg>
-                    💬 Chat with Client
+                    class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-2xl text-xs font-extrabold transition shadow-md shadow-blue-500/10 no-underline">
+                    <i data-lucide="message-square" class="w-4 h-4"></i> Chat with Client
                 </a>
                 {% elif is_provider and job.worker %}
                 <a href="{% url 'inbox' %}?user={{ job.worker.id }}"
-                    class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:from-indigo-600 hover:to-purple-700 transition shadow-md">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                        </path>
-                    </svg>
-                    💬 Chat with Worker
+                    class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-2xl text-xs font-extrabold transition shadow-md shadow-blue-500/10 no-underline">
+                    <i data-lucide="message-square" class="w-4 h-4"></i> Chat with Worker
                 </a>
                 {% endif %}
             </div>
         </div>
     </div>
     {% endif %}
+
     <!-- Participants & Timeline Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <!-- Left Column: Participants -->
         <div class="lg:col-span-1 space-y-6">
             <!-- Client Info -->
-            <div class="li-card p-5">
+            <div class="bg-white border border-brandBorder rounded-3xl p-5 shadow-premium">
                 <h3
-                    class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-4 border-b border-brandBorder pb-2">
+                    class="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
                     Requested By (Client)</h3>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
                     <div
-                        class="w-12 h-12 rounded-full border-2 border-slate-200 bg-slate-100 flex items-center justify-center font-bold text-brandBlue overflow-hidden flex-shrink-0">
+                        class="w-12 h-12 rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center font-extrabold text-brandBlue overflow-hidden flex-shrink-0">
                         {% if job.provider.profile.profile_picture %}
                         <img src="{{ job.provider.profile.profile_picture.url }}" class="w-full h-full object-cover">
                         {% else %}
-                        {{ job.provider.username|make_list|first|upper }}
+                        <span class="text-xl uppercase text-brandBlue">{{ job.provider.username|make_list|first }}</span>
                         {% endif %}
                     </div>
                     <div>
                         <a href="{% url 'user_profile' job.provider.id %}"
-                            class="text-sm font-bold text-brandText hover:text-brandBlue transition">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</a>
-                        <p class="text-xs text-brandIcon">{{ job.provider.profile.role }}</p>
+                            class="text-sm font-extrabold text-brandText hover:text-brandBlue transition no-underline">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</a>
+                        <p class="text-[10px] font-bold text-brandIcon uppercase mt-0.5">{{ job.provider.profile.role }}</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-4 border-t border-brandBorder">
+                <div class="mt-4 pt-4 border-t border-slate-100">
                     <a href="{% url 'inbox' %}?user={{ job.provider.id }}"
-                        class="w-full text-center block bg-slate-50 text-brandBlue font-bold text-xs py-2 rounded-lg hover:bg-slate-100 transition border border-slate-200">💬
-                        Message Client</a>
+                        class="w-full text-center block bg-slate-50 text-brandBlue font-extrabold text-xs py-2.5 rounded-xl hover:bg-slate-100 transition border border-slate-250/60 no-underline shadow-sm flex items-center justify-center gap-1">
+                        <i data-lucide="message-square" class="w-3.5 h-3.5 text-brandBlue"></i> Message Client
+                    </a>
                 </div>
             </div>
 
             <!-- Worker Info -->
-            <div class="li-card p-5">
+            <div class="bg-white border border-brandBorder rounded-3xl p-5 shadow-premium">
                 <h3
-                    class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-4 border-b border-brandBorder pb-2">
+                    class="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
                     Assigned Professional</h3>
                 {% if job.worker %}
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
                     <div
-                        class="w-12 h-12 rounded-full border-2 border-brandBlue bg-blue-50 flex items-center justify-center font-bold text-brandBlue overflow-hidden flex-shrink-0 relative">
+                        class="w-12 h-12 rounded-full border border-blue-100 bg-blue-50 flex items-center justify-center font-extrabold text-brandBlue overflow-hidden flex-shrink-0 relative">
                         {% if job.worker.profile.profile_picture %}
                         <img src="{{ job.worker.profile.profile_picture.url }}"
                             class="w-full h-full object-cover z-10 relative">
                         {% else %}
-                        <span class="z-10 relative">{{ job.worker.username|make_list|first|upper }}</span>
+                        <span class="z-10 relative text-xl uppercase text-brandBlue">{{ job.worker.username|make_list|first }}</span>
                         {% endif %}
                         <div class="absolute inset-0 bg-brandBlue/10 animate-pulse"></div>
                     </div>
                     <div>
                         <a href="{% url 'user_profile' job.worker.id %}"
-                            class="text-sm font-bold text-brandText hover:text-brandBlue transition">{{ job.worker.first_name|default:job.worker.username }} {{ job.worker.last_name }}</a>
+                            class="text-sm font-extrabold text-brandText hover:text-brandBlue transition no-underline">{{ job.worker.first_name|default:job.worker.username }} {{ job.worker.last_name }}</a>
                         {% if job.worker.profile.is_verified %}
-                        <p class="text-[10px] text-emerald-600 font-bold flex items-center gap-1 mt-0.5"><svg
-                                class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                    clip-rule="evenodd"></path>
-                            </svg> Verified Expert</p>
+                        <p class="text-[10px] text-emerald-600 font-extrabold flex items-center gap-1 mt-1 uppercase tracking-wide">
+                            <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-600 fill-emerald-50"></i> Verified
+                        </p>
                         {% endif %}
                     </div>
                 </div>
-                <div class="mt-4 pt-4 border-t border-brandBorder">
+                <div class="mt-4 pt-4 border-t border-slate-100">
                     <a href="{% url 'inbox' %}?user={{ job.worker.id }}"
-                        class="w-full text-center block bg-brandBlue text-white font-bold text-xs py-2 rounded-lg hover:bg-blue-900 transition shadow-sm">💬
-                        Message Worker</a>
+                        class="w-full text-center block bg-brandBlue text-white font-extrabold text-xs py-2.5 rounded-xl hover:bg-blue-700 transition shadow-md shadow-blue-500/10 no-underline flex items-center justify-center gap-1 border-0 cursor-pointer">
+                        <i data-lucide="message-square" class="w-3.5 h-3.5"></i> Message Worker
+                    </a>
                 </div>
                 {% else %}
-                <div class="text-center py-4">
+                <div class="text-center py-6">
                     <div
-                        class="w-12 h-12 bg-slate-100 rounded-full mx-auto flex items-center justify-center text-slate-400 mb-2">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
+                        class="w-11 h-11 bg-slate-50 rounded-2xl mx-auto flex items-center justify-center text-slate-400 mb-3 border border-slate-200/60 shadow-inner">
+                        <i data-lucide="user-x" class="w-5 h-5"></i>
                     </div>
-                    <p class="text-xs font-bold text-slate-500">Not assigned yet</p>
-                    <p class="text-[10px] text-brandIcon mt-1">Waiting for applications</p>
+                    <p class="text-xs font-extrabold text-slate-500">Not assigned yet</p>
+                    <p class="text-[10px] text-brandIcon mt-1 font-bold">Waiting for applications</p>
                 </div>
                 {% endif %}
             </div>
@@ -270,9 +232,9 @@
 
         <!-- Right Column: Activity Timeline -->
         <div class="lg:col-span-2">
-            <div class="li-card p-6 h-full">
+            <div class="bg-white border border-brandBorder rounded-3xl p-6 shadow-premium h-full">
                 <h3
-                    class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-6 border-b border-brandBorder pb-2">
+                    class="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider mb-6 border-b border-slate-100 pb-2">
                     Activity Timeline</h3>
 
                 <div class="relative pl-6 space-y-6">
@@ -282,13 +244,13 @@
                     <!-- Post Created Entry -->
                     <div class="relative">
                         <div
-                            class="absolute -left-[31px] w-6 h-6 bg-blue-100 rounded-full border-4 border-white flex items-center justify-center z-10">
+                            class="absolute -left-[31px] w-6 h-6 bg-blue-100 rounded-full border-4 border-white flex items-center justify-center z-10 shadow-sm">
                             <div class="w-2 h-2 bg-brandBlue rounded-full"></div>
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-brandText">Job Posted</p>
-                            <p class="text-[11px] text-slate-500 font-medium">By {{ job.provider.first_name|default:job.provider.username }}</p>
-                            <p class="text-[10px] text-brandIcon mt-1">{{ job.created_at|date:"M d, Y · h:i A" }}</p>
+                            <p class="text-sm font-extrabold text-brandText">Job Posted</p>
+                            <p class="text-xs text-slate-450 font-bold mt-0.5">By {{ job.provider.first_name|default:job.provider.username }}</p>
+                            <p class="text-[10px] text-brandIcon mt-1.5 font-bold">{{ job.created_at|date:"M d, Y · h:i A" }}</p>
                         </div>
                     </div>
 
@@ -296,26 +258,25 @@
                     {% if job.worker %}
                     <div class="relative">
                         <div
-                            class="absolute -left-[31px] w-6 h-6 bg-emerald-100 rounded-full border-4 border-white flex items-center justify-center z-10">
+                            class="absolute -left-[31px] w-6 h-6 bg-emerald-100 rounded-full border-4 border-white flex items-center justify-center z-10 shadow-sm">
                             <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-brandText">Worker Assigned</p>
-                            <p class="text-[11px] text-slate-500 font-medium">Assigned to {{ job.worker.first_name|default:job.worker.username }}</p>
-                            <p class="text-[10px] text-brandIcon mt-1">Status: {{ job.status }}</p>
+                            <p class="text-sm font-extrabold text-brandText">Worker Assigned</p>
+                            <p class="text-xs text-slate-455 font-bold mt-0.5">Assigned to {{ job.worker.first_name|default:job.worker.username }}</p>
+                            <p class="text-[10px] text-brandIcon mt-1.5 font-bold">Status: {{ job.status }}</p>
                         </div>
                     </div>
                     {% else %}
                     <div class="relative">
                         <div
-                            class="absolute -left-[31px] w-6 h-6 bg-amber-100 rounded-full border-4 border-white flex items-center justify-center z-10">
+                            class="absolute -left-[31px] w-6 h-6 bg-amber-100 rounded-full border-4 border-white flex items-center justify-center z-10 shadow-sm">
                             <div class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-brandText">Accepting Applications</p>
-                            <p class="text-[11px] text-slate-500 font-medium">Job is open to proposals.</p>
-                            <p class="text-[10px] text-brandIcon mt-1">{{ job.applications.count }} Application(s)
-                                received</p>
+                            <p class="text-sm font-extrabold text-brandText">Accepting Applications</p>
+                            <p class="text-xs text-slate-450 font-bold mt-0.5">Job is open to proposals.</p>
+                            <p class="text-[10px] text-brandIcon mt-1.5 font-bold">{{ job.applications.count }} Application(s) received</p>
                         </div>
                     </div>
                     {% endif %}
@@ -324,14 +285,13 @@
                     {% if job.status == 'Pending Approval' %}
                     <div class="relative">
                         <div
-                            class="absolute -left-[31px] w-6 h-6 bg-purple-100 rounded-full border-4 border-white flex items-center justify-center z-10">
+                            class="absolute -left-[31px] w-6 h-6 bg-purple-100 rounded-full border-4 border-white flex items-center justify-center z-10 shadow-sm">
                             <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-purple-600">Pending Client Approval</p>
-                            <p class="text-[11px] text-slate-500 font-medium">Worker has marked work as complete.
-                                Awaiting client verification.</p>
-                            <p class="text-[10px] text-brandIcon mt-1">{{ job.updated_at|date:"M d, Y · h:i A" }}</p>
+                            <p class="text-sm font-extrabold text-purple-600">Pending Client Approval</p>
+                            <p class="text-xs text-slate-450 font-bold mt-0.5">Worker has marked work as complete. Awaiting client verification.</p>
+                            <p class="text-[10px] text-brandIcon mt-1.5 font-bold">{{ job.updated_at|date:"M d, Y · h:i A" }}</p>
                         </div>
                     </div>
                     {% endif %}
@@ -340,18 +300,13 @@
                     {% if job.status == 'Completed' %}
                     <div class="relative">
                         <div
-                            class="absolute -left-[31px] w-6 h-6 bg-emerald-100 rounded-full border-4 border-white flex items-center justify-center z-10">
-                            <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                    clip-rule="evenodd"></path>
-                            </svg>
+                            class="absolute -left-[31px] w-6 h-6 bg-emerald-100 rounded-full border-4 border-white flex items-center justify-center z-10 shadow-sm">
+                            <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i>
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-emerald-600">Job Completed & Verified</p>
-                            <p class="text-[11px] text-slate-500 font-medium">The service has been completed and
-                                approved by the client.</p>
-                            <p class="text-[10px] text-brandIcon mt-1">{{ job.updated_at|date:"M d, Y · h:i A" }}</p>
+                            <p class="text-sm font-extrabold text-emerald-600">Job Completed & Verified</p>
+                            <p class="text-xs text-slate-450 font-bold mt-0.5">The service has been completed and approved by the client.</p>
+                            <p class="text-[10px] text-brandIcon mt-1.5 font-bold">{{ job.updated_at|date:"M d, Y · h:i A" }}</p>
                         </div>
                     </div>
                     {% endif %}
@@ -363,37 +318,29 @@
 
     <!-- Pending Approval Action Banner (Only for Provider) -->
     {% if job.status == 'Pending Approval' and is_provider %}
-    <div class="li-card p-6 mt-6 border-2 border-purple-200 bg-purple-50/50">
+    <div class="bg-white border-2 border-purple-200 rounded-3xl p-6 mt-6 bg-purple-50/20 shadow-premium">
         <div class="flex items-center gap-4 mb-4">
-            <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-2xl">⏳</div>
+            <div class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center text-2xl shadow-sm"><i data-lucide="clock" class="w-6 h-6 text-purple-600"></i></div>
             <div>
-                <h3 class="text-lg font-bold text-purple-800">Completion Verification Required</h3>
-                <p class="text-sm text-purple-600">{{ job.worker.first_name|default:job.worker.username }} has marked
-                    this job as complete. Please verify the work and approve or reject.</p>
+                <h3 class="text-base font-extrabold text-purple-800">Completion Verification Required</h3>
+                <p class="text-xs font-semibold text-purple-600/90 leading-relaxed mt-1">{{ job.worker.first_name|default:job.worker.username }} has marked this job as complete. Please verify the work and approve or reject.</p>
             </div>
         </div>
         <div class="flex gap-3">
-            <form method="POST" action="{% url 'approve_completion' job.id %}">
+            <form method="POST" action="{% url 'approve_completion' job.id %}" class="m-0">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="approve">
                 <button type="submit"
-                    class="bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-emerald-600 transition shadow-md flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Approve — Work is Complete
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-2xl text-xs font-extrabold transition shadow-md shadow-emerald-500/10 flex items-center gap-1.5 border-0 cursor-pointer">
+                    <i data-lucide="check" class="w-4 h-4"></i> Approve — Work is Complete
                 </button>
             </form>
-            <form method="POST" action="{% url 'approve_completion' job.id %}">
+            <form method="POST" action="{% url 'approve_completion' job.id %}" class="m-0">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="reject">
                 <button type="submit"
-                    class="bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-red-600 transition shadow-md flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                    Reject — Not Satisfied
+                    class="bg-red-655 hover:bg-red-700 text-white px-6 py-3.5 rounded-2xl text-xs font-extrabold transition shadow-md border-0 cursor-pointer flex items-center gap-1.5">
+                    <i data-lucide="x" class="w-4 h-4"></i> Reject — Not Satisfied
                 </button>
             </form>
         </div>
@@ -406,56 +353,58 @@
 
         <!-- Submitted Reviews -->
         {% if reviews %}
-        <div class="li-card p-6">
-            <h3 class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-5 border-b border-brandBorder pb-2">
+        <div class="bg-white border border-brandBorder rounded-3xl p-6 shadow-premium">
+            <h3 class="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider mb-5 border-b border-slate-100 pb-2">
                 Feedback & Reviews</h3>
             <div class="space-y-5">
                 {% for review in reviews %}
                 <div class="bg-slate-50 rounded-2xl p-5 border border-slate-100">
-                    <div class="flex items-center gap-3 mb-3">
+                    <div class="flex items-center gap-3.5 mb-4">
                         <div
-                            class="w-10 h-10 rounded-full bg-brandBlue/10 flex items-center justify-center font-bold text-brandBlue overflow-hidden flex-shrink-0">
+                            class="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center font-extrabold text-brandBlue overflow-hidden flex-shrink-0">
                             {% if review.reviewer.profile.profile_picture %}
                             <img src="{{ review.reviewer.profile.profile_picture.url }}"
                                 class="w-full h-full object-cover">
                             {% else %}
-                            {{ review.reviewer.username|make_list|first|upper }}
+                            <span class="uppercase text-brandBlue">{{ review.reviewer.username|make_list|first }}</span>
                             {% endif %}
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-brandText">{{ review.reviewer.first_name|default:review.reviewer.username }} {{ review.reviewer.last_name }}</p>
-                            <p class="text-[10px] text-brandIcon font-medium">Reviewed {{ review.reviewee.first_name|default:review.reviewee.username }} · {{ review.created_at|date:"M d, Y" }}</p>
+                            <p class="text-xs font-extrabold text-brandText">{{ review.reviewer.first_name|default:review.reviewer.username }} {{ review.reviewer.last_name }}</p>
+                            <p class="text-[10px] text-brandIcon font-bold mt-1">Reviewed {{ review.reviewee.first_name|default:review.reviewee.username }} &bull; {{ review.created_at|date:"M d, Y" }}</p>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-                        <div class="text-center bg-white rounded-xl p-2 border border-slate-100">
-                            <p class="text-[10px] text-brandIcon font-bold uppercase">Overall</p>
-                            <p class="text-lg font-black text-amber-500">{{ review.rating }}<span
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                        <div class="text-center bg-white rounded-2xl p-3 border border-slate-100 shadow-sm">
+                            <p class="text-[9px] text-slate-400 font-extrabold uppercase">Overall</p>
+                            <p class="text-lg font-black text-amber-500 mt-1">{{ review.rating }}<span
                                     class="text-xs text-slate-400">/5</span></p>
                         </div>
-                        <div class="text-center bg-white rounded-xl p-2 border border-slate-100">
-                            <p class="text-[10px] text-brandIcon font-bold uppercase">Professional</p>
-                            <p class="text-lg font-black text-blue-500">{{ review.professionalism }}<span
+                        <div class="text-center bg-white rounded-2xl p-3 border border-slate-100 shadow-sm">
+                            <p class="text-[9px] text-slate-400 font-extrabold uppercase">Professional</p>
+                            <p class="text-lg font-black text-brandBlue mt-1">{{ review.professionalism }}<span
                                     class="text-xs text-slate-400">/5</span></p>
                         </div>
-                        <div class="text-center bg-white rounded-xl p-2 border border-slate-100">
-                            <p class="text-[10px] text-brandIcon font-bold uppercase">Communication</p>
-                            <p class="text-lg font-black text-emerald-500">{{ review.communication }}<span
+                        <div class="text-center bg-white rounded-2xl p-3 border border-slate-100 shadow-sm">
+                            <p class="text-[9px] text-slate-400 font-extrabold uppercase">Communication</p>
+                            <p class="text-lg font-black text-brandTeal mt-1">{{ review.communication }}<span
                                     class="text-xs text-slate-400">/5</span></p>
                         </div>
-                        <div class="text-center bg-white rounded-xl p-2 border border-slate-100">
-                            <p class="text-[10px] text-brandIcon font-bold uppercase">Timeliness</p>
-                            <p class="text-lg font-black text-purple-500">{{ review.timeliness }}<span
+                        <div class="text-center bg-white rounded-2xl p-3 border border-slate-100 shadow-sm">
+                            <p class="text-[9px] text-slate-400 font-extrabold uppercase">Timeliness</p>
+                            <p class="text-lg font-black text-purple-600 mt-1">{{ review.timeliness }}<span
                                     class="text-xs text-slate-400">/5</span></p>
                         </div>
                     </div>
                     {% if review.comment %}
                     <p
-                        class="text-sm text-brandText leading-relaxed italic bg-white p-3 rounded-xl border border-slate-100">
+                        class="text-xs text-brandText leading-relaxed italic bg-white p-3.5 rounded-xl border border-slate-150/70 font-semibold shadow-inner">
                         "{{ review.comment }}"</p>
                     {% endif %}
                     {% if review.would_recommend %}
-                    <p class="text-[10px] text-emerald-600 font-bold mt-2 flex items-center gap-1">✅ Would recommend</p>
+                    <p class="text-[10px] text-emerald-600 font-extrabold mt-3.5 flex items-center gap-1 uppercase tracking-wide">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i> Would recommend
+                    </p>
                     {% endif %}
                 </div>
                 {% endfor %}
@@ -466,16 +415,16 @@
         <!-- Submit Review Form -->
         {% if not user_has_reviewed %}
         {% if is_provider or is_worker %}
-        <div class="li-card p-6" id="feedback">
-            <h3 class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-5 border-b border-brandBorder pb-2">
+        <div class="bg-white border border-brandBorder rounded-3xl p-6 shadow-premium" id="feedback">
+            <h3 class="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider mb-5 border-b border-slate-100 pb-2">
                 Leave Your Feedback</h3>
-            <form method="POST" action="{% url 'submit_review' job.id %}" class="space-y-5">
+            <form method="POST" action="{% url 'submit_review' job.id %}" class="space-y-5 m-0">
                 {% csrf_token %}
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-brandText mb-1.5">Overall Rating</label>
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wide ml-1">Overall Rating</label>
                         <select name="rating"
-                            class="appearance-none w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/20 focus:border-brandBlue cursor-pointer transition bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat pr-10">
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-xs font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue cursor-pointer transition">
                             <option value="5">⭐ 5 - Excellent</option>
                             <option value="4">⭐ 4 - Good</option>
                             <option value="3" selected>⭐ 3 - Average</option>
@@ -484,9 +433,9 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-brandText mb-1.5">Professionalism</label>
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wide ml-1">Professionalism</label>
                         <select name="professionalism"
-                            class="appearance-none w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/20 focus:border-brandBlue cursor-pointer transition bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat pr-10">
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-xs font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue cursor-pointer transition">
                             <option value="5">5 - Excellent</option>
                             <option value="4">4 - Good</option>
                             <option value="3" selected>3 - Average</option>
@@ -495,9 +444,9 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-brandText mb-1.5">Communication</label>
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wide ml-1">Communication</label>
                         <select name="communication"
-                            class="appearance-none w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/20 focus:border-brandBlue cursor-pointer transition bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat pr-10">
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-xs font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue cursor-pointer transition">
                             <option value="5">5 - Excellent</option>
                             <option value="4">4 - Good</option>
                             <option value="3" selected>3 - Average</option>
@@ -506,9 +455,9 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-brandText mb-1.5">Timeliness</label>
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wide ml-1">Timeliness</label>
                         <select name="timeliness"
-                            class="appearance-none w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/20 focus:border-brandBlue cursor-pointer transition bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat pr-10">
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-xs font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue cursor-pointer transition">
                             <option value="5">5 - Excellent</option>
                             <option value="4">4 - Good</option>
                             <option value="3" selected>3 - Average</option>
@@ -518,19 +467,18 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-brandText mb-1.5">Written Feedback</label>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wide ml-1">Written Feedback</label>
                     <textarea name="comment" rows="3" placeholder="Share your experience working with them..."
-                        class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/20 focus:border-brandBlue resize-none"></textarea>
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-medium text-brandText focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue resize-none shadow-inner leading-relaxed"></textarea>
                 </div>
                 <div class="flex items-center justify-between">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="would_recommend" checked
-                            class="w-4 h-4 text-brandBlue border-slate-300 rounded focus:ring-brandBlue">
-                        <span class="text-sm font-bold text-brandText">I would recommend this person</span>
+                            class="w-4 h-4 text-brandBlue border-slate-350 rounded focus:ring-brandBlue accent-brandBlue">
+                        <span class="text-xs font-bold text-slate-700">I would recommend this person</span>
                     </label>
                     <button type="submit"
-                        class="bg-brandBlue text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-blue-900 transition shadow-md">Submit
-                        Review</button>
+                        class="bg-brandBlue hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-extrabold text-xs transition shadow-md shadow-blue-500/10 border-0 cursor-pointer hover:-translate-y-0.5 active:translate-y-0">Submit Review</button>
                 </div>
             </form>
         </div>
@@ -540,4 +488,12 @@
     {% endif %}
 
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
+</script>
 {% endblock %}

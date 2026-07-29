@@ -5,78 +5,87 @@
     .network-card {
         background: #fff;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border-radius: 24px;
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        transition: all .2s;
-        position: relative
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.015);
     }
 
     .network-card:hover {
-        box-shadow: 0 4px 20px rgba(0, 0, 0, .08);
-        border-color: #c7d2fe;
-        transform: translateY(-2px)
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+        border-color: rgba(37, 99, 235, 0.2);
+        transform: translateY(-2px);
     }
 
     .card-banner {
-        height: 56px;
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #f97316 100%);
-        position: relative
+        height: 60px;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #f97316 100%);
+        position: relative;
     }
 
     .card-avatar {
-        width: 72px;
-        height: 72px;
+        width: 76px;
+        height: 76px;
         border-radius: 50%;
-        border: 3px solid #fff;
+        border: 4px solid #fff;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 28px;
-        font-weight: 700;
-        color: #1e3a8a;
+        font-weight: 800;
+        color: #2563eb;
         background: #eff6ff;
-        margin: -36px auto 0;
+        margin: -38px auto 0;
         position: relative;
         z-index: 2;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
-        overflow: hidden
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
     }
 
     .card-avatar img {
         width: 100%;
         height: 100%;
-        object-fit: cover
+        object-fit: cover;
     }
 
     .card-body {
-        padding: 8px 16px 16px;
+        padding: 10px 16px 20px;
         text-align: center;
         flex: 1;
         display: flex;
-        flex-direction: column
+        flex-direction: column;
     }
 
     .card-name {
         font-size: 15px;
-        font-weight: 700;
+        font-weight: 900;
         color: #0f172a;
         margin-top: 8px;
-        line-height: 1.2
+        line-height: 1.25;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .card-name:hover {
+        color: #2563eb;
     }
 
     .card-role {
-        font-size: 12px;
-        font-weight: 600;
+        font-size: 11px;
+        font-weight: 800;
         color: #f97316;
-        margin-top: 2px
+        margin-top: 3px;
+        text-transform: uppercase;
     }
 
     .card-title {
         font-size: 11px;
         color: #64748b;
-        margin-top: 2px
+        margin-top: 2px;
+        font-weight: 600;
     }
 
     .card-skills {
@@ -84,160 +93,169 @@
         flex-wrap: wrap;
         gap: 4px;
         justify-content: center;
-        margin-top: 8px
+        margin-top: 10px;
     }
 
     .card-skill {
         background: #f1f5f9;
-        color: #334155;
+        color: #475569;
         font-size: 10px;
-        font-weight: 600;
-        padding: 2px 8px;
-        border-radius: 20px
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 20px;
+        border: 1px solid rgba(226, 232, 240, 0.5);
     }
 
     .card-status {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 4px;
-        margin-top: 8px;
+        gap: 5px;
+        margin-top: 12px;
         font-size: 11px;
-        font-weight: 700
+        font-weight: 800;
     }
 
     .card-status .dot {
         width: 6px;
         height: 6px;
         border-radius: 50%;
-        display: inline-block
+        display: inline-block;
     }
 
     .card-actions {
         margin-top: auto;
-        padding-top: 12px;
+        padding-top: 16px;
         display: flex;
         flex-direction: column;
-        gap: 6px
+        gap: 8px;
     }
 
     .btn-connect {
         width: 100%;
         padding: 8px;
         border-radius: 20px;
-        font-size: 13px;
-        font-weight: 700;
-        border: 2px solid #1e3a8a;
-        color: #1e3a8a;
+        font-size: 12px;
+        font-weight: 800;
+        border: 2px solid #2563eb;
+        color: #2563eb;
         background: transparent;
         cursor: pointer;
-        transition: all .2s;
+        transition: all 0.2s;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 4px
+        gap: 4px;
     }
 
     .btn-connect:hover {
-        background: #1e3a8a;
-        color: #fff
+        background: #2563eb;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
     }
 
     .btn-connected {
         width: 100%;
         padding: 8px;
         border-radius: 20px;
-        font-size: 13px;
-        font-weight: 700;
+        font-size: 12px;
+        font-weight: 800;
         border: 2px solid #10b981;
         color: #10b981;
-        background: #ecfdf5;
-        cursor: default
+        background: #f0fdf4;
+        cursor: default;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
     }
 
     .btn-pending {
         width: 100%;
         padding: 8px;
         border-radius: 20px;
-        font-size: 13px;
-        font-weight: 700;
+        font-size: 12px;
+        font-weight: 800;
         border: 2px solid #f59e0b;
         color: #f59e0b;
         background: #fffbeb;
-        cursor: default
-    }
-
-    .btn-message {
-        width: 100%;
-        padding: 7px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 700;
-        border: 1px solid #e2e8f0;
-        color: #1e3a8a;
-        background: #f8fafc;
-        cursor: pointer;
-        transition: all .2s;
+        cursor: default;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 4px;
-        text-decoration: none
+    }
+
+    .btn-message {
+        width: 100%;
+        padding: 8px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 800;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        text-decoration: none;
     }
 
     .btn-message:hover {
-        background: #1e3a8a;
-        color: #fff;
-        border-color: #1e3a8a
+        background: #f1f5f9;
+        color: #0f172a;
     }
 
     .btn-accept {
-        padding: 7px 12px;
+        padding: 8px 14px;
         border-radius: 20px;
-        font-size: 12px;
-        font-weight: 700;
+        font-size: 11px;
+        font-weight: 800;
         border: none;
         color: #fff;
-        background: #1e3a8a;
+        background: #2563eb;
         cursor: pointer;
-        transition: all .15s;
-        flex: 1
+        transition: all 0.15s;
+        flex: 1;
     }
 
     .btn-accept:hover {
-        background: #1e40af
+        background: #1d4ed8;
     }
 
     .btn-reject {
-        padding: 7px 12px;
+        padding: 8px 14px;
         border-radius: 20px;
-        font-size: 12px;
-        font-weight: 700;
+        font-size: 11px;
+        font-weight: 800;
         border: 1px solid #e2e8f0;
         color: #64748b;
         background: #fff;
         cursor: pointer;
-        transition: all .15s;
-        flex: 1
+        transition: all 0.15s;
+        flex: 1;
     }
 
     .btn-reject:hover {
         background: #fef2f2;
         color: #ef4444;
-        border-color: #fca5a5
+        border-color: #fca5a5;
     }
 
     .btn-withdraw {
         width: 100%;
         padding: 8px;
         border-radius: 20px;
-        font-size: 13px;
-        font-weight: 700;
+        font-size: 12px;
+        font-weight: 800;
         border: 2px solid #fee2e2;
         color: #ef4444;
         background: transparent;
         cursor: pointer;
-        transition: all .2s;
+        transition: all 0.2s;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -246,62 +264,56 @@
     }
 
     .btn-withdraw:hover {
-        background: #fee2e2;
+        background: #fef2f2;
     }
 
     .tab-btn {
-        padding: 10px 20px;
-        font-size: 14px;
-        font-weight: 700;
+        padding: 14px 24px;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
         border: none;
         background: transparent;
         color: #64748b;
         cursor: pointer;
         border-bottom: 3px solid transparent;
-        transition: all .2s
+        transition: all 0.2s;
+        text-decoration: none;
     }
 
     .tab-btn:hover {
-        color: #1e3a8a
+        color: #2563eb;
     }
 
     .tab-btn.active {
-        color: #1e3a8a;
-        border-bottom-color: #f97316
+        color: #2563eb;
+        border-bottom-color: #f97316;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-[1100px] mx-auto mt-4 pb-10 px-4">
-    <!-- Search Bar -->
-    <div class="li-card p-4 mb-5">
+<div class="max-w-[1100px] mx-auto mt-4 pb-20 px-4">
+    <div class="bg-white border border-brandBorder rounded-3xl p-4 mb-6 shadow-premium">
         <div class="flex items-center gap-3">
             <div class="relative flex-1">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="w-4 h-4 text-brandIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                </div>
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-450">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </span>
                 <input type="text" id="live-search" autocomplete="off" placeholder="Search by name, skill, or role..."
-                    class="w-full pl-10 pr-10 py-2.5 rounded-lg border border-brandBorder text-sm focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue outline-none transition">
+                    class="w-full pl-10 pr-10 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-blue-50 focus:border-brandBlue outline-none transition duration-200 shadow-inner">
                 <button type="button" id="clear-search"
-                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-brandIcon hover:text-red-500 transition hidden"
+                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-brandIcon hover:text-red-500 transition hidden border-0 bg-transparent cursor-pointer"
                     onclick="document.getElementById('live-search').value='';filterCards();this.classList.add('hidden')">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
+                    <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
             <span id="search-count"
-                class="text-xs font-bold text-brandIcon bg-slate-100 px-3 py-1.5 rounded-full whitespace-nowrap"></span>
+                class="text-[10px] font-bold text-slate-500 bg-slate-100 px-4 py-2.5 rounded-2xl whitespace-nowrap border border-slate-200/50"></span>
         </div>
     </div>
 
-    <!-- Tabs -->
-    <div class="li-card mb-5 flex border-b-0 overflow-hidden">
+    <div class="bg-white border border-brandBorder rounded-3xl mb-6 flex overflow-hidden shadow-premium">
         <a href="{% url 'network' %}?tab=all{% if search_query %}&q={{ search_query }}{% endif %}"
             class="tab-btn {% if active_tab == 'all' %}active{% endif %}">All People</a>
         <a href="{% url 'network' %}?tab=connections{% if search_query %}&q={{ search_query }}{% endif %}"
@@ -310,35 +322,31 @@
         </a>
     </div>
 
-    <!-- Stats Row -->
-    <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-4">
-            <h1 class="text-xl font-bold text-brandText">
-                {% if search_query %}
-                Results for "{{ search_query }}"
-                {% elif active_tab == 'connections' %}
-                My Connections
-                {% else %}
-                People on SevaLink
-                {% endif %}
-            </h1>
-        </div>
-        <span class="text-sm text-brandIcon font-semibold">{{ display_users|length }} people</span>
+    <div class="flex items-center justify-between mb-5 px-1">
+        <h1 class="text-xl font-black text-brandText tracking-tight">
+            {% if search_query %}
+            Results for "{{ search_query }}"
+            {% elif active_tab == 'connections' %}
+            My Connections
+            {% else %}
+            People on SevaLink
+            {% endif %}
+        </h1>
+        <span class="text-xs font-bold text-brandIcon bg-slate-100 border border-slate-200/50 px-4 py-1.5 rounded-full">{{ display_users|length }} people</span>
     </div>
 
-    <!-- Incoming Requests (only on All tab) -->
     {% if incoming_requests and active_tab == 'all' %}
-    <div class="li-card p-4 mb-5">
-        <h2 class="font-bold text-sm text-brandText mb-3 flex items-center gap-2">
-            <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+    <div class="bg-white border border-brandBorder rounded-3xl p-5 mb-6 shadow-premium">
+        <h2 class="font-extrabold text-xs text-brandText mb-4 flex items-center gap-2 uppercase tracking-wider">
+            <span class="w-2.5 h-2.5 bg-brandOrange rounded-full animate-ping"></span>
             Pending Invitations ({{ incoming_requests|length }})
         </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {% for req in incoming_requests %}
-            <div class="flex items-center gap-3 p-3 rounded-xl bg-amber-50/50 border border-amber-100"
+            <div class="flex items-center gap-3.5 p-3.5 rounded-2xl bg-amber-50/20 border border-amber-100"
                 id="req-{{ req.from_user.id }}">
                 <div
-                    class="w-12 h-12 rounded-full bg-brandBlue/10 text-brandBlue font-bold flex items-center justify-center text-lg uppercase flex-shrink-0 overflow-hidden">
+                    class="w-12 h-12 rounded-full bg-blue-50 border border-blue-100 text-brandBlue font-extrabold flex items-center justify-center text-lg uppercase flex-shrink-0 overflow-hidden shadow-sm">
                     {% if req.from_user.profile.profile_picture %}
                     <img src="{{ req.from_user.profile.profile_picture.url }}" class="w-full h-full object-cover">
                     {% else %}
@@ -346,16 +354,16 @@
                     {% endif %}
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold text-brandText truncate">
+                    <p class="text-xs font-extrabold text-brandText truncate leading-tight">
                         {{ req.from_user.first_name|default:req.from_user.username }} {{ req.from_user.last_name }}
                     </p>
-                    <p class="text-[11px] text-brandIcon font-semibold">
+                    <p class="text-[10px] text-brandIcon font-bold mt-1 uppercase tracking-wide">
                         {{ req.from_user.profile.role|default:"User" }}
                     </p>
                 </div>
-                <div class="flex gap-1.5">
-                    <button onclick="acceptConnection({{ req.from_user.id }})" class="btn-accept">Accept</button>
-                    <button onclick="rejectConnection({{ req.from_user.id }})" class="btn-reject">Ignore</button>
+                <div class="flex gap-2 flex-shrink-0">
+                    <button onclick="acceptConnection({{ req.from_user.id }})" class="btn-accept shadow-sm">Accept</button>
+                    <button onclick="rejectConnection({{ req.from_user.id }})" class="btn-reject shadow-sm">Ignore</button>
                 </div>
             </div>
             {% endfor %}
@@ -363,8 +371,7 @@
     </div>
     {% endif %}
 
-    <!-- Profile Cards Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {% for item in display_users %}
         <div class="network-card" id="user-card-{{ item.user.id }}">
             <div class="card-banner"></div>
@@ -372,12 +379,12 @@
                 {% if item.profile.profile_picture %}
                 <img src="{{ item.profile.profile_picture.url }}" alt="{{ item.user.username }}">
                 {% else %}
-                {{ item.user.username|make_list|first|upper }}
+                <span class="text-3xl font-extrabold uppercase text-brandBlue">{{ item.user.username|make_list|first }}</span>
                 {% endif %}
             </div>
             <div class="card-body">
                 <a href="{% url 'user_profile' item.user.id %}"
-                    class="card-name hover:text-brandBlue hover:underline transition-colors">
+                    class="card-name">
                     {{ item.user.first_name|default:item.user.username }} {{ item.user.last_name }}
                 </a>
                 <p class="card-role">{{ item.profile.role }}</p>
@@ -390,27 +397,28 @@
                 {% endif %}
                 <div class="card-status">
                     {% if item.profile.is_available %}
-                    <span class="dot" style="background:#10b981"></span><span style="color:#10b981">Available</span>
+                    <span class="dot bg-emerald-500 animate-pulse"></span><span class="text-emerald-600 font-extrabold text-[10px] uppercase">Available</span>
                     {% else %}
-                    <span class="dot" style="background:#94a3b8"></span><span style="color:#94a3b8">Busy</span>
+                    <span class="dot bg-slate-400"></span><span class="text-slate-400 font-bold text-[10px] uppercase">Busy</span>
                     {% endif %}
                     {% if item.profile.is_verified %}
-                    <span style="color:#3b82f6;margin-left:4px">✓ Verified</span>
+                    <span class="text-brandBlue font-extrabold text-[10px] uppercase ml-1 flex items-center gap-0.5"><i data-lucide="check-circle" class="w-3.5 h-3.5 text-brandBlue fill-blue-50"></i> Verified</span>
                     {% endif %}
                 </div>
                 <div class="card-actions" id="conn-actions-{{ item.user.id }}">
                     {% if item.connection_status == 'connected' %}
-                    <button class="btn-connected">✓ Connected</button>
-                    <a href="{% url 'inbox' %}?user={{ item.user.id }}" class="btn-message">💬 Message</a>
+                    <button class="btn-connected"><i data-lucide="check" class="w-4 h-4"></i> Connected</button>
+                    <a href="{% url 'inbox' %}?user={{ item.user.id }}" class="btn-message"><i data-lucide="message-square" class="w-4 h-4"></i> Message</a>
                     {% elif item.connection_status == 'pending_sent' %}
-                    <button class="btn-pending">⏳ Pending</button>
-                    <button onclick="cancelConnection({{ item.user.id }})" class="btn-withdraw">Withdraw</button>
+                    <button class="btn-pending"><i data-lucide="clock" class="w-4 h-4"></i> Pending</button>
+                    <button onclick="cancelConnection({{ item.user.id }})" class="btn-withdraw"><i data-lucide="x" class="w-4 h-4"></i> Withdraw</button>
                     {% elif item.connection_status == 'pending_received' %}
-                    <div class="flex gap-2"><button onclick="acceptConnection({{ item.user.id }})"
-                            class="btn-accept">Accept</button><button onclick="rejectConnection({{ item.user.id }})"
-                            class="btn-reject">Ignore</button></div>
+                    <div class="flex gap-2">
+                        <button onclick="acceptConnection({{ item.user.id }})" class="btn-accept">Accept</button>
+                        <button onclick="rejectConnection({{ item.user.id }})" class="btn-reject">Ignore</button>
+                    </div>
                     {% else %}
-                    <button onclick="sendConnection({{ item.user.id }})" class="btn-connect">+ Connect</button>
+                    <button onclick="sendConnection({{ item.user.id }})" class="btn-connect"><i data-lucide="user-plus" class="w-4 h-4"></i> Connect</button>
                     {% endif %}
                 </div>
             </div>
@@ -418,18 +426,20 @@
         {% endfor %}
     </div>
 
-    <div class="col-span-full text-center py-16" id="empty-state"
+    <div class="col-span-full text-center py-20 bg-white border border-brandBorder rounded-3xl p-6 shadow-premium mt-6" id="empty-state"
         style="display:{% if display_users %}none{% else %}block{% endif %};">
-        <div class="text-5xl mb-4">
-            {% if active_tab == 'connections' %}🤝{% else %}👥{% endif %}
+        <div class="w-14 h-14 bg-slate-50 border border-slate-150 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            {% if active_tab == 'connections' %}
+            <i data-lucide="users-2" class="w-6 h-6 text-slate-400"></i>
+            {% else %}
+            <i data-lucide="users" class="w-6 h-6 text-slate-400"></i>
+            {% endif %}
         </div>
-        <p class="text-lg font-bold text-brandText mb-1">
+        <p class="text-base font-extrabold text-brandText mb-1">
             {% if active_tab == 'connections' %}No connections yet{% else %}No people found{% endif %}
         </p>
-        <p class="text-sm text-brandIcon">
-            {% if active_tab == 'connections' %}Connect with people on SevaLink to see them here.{% else %}No other
-            users
-            on SevaLink yet.{% endif %}
+        <p class="text-xs text-brandIcon font-bold">
+            {% if active_tab == 'connections' %}Connect with people on SevaLink to see them here.{% else %}No other users on SevaLink yet.{% endif %}
         </p>
     </div>
 </div>
@@ -437,7 +447,6 @@
 
 {% block extra_scripts %}
 <script>
-    // Live search filter
     function filterCards() {
         const query = document.getElementById('live-search').value.toLowerCase().trim();
         const cards = document.querySelectorAll('.network-card');
@@ -452,7 +461,6 @@
         });
         clearBtn.classList.toggle('hidden', !query);
         countEl.textContent = query ? visible + ' found' : cards.length + ' people';
-        // Show/hide empty state
         const emptyState = document.getElementById('empty-state');
         if (emptyState) emptyState.style.display = (visible === 0 && query) ? '' : 'none';
     }
@@ -470,17 +478,23 @@
 
     function sendConnection(userId) {
         const actions = document.getElementById('conn-actions-' + userId);
-        actions.innerHTML = '<button class="btn-pending">Sending...</button>';
+        actions.innerHTML = '<button class="btn-pending"><i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Sending...</button>';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
         fetch('/connect/' + userId + '/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' }})
             .then(r => r.json())
             .then(data => {
                 if (data.result === 'connected') {
-                    actions.innerHTML = '<button class="btn-connected">✓ Connected</button><a href="/messages/" class="btn-message">💬 Message</a>';
+                    actions.innerHTML = '<button class="btn-connected"><i data-lucide="check" class="w-4 h-4"></i> Connected</button><a href="/messages/?user=' + userId + '" class="btn-message"><i data-lucide="message-square" class="w-4 h-4"></i> Message</a>';
                 } else if (data.result === 'pending_sent') {
-                    actions.innerHTML = '<button class="btn-pending">⏳ Pending</button>';
+                    actions.innerHTML = '<button class="btn-pending"><i data-lucide="clock" class="w-4 h-4"></i> Pending</button>';
                 }
+                if (typeof lucide !== 'undefined') lucide.createIcons();
             })
-            .catch(() => { actions.innerHTML = '<button onclick="sendConnection(' + userId + ')" class="btn-connect">+ Connect</button>'; });
+            .catch(() => {
+                actions.innerHTML = '<button onclick="sendConnection(' + userId + ')" class="btn-connect"><i data-lucide="user-plus" class="w-4 h-4"></i> Connect</button>';
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
     }
 
     function updateConnectionCount(delta) {
@@ -502,7 +516,10 @@
             .then(data => {
                 if (data.result === 'connected') {
                     const actions = document.getElementById('conn-actions-' + userId);
-                    if (actions) actions.innerHTML = '<button class="btn-connected">✓ Connected</button><a href="/messages/" class="btn-message">💬 Message</a>';
+                    if (actions) {
+                        actions.innerHTML = '<button class="btn-connected"><i data-lucide="check" class="w-4 h-4"></i> Connected</button><a href="/messages/?user=' + userId + '" class="btn-message"><i data-lucide="message-square" class="w-4 h-4"></i> Message</a>';
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                    }
                     const req = document.getElementById('req-' + userId);
                     if (req) req.remove();
                     updateConnectionCount(1);
@@ -518,24 +535,38 @@
                     const req = document.getElementById('req-' + userId);
                     if (req) req.remove();
                     const actions = document.getElementById('conn-actions-' + userId);
-                    if (actions) actions.innerHTML = '<button onclick="sendConnection(' + userId + ')" class="btn-connect">+ Connect</button>';
+                    if (actions) {
+                        actions.innerHTML = '<button onclick="sendConnection(' + userId + ')" class="btn-connect"><i data-lucide="user-plus" class="w-4 h-4"></i> Connect</button>';
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                    }
                 }
             });
     }
 
     function cancelConnection(userId) {
         const actions = document.getElementById('conn-actions-' + userId);
-        actions.innerHTML = '<button class="btn-pending">Canceling...</button>';
+        actions.innerHTML = '<button class="btn-pending"><i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Canceling...</button>';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
         fetch('/connect/' + userId + '/cancel/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' }})
             .then(r => r.json())
             .then(data => {
                 if (data.result === 'cancelled') {
-                    if (actions) actions.innerHTML = '<button onclick="sendConnection(' + userId + ')" class="btn-connect">+ Connect</button>';
+                    if (actions) {
+                        actions.innerHTML = '<button onclick="sendConnection(' + userId + ')" class="btn-connect"><i data-lucide="user-plus" class="w-4 h-4"></i> Connect</button>';
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                    }
                 }
             })
             .catch(() => {
-                // Ignore silent failure, just let it stay showing pending/cancel
+                // Ignore silent failure
             });
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
 </script>
 {% endblock %}

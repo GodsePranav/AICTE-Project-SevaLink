@@ -1,74 +1,64 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-[800px] mx-auto mt-6 pb-10 px-4">
-    <div class="mb-4">
+<div class="max-w-[800px] mx-auto mt-6 pb-12 px-4">
+    <div class="mb-5">
         <a href="javascript:history.back()"
-            class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-brandBlue transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
-                </path>
-            </svg>
+            class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-brandBlue transition no-underline bg-white border border-slate-200/60 px-4 py-2 rounded-2xl shadow-sm">
+            <i data-lucide="arrow-left" class="w-4 h-4 text-slate-500"></i>
             Back
         </a>
     </div>
+
     <!-- Profile Header Card -->
-    <div class="bg-white rounded-3xl p-6 shadow-sm border border-brandBorder mb-6 relative overflow-hidden">
+    <div class="bg-white rounded-3xl p-6 shadow-premium border border-brandBorder mb-6 relative overflow-hidden group">
         <!-- Background Banner -->
-        <div class="absolute top-0 left-0 right-0 h-32 bg-gradient-to-r from-brandBlue to-blue-800 z-0"></div>
+        <div class="absolute top-0 left-0 right-0 h-32 bg-gradient-to-r from-brandBlue to-blue-700 z-0">
+            <div class="absolute -top-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+            <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+        </div>
 
         <div class="relative z-10 pt-16 flex flex-col items-center">
             <!-- Avatar -->
-            <div
-                class="w-32 h-32 rounded-full border-4 border-white shadow-md bg-slate-100 flex items-center justify-center text-4xl font-bold text-brandBlue uppercase mb-4 overflow-hidden">
+            <div class="w-32 h-32 rounded-full border-4 border-white shadow-premium bg-slate-50 flex items-center justify-center text-4xl font-extrabold text-brandBlue uppercase mb-4 overflow-hidden group-hover:border-brandOrange transition-all duration-300">
                 {% if target_user.profile.profile_picture %}
                 <img src="{{ target_user.profile.profile_picture.url }}" class="w-full h-full object-cover">
                 {% else %}
-                {{ target_user.username|make_list|first }}
+                <div class="w-full h-full flex items-center justify-center bg-blue-50 text-brandBlue font-extrabold text-4xl uppercase">
+                    {{ target_user.username|make_list|first }}
+                </div>
                 {% endif %}
             </div>
 
             <!-- Basic Info -->
-            <h1 class="text-2xl font-extrabold text-brandText">
+            <h1 class="text-2xl font-black text-brandText tracking-tight">
                 {{ target_user.first_name|default:target_user.username }} {{ target_user.last_name }}
             </h1>
-            <div class="flex items-center gap-2 mb-2">
+            <div class="flex items-center gap-2.5 mt-1.5 mb-3 flex-wrap justify-center">
                 {% if target_user.profile.role == 'Worker' or target_user.profile.role == 'Both' %}
-                <span
-                    class="bg-brandOrange text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm uppercase tracking-wide">Worker</span>
+                <span class="bg-brandOrange text-white px-3.5 py-1 rounded-full text-[10px] font-extrabold shadow-sm uppercase tracking-wider">Worker</span>
                 {% endif %}
                 {% if target_user.profile.role == 'Job Provider' or target_user.profile.role == 'Both' %}
-                <span
-                    class="bg-brandBlue text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm uppercase tracking-wide">Job
-                    Provider</span>
+                <span class="bg-brandBlue text-white px-3.5 py-1 rounded-full text-[10px] font-extrabold shadow-sm uppercase tracking-wider">Job Provider</span>
                 {% endif %}
                 {% if target_user.profile.role not in "Worker,Job Provider,Both" %}
-                <span
-                    class="bg-slate-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm uppercase tracking-wide">User</span>
+                <span class="bg-slate-500 text-white px-3.5 py-1 rounded-full text-[10px] font-extrabold shadow-sm uppercase tracking-wider">User</span>
                 {% endif %}
                 {% if target_user.profile.job_title %}
-                <span class="text-brandBlue font-extrabold">• {{ target_user.profile.job_title }}</span>
+                <span class="text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1 rounded-full border border-slate-200/60 flex items-center gap-1"><i data-lucide="briefcase" class="w-3.5 h-3.5 text-slate-400"></i> {{ target_user.profile.job_title }}</span>
                 {% endif %}
             </div>
 
-            <div class="flex items-center gap-2 mb-6">
+            <div class="flex items-center gap-3 mb-6">
                 {% if target_user.profile.is_available %}
-                <span
-                    class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold border border-emerald-100"><span
-                        class="w-2 h-2 rounded-full bg-emerald-500"></span> Available for Work</span>
+                <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3.5 py-1.5 rounded-full text-xs font-bold border border-emerald-100/60"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span> Available for Work</span>
                 {% else %}
-                <span
-                    class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-xs font-bold border border-slate-200"><span
-                        class="w-2 h-2 rounded-full bg-slate-400"></span> Busy</span>
+                <span class="inline-flex items-center gap-1.5 bg-slate-50 text-slate-500 px-3.5 py-1.5 rounded-full text-xs font-bold border border-slate-200/60"><span class="w-2 h-2 rounded-full bg-slate-400"></span> Busy</span>
                 {% endif %}
 
                 {% if target_user.profile.is_verified %}
-                <span class="text-emerald-500 flex items-center gap-1 text-sm font-bold" title="Verified Account">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clip-rule="evenodd"></path>
-                    </svg>
+                <span class="text-emerald-600 bg-emerald-50/50 border border-emerald-100/60 px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1" title="Verified Account">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
                     Verified
                 </span>
                 {% endif %}
@@ -78,37 +68,37 @@
             <div class="flex gap-3" id="conn-actions-{{ target_user.id }}">
                 {% if connection_status == 'connected' %}
                 <button
-                    class="bg-emerald-50 text-emerald-600 border border-emerald-200 font-bold px-6 py-2.5 rounded-full text-sm cursor-default flex items-center gap-2 shadow-sm">
-                    ✓ Connected
+                    class="bg-emerald-50 text-emerald-700 border border-emerald-200 font-extrabold px-6 py-3 rounded-2xl text-xs cursor-default flex items-center gap-2 shadow-sm">
+                    <i data-lucide="check-check" class="w-4 h-4"></i> Connected
                 </button>
                 <a href="{% url 'inbox' %}?user={{ target_user.id }}"
-                    class="bg-brandBlue text-white font-bold px-6 py-2.5 rounded-full text-sm hover:bg-blue-700 transition shadow-md shadow-brandBlue/30 flex items-center gap-2">
-                    💬 Message
+                    class="bg-brandBlue text-white font-extrabold px-6 py-3 rounded-2xl text-xs hover:bg-blue-700 transition shadow-md shadow-brandBlue/30 flex items-center gap-2 no-underline hover:-translate-y-0.5 active:translate-y-0">
+                    <i data-lucide="message-square" class="w-4 h-4"></i> Message
                 </a>
                 {% elif connection_status == 'pending_sent' %}
                 <button
-                    class="bg-amber-50 text-amber-600 border border-amber-200 font-bold px-6 py-2.5 rounded-full text-sm cursor-default flex items-center gap-2 shadow-sm">
-                    ⏳ Request Sent
+                    class="bg-amber-50 text-amber-700 border border-amber-200 font-extrabold px-6 py-3 rounded-2xl text-xs cursor-default flex items-center gap-2 shadow-sm">
+                    <i data-lucide="clock" class="w-4 h-4 text-amber-500"></i> Request Sent
                 </button>
                 <button onclick="cancelConnection({{ target_user.id }})"
-                    class="bg-red-50 text-red-600 border border-red-200 font-bold px-6 py-2.5 rounded-full text-sm hover:bg-red-100 transition shadow-sm">
+                    class="bg-red-50 text-brandRed border border-red-200 font-extrabold px-6 py-3 rounded-2xl text-xs hover:bg-red-100 transition shadow-sm hover:-translate-y-0.5 active:translate-y-0">
                     Withdraw
                 </button>
                 {% elif connection_status == 'pending_received' %}
                 <div class="flex gap-2">
                     <button onclick="acceptConnection({{ target_user.id }})"
-                        class="bg-brandBlue text-white font-bold px-6 py-2.5 rounded-full text-sm hover:bg-blue-700 transition shadow-sm shadow-brandBlue/30">
+                        class="bg-brandBlue text-white font-extrabold px-6 py-3 rounded-2xl text-xs hover:bg-blue-700 transition shadow-md shadow-brandBlue/30 hover:-translate-y-0.5 active:translate-y-0">
                         Accept Request
                     </button>
                     <button onclick="rejectConnection({{ target_user.id }})"
-                        class="bg-slate-100 text-slate-600 border border-slate-200 font-bold px-6 py-2.5 rounded-full text-sm hover:bg-slate-200 transition shadow-sm">
+                        class="bg-slate-50 border border-slate-200 text-slate-600 font-extrabold px-6 py-3 rounded-2xl text-xs hover:bg-slate-100 transition shadow-sm hover:-translate-y-0.5 active:translate-y-0">
                         Ignore
                     </button>
                 </div>
                 {% else %}
                 <button onclick="sendConnection({{ target_user.id }})"
-                    class="bg-brandBlue text-white font-bold px-8 py-2.5 rounded-full text-sm hover:bg-blue-700 transition shadow-md shadow-brandBlue/30 flex items-center gap-2">
-                    + Connect
+                    class="bg-brandBlue text-white font-extrabold px-8 py-3 rounded-2xl text-xs hover:bg-blue-700 transition shadow-md shadow-brandBlue/30 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> Connect
                 </button>
                 {% endif %}
             </div>
@@ -120,25 +110,23 @@
 
         <!-- Left Column: About & Skills -->
         <div class="md:col-span-2 space-y-6">
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-brandBorder">
-                <h3 class="text-lg font-bold text-brandText mb-4 border-b border-brandBorder pb-3">About</h3>
+            <div class="bg-white rounded-3xl p-6 shadow-premium border border-brandBorder hover:shadow-premiumHover transition-all duration-300">
+                <h3 class="text-base font-extrabold text-brandText mb-4 border-b border-slate-100 pb-3 flex items-center gap-2"><i data-lucide="user" class="w-5 h-5 text-brandBlue"></i> About</h3>
                 {% if target_user.profile.about %}
-                <p class="text-slate-600 leading-relaxed">{{ target_user.profile.about }}</p>
+                <p class="text-slate-600 leading-relaxed text-sm font-medium">{{ target_user.profile.about }}</p>
                 {% else %}
-                <p class="text-slate-400 italic">{{ target_user.first_name|default:target_user.username }} {{ target_user.last_name }} hasn't added
-                    an about section yet.</p>
+                <p class="text-slate-400 italic text-sm font-semibold">{{ target_user.first_name|default:target_user.username }} {{ target_user.last_name }} hasn't added an about section yet.</p>
                 {% endif %}
             </div>
 
             {% if target_user.profile.service_skills_list %}
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-brandBorder">
-                <h3 class="text-lg font-bold text-brandText mb-4 border-b border-brandBorder pb-3">Skills & Services
-                </h3>
-                <div class="flex flex-wrap gap-2">
+            <div class="bg-white rounded-3xl p-6 shadow-premium border border-brandBorder hover:shadow-premiumHover transition-all duration-300">
+                <h3 class="text-base font-extrabold text-brandText mb-4 border-b border-slate-100 pb-3 flex items-center gap-2"><i data-lucide="star" class="w-5 h-5 text-brandBlue"></i> Skills & Services</h3>
+                <div class="flex flex-wrap gap-2.5">
                     {% for skill in target_user.profile.service_skills_list %}
                     <span
-                        class="bg-brandBlue/10 text-brandBlue px-4 py-2 rounded-full text-sm font-bold border border-brandBlue/20">
-                        {{ skill }}
+                        class="bg-blue-50 text-brandBlue px-4 py-2 rounded-full text-xs font-extrabold border border-blue-100 flex items-center gap-1.5">
+                        ⚙️ {{ skill }}
                     </span>
                     {% endfor %}
                 </div>
@@ -148,45 +136,45 @@
 
         <!-- Right Column: Stats -->
         <div class="space-y-6">
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-brandBorder">
-                <h3 class="text-lg font-bold text-brandText mb-4 border-b border-brandBorder pb-3">Details</h3>
+            <div class="bg-white rounded-3xl p-6 shadow-premium border border-brandBorder hover:shadow-premiumHover transition-all duration-300">
+                <h3 class="text-base font-extrabold text-brandText mb-4 border-b border-slate-100 pb-3 flex items-center gap-2"><i data-lucide="info" class="w-5 h-5 text-brandBlue"></i> Details</h3>
 
-                <ul class="space-y-4">
+                <ul class="space-y-4 pl-0 list-none">
                     <li>
-                        <span class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Primary
-                            Category</span>
-                        <span class="text-sm font-bold text-brandText">
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Primary Category</span>
+                        <span class="text-xs font-extrabold text-brandText bg-slate-50 border border-slate-150 px-3 py-1.5 rounded-xl block">
                             {{ target_user.profile.primary_category|default:"Not specified" }}
                         </span>
                     </li>
                     {% if target_user.profile.years_experience %}
                     <li>
-                        <span
-                            class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Experience</span>
-                        <span class="text-sm font-bold text-brandText">
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Experience</span>
+                        <span class="text-xs font-extrabold text-brandText bg-slate-50 border border-slate-150 px-3 py-1.5 rounded-xl block">
                             {{ target_user.profile.years_experience }} years
                         </span>
                     </li>
-                    {% endif %} <li>
-                        <span
-                            class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Location</span>
-                        <span class="text-sm font-bold text-brandText">
+                    {% endif %}
+                    <li>
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Location</span>
+                        <span class="text-xs font-extrabold text-brandText bg-slate-50 border border-slate-150 px-3 py-1.5 rounded-xl block flex items-center gap-1.5">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brandOrange"></i>
                             {{ target_user.profile.city|default:"Not specified" }}
                             {% if target_user.profile.state %}, {{ target_user.profile.state }}{% endif %}
                         </span>
                     </li>
                     <li>
-                        <span
-                            class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Joined</span>
-                        <span class="text-sm font-bold text-brandText">{{ target_user.date_joined|date:"F Y" }}</span>
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Joined</span>
+                        <span class="text-xs font-extrabold text-brandText bg-slate-50 border border-slate-150 px-3 py-1.5 rounded-xl block flex items-center gap-1.5">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+                            {{ target_user.date_joined|date:"F Y" }}
+                        </span>
                     </li>
                 </ul>
             </div>
 
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-brandBorder text-center">
-                <h3 class="text-4xl font-extrabold text-brandBlue mb-1">{{ target_user.profile.connections.all|length }}
-                </h3>
-                <p class="text-sm font-semibold text-brandIcon">Connections</p>
+            <div class="bg-white rounded-3xl p-6 shadow-premium border border-brandBorder text-center hover:shadow-premiumHover transition-all duration-300">
+                <h3 class="text-4xl font-black text-brandBlue mb-1">{{ target_user.profile.connections.all|length }}</h3>
+                <p class="text-[10px] font-bold text-brandIcon uppercase tracking-wider">Connections</p>
             </div>
         </div>
     </div>
@@ -207,7 +195,7 @@
 
     function sendConnection(userId) {
         const actions = document.getElementById('conn-actions-' + userId);
-        actions.innerHTML = '<button class="bg-amber-50 text-amber-600 border border-amber-200 font-bold px-6 py-2.5 rounded-full text-sm cursor-default flex items-center gap-2 shadow-sm">⏳ Sending...</button>';
+        actions.innerHTML = '<button class="bg-amber-50 text-amber-600 border border-amber-200 font-bold px-6 py-3 rounded-2xl text-xs cursor-default flex items-center gap-2 shadow-sm">⏳ Sending...</button>';
         fetch('/connect/' + userId + '/', { method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/json' }})
             .then(r => r.json())
             .then(data => {
@@ -249,5 +237,11 @@
                 }
             });
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
 </script>
 {% endblock %}

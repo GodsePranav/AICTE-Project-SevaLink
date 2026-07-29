@@ -13,6 +13,7 @@ def home_view(request):
         return render(request, 'home.html', {})
 
     from services.models import ServiceJob
+    from django.db.models import Q
     context = {}
     
     # Determine sort order from query parameter
@@ -24,16 +25,29 @@ def home_view(request):
         'price_low': 'price',
     }
     order = sort_map.get(sort_param, '-created_at')
+    filter_skill = request.GET.get('filter', '').strip()
     
     try:
         role = request.user.profile.role
         if role == 'Job Provider':
-            context['active_jobs'] = ServiceJob.objects.filter(provider=request.user).exclude(status__in=['Completed', 'Cancelled']).order_by(order)
+            active_jobs = ServiceJob.objects.filter(provider=request.user).exclude(status__in=['Completed', 'Cancelled'])
+            if filter_skill:
+                active_jobs = active_jobs.filter(
+                    Q(title__icontains=filter_skill) | Q(category__icontains=filter_skill) | Q(description__icontains=filter_skill)
+                )
+            context['active_jobs'] = active_jobs.order_by(order)
         if role == 'Worker':
-            context['available_jobs'] = ServiceJob.objects.filter(status='Pending', worker__isnull=True).order_by(order)
+            available_jobs = ServiceJob.objects.filter(status='Pending', worker__isnull=True)
+            if filter_skill:
+                available_jobs = available_jobs.filter(
+                    Q(title__icontains=filter_skill) | Q(category__icontains=filter_skill) | Q(description__icontains=filter_skill)
+                )
+            context['available_jobs'] = available_jobs.order_by(order)
     except Exception:
         pass
 
+    context['current_filter'] = filter_skill
+    context['sort_param'] = sort_param
     return render(request, 'home.html', context)
 
 

@@ -4,183 +4,197 @@
 <style>
     .message-bubble {
         max-width: 75%;
-        border-radius: 0.5rem;
-        padding: 0.5rem 0.75rem;
+        border-radius: 18px;
+        padding: 10px 14px;
         position: relative;
-        font-size: 14px;
-        line-height: 1.4;
+        font-size: 13.5px;
+        line-height: 1.45;
+        font-weight: 500;
     }
 
     .message-sent {
-        background-color: #1e3a8a;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
         color: white;
-        border-top-right-radius: 0;
+        border-top-right-radius: 4px;
         margin-left: auto;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
     }
 
     .message-received {
         background-color: #f8fafc;
         color: #0f172a;
-        border-top-left-radius: 0;
+        border-top-left-radius: 4px;
         border: 1px solid #e2e8f0;
+    }
+
+    .chat-list-item {
+        border-left: 4px solid transparent;
+        transition: all 0.2s ease;
     }
 
     .chat-list-item.active {
         background-color: #eff6ff;
-        border-left: 4px solid #f97316;
+        border-left-color: #2563eb;
     }
 
     .inbox-container {
-        height: calc(100vh - 120px);
+        height: calc(100vh - 160px);
+        min-height: 500px;
     }
 
     .attachment-preview {
         max-width: 200px;
         max-height: 150px;
-        border-radius: 0.5rem;
+        border-radius: 12px;
         cursor: pointer;
+        transition: transform 0.2s;
+        border: 2px solid white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    .attachment-preview:hover {
+        transform: scale(1.02);
     }
 
     .attachment-link {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 700;
         text-decoration: none;
+        transition: all 0.2s;
     }
 
     .attachment-link-sent {
         background: rgba(255, 255, 255, 0.15);
         color: white;
     }
+    .attachment-link-sent:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
 
     .attachment-link-received {
         background: #f1f5f9;
-        color: #1e3a8a;
+        color: #2563eb;
+        border: 1px solid #e2e8f0;
+    }
+    .attachment-link-received:hover {
+        background: #e2e8f0;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-[1200px] mx-auto mt-4 px-4 md:px-0">
-    <a href="javascript:history.back()"
-        class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-brandBlue transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
-            </path>
-        </svg>
-        Back
-    </a>
+<div class="max-w-[1200px] mx-auto mt-4 px-4">
+    <div class="mb-4">
+        <a href="javascript:history.back()"
+            class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-brandBlue transition no-underline bg-white border border-slate-200/60 px-4 py-2 rounded-2xl shadow-sm">
+            <i data-lucide="arrow-left" class="w-4 h-4 text-slate-500"></i>
+            Back
+        </a>
+    </div>
 </div>
-<div class="li-card inbox-container flex overflow-hidden mt-4 mx-4 md:mx-auto">
+
+<div class="max-w-[1200px] bg-white border border-brandBorder rounded-3xl overflow-hidden shadow-premium inbox-container flex mt-4 mx-4 lg:mx-auto">
     <!-- Left Pane: Chat List -->
     <div class="w-1/3 border-r border-brandBorder flex flex-col bg-white">
-        <div class="p-3 border-b border-brandBorder flex justify-between items-center bg-white z-10">
-            <h2 class="text-base font-semibold text-brandText">Messages</h2>
+        <div class="p-4 border-b border-brandBorder flex justify-between items-center bg-white">
+            <h2 class="text-base font-extrabold text-brandText tracking-tight uppercase">Messages</h2>
         </div>
-        <div class="p-2 border-b border-brandBorder">
+        <div class="p-3 border-b border-brandBorder">
             <div class="relative w-full">
-                <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                    <svg class="w-4 h-4 text-brandIcon" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M21.41 18.59l-5.27-5.28A6.83 6.83 0 0017 10a7 7 0 10-7 7 6.83 6.83 0 003.31-.86l5.28 5.27a2 2 0 002.82-2.82zM5 10a5 5 0 115 5 5 5 0 01-5-5z">
-                        </path>
-                    </svg>
-                </div>
-                <input type="text" placeholder="Search messages"
-                    class="w-full bg-slate-50 border border-slate-200 h-[32px] rounded-lg focus:outline-none focus:ring-1 focus:ring-brandOrange focus:border-brandOrange transition-all pl-8 pr-2 text-sm text-brandText placeholder-slate-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </span>
+                <input type="text" placeholder="Search conversations..."
+                    class="w-full bg-slate-50 border border-slate-200 h-[40px] rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue transition-all pl-10 pr-4 text-xs font-medium text-brandText placeholder-slate-400">
             </div>
         </div>
         <div class="flex-1 overflow-y-auto hide-scrollbar" id="contact-list">
             {% if contacts %}
             {% for contact in contacts %}
-            <div class="chat-list-item p-3 cursor-pointer hover:bg-slate-50 transition border-b border-brandBorder/50 {% if forloop.first %}active{% endif %}"
+            <div class="chat-list-item p-4 cursor-pointer hover:bg-slate-50 border-b border-slate-100 {% if forloop.first %}active{% endif %}"
                 onclick="loadChat({{ contact.user.id }}, this)">
                 <div class="flex items-start">
                     <div
-                        class="w-12 h-12 rounded-full overflow-hidden bg-slate-200 flex items-center justify-center text-xl flex-shrink-0 mr-3 relative text-brandBlue font-bold border border-slate-300 shadow-sm">
+                        class="w-11 h-11 rounded-full overflow-hidden bg-blue-50 flex items-center justify-center text-lg flex-shrink-0 mr-3.5 relative text-brandBlue font-extrabold border border-blue-100 shadow-sm">
                         {{ contact.user.username|make_list|first|upper }}</div>
                     <div class="flex-1 min-w-0">
                         <div class="flex justify-between items-baseline">
-                            <h3 class="font-bold text-sm truncate text-brandText leading-tight">{{ contact.user.first_name|default:contact.user.username }} {{ contact.user.last_name }}
-                            </h3>
-                            <span class="text-xs font-semibold text-brandIcon">{% if contact.latest_message %}{{ contact.latest_message.timestamp|date:"h:i A" }}{% endif %}</span>
+                            <h3 class="font-extrabold text-sm truncate text-brandText leading-tight">{{ contact.user.first_name|default:contact.user.username }} {{ contact.user.last_name }}</h3>
+                            <span class="text-[10px] font-bold text-slate-400">{% if contact.latest_message %}{{ contact.latest_message.timestamp|date:"h:i A" }}{% endif %}</span>
                         </div>
-                        <p class="text-xs text-brandText font-semibold truncate mt-0.5">{% if contact.latest_message %}{% if contact.latest_message.sender == request.user %}You: {% endif %}{{ contact.latest_message.content|default:"📎 Attachment" }}{% else %}<span
-                                class="italic text-slate-400">New message</span>{% endif %}</p>
+                        <p class="text-[11px] text-brandIcon font-semibold truncate mt-1">{% if contact.latest_message %}{% if contact.latest_message.sender == request.user %}You: {% endif %}{{ contact.latest_message.content|default:"📎 Attachment" }}{% else %}<span
+                                class="italic text-slate-400">New conversation</span>{% endif %}</p>
                     </div>
                 </div>
             </div>
             {% endfor %}
             {% else %}
-            <div class="p-6 text-center text-slate-500 font-semibold text-sm">No conversations yet.</div>
+            <div class="p-8 text-center text-slate-400 font-bold text-xs">No conversations yet.</div>
             {% endif %}
         </div>
     </div>
 
     <!-- Right Pane: Active Chat -->
-    <div class="w-2/3 flex flex-col relative bg-white">
-        <div class="p-3 border-b border-brandBorder flex justify-between items-center bg-white z-10 min-h-[58px]">
+    <div class="w-2/3 flex flex-col relative bg-slate-50/30">
+        <div class="p-4 border-b border-brandBorder flex justify-between items-center bg-white min-h-[64px] shadow-sm z-10">
             <div class="flex items-center group cursor-pointer" id="active-chat-header">
                 <div>
-                    <h3 class="font-bold text-base text-brandText leading-tight group-hover:text-brandBlue transition"
+                    <h3 class="font-extrabold text-sm text-brandText leading-tight group-hover:text-brandBlue transition"
                         id="active-chat-name">Select a conversation</h3>
-                    <p class="text-[12px] font-semibold text-brandOrange leading-tight mt-0.5" id="active-chat-role">
+                    <p class="text-[10px] font-bold text-brandOrange uppercase tracking-wide leading-tight mt-1" id="active-chat-role">
                     </p>
                 </div>
             </div>
         </div>
-        <div class="flex-1 overflow-y-auto p-4 space-y-4 hide-scrollbar flex flex-col bg-slate-50/50"
-            id="chat-messages">
-            <div class="flex-1 flex items-center justify-center text-slate-400 font-semibold text-sm">Select a message
-                on the left to start chatting.</div>
-        </div>
-
-        <!-- Attachment Preview -->
-        <div id="attachment-preview" class="hidden px-4 py-2 bg-slate-50 border-t border-brandBorder">
-            <div class="flex items-center gap-2">
-                <span class="text-xs font-bold text-brandText" id="attachment-name"></span>
-                <button onclick="clearAttachment()"
-                    class="text-red-500 hover:text-red-700 text-sm font-bold">&times;</button>
+        <div class="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col" id="chat-messages">
+            <div class="flex-1 flex flex-col items-center justify-center text-slate-400 text-xs font-bold gap-2">
+                <i data-lucide="message-square" class="w-8 h-8 text-slate-350"></i>
+                Select a message on the left to start chatting.
             </div>
         </div>
 
+        <!-- Attachment Preview -->
+        <div id="attachment-preview" class="hidden px-4 py-3 bg-slate-50 border-t border-brandBorder flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i data-lucide="paperclip" class="w-4 h-4 text-brandBlue"></i>
+                <span class="text-xs font-bold text-brandText" id="attachment-name"></span>
+            </div>
+            <button onclick="clearAttachment()"
+                class="text-red-500 hover:text-red-700 text-sm font-bold bg-transparent border-0 cursor-pointer">&times;</button>
+        </div>
+
         <!-- Input Area -->
-        <div class="px-4 py-3 border-t border-brandBorder bg-white border-l-0">
+        <div class="px-4 py-4 border-t border-brandBorder bg-white">
             <form id="chat-form"
-                class="flex flex-col bg-slate-50 border border-slate-300 rounded-xl overflow-hidden focus-within:border-brandOrange focus-within:ring-1 focus-within:ring-brandOrange transition-all shadow-inner"
+                class="flex flex-col bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden focus-within:border-brandBlue focus-within:ring-4 focus-within:ring-blue-50 transition-all shadow-inner"
                 onsubmit="event.preventDefault(); sendMessage();">
                 <textarea id="chat-input"
-                    class="w-full bg-transparent text-brandText p-3 pb-0 focus:outline-none resize-none hide-scrollbar font-medium text-sm"
+                    class="w-full bg-transparent text-brandText p-3 focus:outline-none resize-none hide-scrollbar font-medium text-xs border-0 outline-none leading-relaxed"
                     rows="2" placeholder="Write a message..."
                     oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'; toggleSendBtn();"></textarea>
                 <input type="file" id="image-input" accept="image/*" class="hidden" onchange="handleFileSelect(this)">
                 <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(this)">
-                <div class="flex justify-between items-center p-2 mt-1 border-t border-transparent">
-                    <div class="flex text-brandIcon gap-1">
+                <div class="flex justify-between items-center p-2.5 border-t border-slate-100 bg-white">
+                    <div class="flex text-brandIcon gap-1.5">
                         <button type="button" onclick="document.getElementById('image-input').click()"
-                            class="p-1.5 hover:bg-slate-200 hover:text-brandBlue rounded-lg transition"
+                            class="p-2 hover:bg-slate-100 hover:text-brandBlue rounded-xl transition border-0 bg-transparent cursor-pointer"
                             title="Attach Image">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M19 4H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zM5 18l3.5-4.5 2.5 3 4.5-6L19 18z">
-                                </path>
-                            </svg>
+                            <i data-lucide="image" class="w-4 h-4"></i>
                         </button>
                         <button type="button" onclick="document.getElementById('file-input').click()"
-                            class="p-1.5 hover:bg-slate-200 hover:text-brandBlue rounded-lg transition"
+                            class="p-2 hover:bg-slate-100 hover:text-brandBlue rounded-xl transition border-0 bg-transparent cursor-pointer"
                             title="Attach File">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm4 18H6V4h7v5h5v11z">
-                                </path>
-                            </svg>
+                            <i data-lucide="paperclip" class="w-4 h-4"></i>
                         </button>
                     </div>
                     <button type="submit" id="send-btn" disabled
-                        class="bg-brandBlue hover:bg-blue-900 text-white px-5 py-1.5 rounded-lg font-bold text-sm transition shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">Send</button>
+                        class="bg-brandBlue hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-extrabold text-xs transition shadow-md hover:-translate-y-0.5 active:translate-y-0 border-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none flex items-center gap-1">
+                        <i data-lucide="send" class="w-3.5 h-3.5"></i> Send
+                    </button>
                 </div>
             </form>
         </div>
@@ -256,7 +270,7 @@
 
     function renderMessages(messages, otherUser) {
         const chatContainer = document.getElementById('chat-messages');
-        chatContainer.innerHTML = '<div class="text-center text-xs font-semibold text-brandIcon my-2 border-b border-brandBorder pb-4 mx-4"><div class="w-16 h-16 rounded-full mx-auto bg-slate-200 border border-slate-300 flex items-center justify-center text-2xl mb-2 text-brandBlue font-bold">' + otherUser.name.charAt(0).toUpperCase() + '</div><h3 class="font-bold text-brandText text-sm">' + otherUser.name + '</h3><p>' + otherUser.role + '</p></div>';
+        chatContainer.innerHTML = '<div class="text-center text-xs font-semibold text-brandIcon my-2 border-b border-slate-100 pb-4 mx-4"><div class="w-16 h-16 rounded-full mx-auto bg-blue-50 border border-blue-100 flex items-center justify-center text-2xl mb-2 text-brandBlue font-bold">' + otherUser.name.charAt(0).toUpperCase() + '</div><h3 class="font-bold text-brandText text-sm">' + otherUser.name + '</h3><p class="mt-1 text-[10px] font-bold text-brandOrange uppercase tracking-wide">' + otherUser.role + '</p></div>';
 
         messages.forEach(msg => {
             chatContainer.appendChild(createMessageElement(msg, otherUser));
@@ -270,10 +284,10 @@
 
         if (msg.attachment_url) {
             if (msg.is_image) {
-                attachmentHtml = '<img src="' + msg.attachment_url + '" alt="' + (msg.attachment_name || 'image') + '" class="attachment-preview mt-1 rounded-lg" onclick="window.open(this.src)">';
+                attachmentHtml = '<img src="' + msg.attachment_url + '" alt="' + (msg.attachment_name || 'image') + '" class="attachment-preview mt-2" onclick="window.open(this.src)">';
             } else {
                 const linkClass = msg.is_sender ? 'attachment-link-sent' : 'attachment-link-received';
-                attachmentHtml = '<a href="' + msg.attachment_url + '" target="_blank" class="attachment-link ' + linkClass + ' mt-1">📎 ' + (msg.attachment_name || 'file') + '</a>';
+                attachmentHtml = '<a href="' + msg.attachment_url + '" target="_blank" class="attachment-link ' + linkClass + ' mt-2">📎 ' + (msg.attachment_name || 'file') + '</a>';
             }
         }
 
@@ -281,12 +295,12 @@
 
         if (msg.is_sender) {
             div.className = 'flex mb-4 justify-end';
-            div.innerHTML = '<div class="flex flex-col items-end max-w-[75%]"><span class="text-[10px] font-semibold text-brandIcon mb-1 mr-1">' + msg.timestamp + '</span><div class="message-bubble message-sent shadow-sm">' + contentHtml + attachmentHtml + '</div></div>';
+            div.innerHTML = '<div class="flex flex-col items-end max-w-[75%]"><span class="text-[9px] font-bold text-slate-400 mb-1 mr-1">' + msg.timestamp + '</span><div class="message-bubble message-sent shadow-sm">' + contentHtml + attachmentHtml + '</div></div>';
         } else {
             const initial = otherUser ? otherUser.name.charAt(0).toUpperCase() : '?';
             const name = otherUser ? otherUser.name : 'Unknown';
             div.className = 'flex mb-4';
-            div.innerHTML = '<div class="w-8 h-8 rounded-full overflow-hidden bg-slate-200 border border-slate-300 flex items-center justify-center text-brandBlue font-bold mr-2 flex-shrink-0 text-xs shadow-sm">' + initial + '</div><div class="flex flex-col max-w-[75%]"><span class="text-[11px] font-bold text-brandText mb-1 ml-1">' + name + ' <span class="font-semibold text-brandIcon text-[10px] ml-1">' + msg.timestamp + '</span></span><div class="message-bubble message-received shadow-sm">' + contentHtml + attachmentHtml + '</div></div>';
+            div.innerHTML = '<div class="w-8 h-8 rounded-full overflow-hidden bg-blue-50 border border-blue-100 flex items-center justify-center text-brandBlue font-bold mr-2.5 flex-shrink-0 text-xs shadow-sm">' + initial + '</div><div class="flex flex-col max-w-[75%]"><span class="text-[11px] font-bold text-brandText mb-1 ml-1">' + name + ' <span class="font-semibold text-slate-400 text-[9px] ml-1">' + msg.timestamp + '</span></span><div class="message-bubble message-received shadow-sm">' + contentHtml + attachmentHtml + '</div></div>';
         }
         return div;
     }
@@ -373,5 +387,11 @@
         if (firstContact) firstContact.click();
         {% endif %}
     };
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
 </script>
 {% endblock %}

@@ -1,26 +1,29 @@
 {% extends 'base.html' %}
-{% block content %}
-<div class="flex flex-col md:flex-row gap-6 mt-4 pb-10 justify-center">
-    <main class="w-full md:w-[700px] flex-shrink-0 flex flex-col gap-4">
-        <!-- Profile Card -->
-        <div class="li-card relative pb-5">
-            <div class="bg-gradient-to-r from-brandBlue to-blue-600 h-[150px] rounded-t-[0.8rem]"></div>
 
-            <div
-                class="w-32 h-32 rounded-full border-4 border-white bg-slate-200 ml-6 -mt-16 relative z-10 overflow-hidden shadow-sm flex items-center justify-center">
+{% block content %}
+<div class="flex flex-col lg:flex-row gap-8 mt-4 pb-12 justify-center px-4">
+    <!-- Main Content -->
+    <main class="w-full lg:w-[680px] flex-shrink-0 flex flex-col gap-6">
+        <!-- Profile Card -->
+        <div class="bg-white border border-brandBorder rounded-3xl overflow-hidden shadow-premium hover:shadow-premiumHover transition-all duration-300 relative group">
+            <div class="bg-gradient-to-r from-brandBlue to-blue-700 h-[160px] relative">
+                <div class="absolute -top-10 -left-10 w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
+                <div class="absolute -bottom-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
+            </div>
+
+            <div class="w-32 h-32 rounded-full border-4 border-white bg-slate-50 ml-8 -mt-16 relative z-10 overflow-hidden shadow-premium flex items-center justify-center group-hover:border-brandOrange transition-all duration-300">
                 {% if request.user.profile.profile_picture %}
                 <img src="{{ request.user.profile.profile_picture.url }}"
-                    class="w-full h-full object-cover absolute inset-0 text-slate-100 flex items-center justify-center">
+                    class="w-full h-full object-cover">
                 {% else %}
-                <svg class="w-full h-full text-slate-400 mt-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path
-                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                </svg>
+                <div class="w-full h-full flex items-center justify-center bg-blue-50 text-brandBlue font-extrabold text-4xl uppercase">
+                    {{ request.user.username|make_list|first }}
+                </div>
                 {% endif %}
             </div>
 
-            <div class="px-6 mt-3">
-                <h2 class="font-bold text-2xl text-brandText">
+            <div class="px-8 mt-4 pb-6">
+                <h2 class="font-extrabold text-2xl text-brandText tracking-tight">
                     {% if request.user.is_authenticated %}
                     {{ request.user.first_name }} {{ request.user.last_name }}
                     {% if not request.user.first_name %}{{ request.user.username }}{% endif %}
@@ -28,40 +31,36 @@
                     Guest User
                     {% endif %}
                 </h2>
-                <div class="mt-2 flex items-center gap-2">
+                <div class="mt-2.5 flex items-center gap-2.5 flex-wrap">
                     {% if request.user.profile.role == 'Worker' %}
-                    <span
-                        class="bg-brandOrange text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm uppercase tracking-wide">Worker</span>
+                    <span class="bg-brandOrange text-white px-3.5 py-1 rounded-full text-[10px] font-extrabold shadow-sm uppercase tracking-wider">Worker</span>
+                    {% elif request.user.profile.role == 'Job Provider' %}
+                    <span class="bg-brandBlue text-white px-3.5 py-1 rounded-full text-[10px] font-extrabold shadow-sm uppercase tracking-wider">Job Provider</span>
+                    {% else %}
+                    <span class="bg-slate-500 text-white px-3.5 py-1 rounded-full text-[10px] font-extrabold shadow-sm uppercase tracking-wider">User</span>
                     {% endif %}
-                    {% if request.user.profile.role == 'Job Provider' %}
-                    <span
-                        class="bg-brandBlue text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm uppercase tracking-wide">Job
-                        Provider</span>
-                    {% endif %}
-                    {% if request.user.profile.role not in "Worker,Job Provider" %}
-                    <span
-                        class="bg-slate-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm uppercase tracking-wide">User</span>
-                    {% endif %}
-                    <span class="text-sm font-medium text-slate-500">• SevaLink Member</span>
+                    <span class="text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1 rounded-full border border-slate-200/60 flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-500"></i> SevaLink Member</span>
                 </div>
-                <p class="text-sm font-semibold text-brandIcon mt-1">Joined {{ request.user.date_joined|date:"M Y" }} •
-                    <span class="text-brandBlue font-bold">{{ request.user.email }}</span>
+                <p class="text-xs font-bold text-brandIcon mt-3 flex items-center gap-2 flex-wrap">
+                    <span class="flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i> Joined {{ request.user.date_joined|date:"M Y" }}</span>
+                    <span class="text-slate-300">&bull;</span>
+                    <span class="text-brandBlue font-bold flex items-center gap-1"><i data-lucide="mail" class="w-3.5 h-3.5 text-brandBlue"></i> {{ request.user.email }}</span>
                 </p>
 
-                <div class="flex gap-3 mt-4 flex-wrap">
+                <div class="flex gap-3.5 mt-6 flex-wrap">
                     <a href="{% url 'edit_profile' %}"
-                        class="bg-brandBlue text-white font-bold px-5 py-2 rounded-full hover:bg-blue-900 transition shadow-sm text-sm">
-                        ✏️ Edit Profile
+                        class="bg-brandBlue text-white font-bold px-6 py-3 rounded-2xl hover:bg-blue-700 transition duration-300 shadow-md shadow-blue-500/10 text-xs flex items-center gap-1.5 no-underline hover:-translate-y-0.5 active:translate-y-0">
+                        <i data-lucide="edit-3" class="w-4 h-4"></i> Edit Profile
                     </a>
                     <a href="{% url 'post_job_page' %}"
-                        class="border border-brandBlue text-brandBlue font-bold px-5 py-2 rounded-full hover:bg-slate-50 transition shadow-sm text-sm">
-                        + Post a Job
+                        class="border border-slate-200 text-slate-700 bg-slate-50 hover:bg-slate-100 font-bold px-6 py-3 rounded-2xl transition duration-300 shadow-sm text-xs flex items-center gap-1.5 no-underline hover:-translate-y-0.5 active:translate-y-0">
+                        <i data-lucide="plus-circle" class="w-4 h-4 text-brandOrange"></i> Post a Job
                     </a>
                     <form method="POST" action="{% url 'logout' %}" class="inline">
                         {% csrf_token %}
                         <button type="submit"
-                            class="border border-red-500 text-red-500 font-bold px-5 py-2 rounded-full hover:bg-red-50 transition shadow-sm text-sm">
-                            Logout
+                            class="border border-red-200 text-brandRed bg-red-50 hover:bg-red-100 font-bold px-6 py-3 rounded-2xl transition duration-300 shadow-sm text-xs flex items-center gap-1.5 hover:-translate-y-0.5 active:translate-y-0">
+                            <i data-lucide="log-out" class="w-4 h-4"></i> Logout
                         </button>
                     </form>
                 </div>
@@ -69,46 +68,52 @@
         </div>
 
         <!-- Stats Card -->
-        <div class="li-card p-6">
-            <h2 class="font-bold text-lg mb-4 text-brandText">Activity Summary</h2>
+        <div class="bg-white border border-brandBorder rounded-3xl p-6 shadow-premium hover:shadow-premiumHover transition-all duration-300">
+            <h2 class="font-extrabold text-base text-brandText mb-4 flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-5 h-5 text-brandBlue"></i> Activity Summary</h2>
             <div class="grid grid-cols-2 gap-4">
-                <div class="bg-blue-50 rounded-xl p-4 text-center border border-blue-100">
-                    <p class="text-2xl font-bold text-brandBlue">{{ jobs_posted }}</p>
-                    <p class="text-xs font-semibold text-brandIcon mt-1">Jobs Posted</p>
+                <div class="bg-blue-50/50 rounded-2xl p-5 text-center border border-blue-100/60 shadow-inner">
+                    <p class="text-3xl font-black text-brandBlue">{{ jobs_posted }}</p>
+                    <p class="text-[10px] font-bold text-brandIcon uppercase tracking-wider mt-1.5">Jobs Posted</p>
                 </div>
-                <div class="bg-emerald-50 rounded-xl p-4 text-center border border-emerald-100">
-                    <p class="text-2xl font-bold text-emerald-600">{{ jobs_completed }}</p>
-                    <p class="text-xs font-semibold text-brandIcon mt-1">Jobs Completed</p>
+                <div class="bg-emerald-50/50 rounded-2xl p-5 text-center border border-emerald-100/60 shadow-inner">
+                    <p class="text-3xl font-black text-brandTeal">{{ jobs_completed }}</p>
+                    <p class="text-[10px] font-bold text-brandIcon uppercase tracking-wider mt-1.5">Jobs Completed</p>
                 </div>
             </div>
         </div>
 
         <!-- Contact Info -->
-        <div class="li-card p-6">
-            <h2 class="font-bold text-lg mb-4 text-brandText">Contact Information</h2>
-            <div class="space-y-3">
-                <div class="flex items-center gap-3">
-                    <span class="text-lg">📧</span>
+        <div class="bg-white border border-brandBorder rounded-3xl p-6 shadow-premium hover:shadow-premiumHover transition-all duration-300">
+            <h2 class="font-extrabold text-base text-brandText mb-4 flex items-center gap-2"><i data-lucide="user-check" class="w-5 h-5 text-brandBlue"></i> Contact Information</h2>
+            <div class="space-y-4">
+                <div class="flex items-center gap-3.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-brandBlue flex items-center justify-center shadow-inner border border-blue-100">
+                        <i data-lucide="mail" class="w-5 h-5"></i>
+                    </div>
                     <div>
-                        <p class="text-xs font-bold text-brandIcon">Email</p>
-                        <p class="text-sm font-semibold text-brandText">{{ request.user.email|default:"Not set" }}</p>
+                        <p class="text-[10px] font-bold text-brandIcon uppercase tracking-wider">Email Address</p>
+                        <p class="text-sm font-extrabold text-brandText mt-0.5">{{ request.user.email|default:"Not set" }}</p>
                     </div>
                 </div>
                 {% if request.user.profile.phone_number %}
-                <div class="flex items-center gap-3">
-                    <span class="text-lg">📱</span>
+                <div class="flex items-center gap-3.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <div class="w-10 h-10 rounded-xl bg-orange-50 text-brandOrange flex items-center justify-center shadow-inner border border-orange-100">
+                        <i data-lucide="phone" class="w-5 h-5"></i>
+                    </div>
                     <div>
-                        <p class="text-xs font-bold text-brandIcon">Phone</p>
-                        <p class="text-sm font-semibold text-brandText">{{ request.user.profile.phone_number }}</p>
+                        <p class="text-[10px] font-bold text-brandIcon uppercase tracking-wider">Phone Number</p>
+                        <p class="text-sm font-extrabold text-brandText mt-0.5">{{ request.user.profile.phone_number }}</p>
                     </div>
                 </div>
                 {% endif %}
                 {% if request.user.profile.job_title %}
-                <div class="flex items-center gap-3">
-                    <span class="text-lg">💼</span>
+                <div class="flex items-center gap-3.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-brandTeal flex items-center justify-center shadow-inner border border-emerald-100">
+                        <i data-lucide="briefcase" class="w-5 h-5"></i>
+                    </div>
                     <div>
-                        <p class="text-xs font-bold text-brandIcon">Job Title</p>
-                        <p class="text-sm font-semibold text-brandText">{{ request.user.profile.job_title }}</p>
+                        <p class="text-[10px] font-bold text-brandIcon uppercase tracking-wider">Job Title</p>
+                        <p class="text-sm font-extrabold text-brandText mt-0.5">{{ request.user.profile.job_title }}</p>
                     </div>
                 </div>
                 {% endif %}
@@ -116,17 +121,17 @@
         </div>
 
         <!-- Service Skills -->
-        <div class="li-card p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="font-bold text-lg text-brandText">Service Skills</h2>
+        <div class="bg-white border border-brandBorder rounded-3xl p-6 shadow-premium hover:shadow-premiumHover transition-all duration-300">
+            <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
+                <h2 class="font-extrabold text-base text-brandText flex items-center gap-2"><i data-lucide="star" class="w-5 h-5 text-brandBlue"></i> Service Skills</h2>
                 <button id="edit-skills-btn" onclick="toggleSkillsEditor()"
-                    class="text-xs font-bold text-brandBlue hover:text-blue-900 transition px-3 py-1 rounded-lg border border-brandBlue/20 hover:border-brandBlue/50">
-                    ✏️ Edit Skills
+                    class="text-xs font-bold text-brandBlue hover:text-blue-700 transition px-3 py-1.5 rounded-xl border border-slate-200 hover:border-brandBlue/40 flex items-center gap-1 bg-slate-50 shadow-sm">
+                    <i data-lucide="edit-2" class="w-3.5 h-3.5"></i> Edit Skills
                 </button>
             </div>
 
             <!-- Skills Display (pills) -->
-            <div id="skills-display" class="flex flex-wrap gap-2 min-h-[40px]">
+            <div id="skills-display" class="flex flex-wrap gap-2.5 min-h-[40px]">
                 {% if request.user.profile.service_skills %}
                 <!-- Skills will be rendered as pills by JS on page load -->
                 {% endif %}
@@ -138,74 +143,71 @@
 
             <!-- Skills Editor (hidden by default) -->
             <div id="skills-editor" class="hidden mt-4 pt-4 border-t border-slate-100">
-                <div class="flex gap-2 mb-3">
+                <div class="flex gap-3 mb-4">
                     <input type="text" id="new-skill-input" placeholder="Type a skill (e.g. Plumbing, Electrical)"
-                        class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition"
+                        class="flex-1 px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue transition"
                         onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill();}">
                     <button onclick="addSkill()"
-                        class="bg-brandBlue text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-blue-900 transition shadow-sm whitespace-nowrap">
+                        class="bg-brandBlue text-white px-5 py-3 rounded-2xl text-xs font-bold hover:bg-blue-700 transition shadow-md shadow-blue-500/10 whitespace-nowrap">
                         + Add
                     </button>
                 </div>
-                <div class="flex flex-wrap gap-2 mb-3">
-                    <span class="text-[11px] font-semibold text-slate-400">Quick add:</span>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mr-1.5 flex items-center">Quick add:</span>
                     <button type="button" onclick="addSkillDirect('Electrical')"
-                        class="text-[11px] font-bold text-brandBlue hover:underline">Electrical</button>
+                        class="text-xs font-bold text-brandBlue hover:text-blue-800 bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-100/40"><i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> Electrical</button>
                     <button type="button" onclick="addSkillDirect('Plumbing')"
-                        class="text-[11px] font-bold text-brandBlue hover:underline">Plumbing</button>
+                        class="text-xs font-bold text-brandBlue hover:text-blue-800 bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-100/40">💧 Plumbing</button>
                     <button type="button" onclick="addSkillDirect('Cleaning')"
-                        class="text-[11px] font-bold text-brandBlue hover:underline">Cleaning</button>
+                        class="text-xs font-bold text-brandBlue hover:text-blue-800 bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-100/40">🧹 Cleaning</button>
                     <button type="button" onclick="addSkillDirect('Carpentry')"
-                        class="text-[11px] font-bold text-brandBlue hover:underline">Carpentry</button>
+                        class="text-xs font-bold text-brandBlue hover:text-blue-800 bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-100/40"><i data-lucide="briefcase" class="w-5 h-5 text-brandBlue"></i> Carpentry</button>
                     <button type="button" onclick="addSkillDirect('AC Repair')"
-                        class="text-[11px] font-bold text-brandBlue hover:underline">AC Repair</button>
+                        class="text-xs font-bold text-brandBlue hover:text-blue-800 bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-100/40"><i data-lucide="wind" class="w-4 h-4 text-sky-400"></i> AC Repair</button>
                     <button type="button" onclick="addSkillDirect('Painting')"
-                        class="text-[11px] font-bold text-brandBlue hover:underline">Painting</button>
-                    <button type="button" onclick="addSkillDirect('Packing')"
-                        class="text-[11px] font-bold text-brandBlue hover:underline">Packing</button>
+                        class="text-xs font-bold text-brandBlue hover:text-blue-800 bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-100/40"><i data-lucide="palette" class="w-4 h-4 text-rose-500"></i> Painting</button>
                 </div>
                 <button onclick="saveSkills()"
-                    class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl hover:bg-emerald-700 transition text-sm shadow-sm"
+                    class="w-full bg-emerald-500 text-white font-bold py-3.5 rounded-2xl hover:bg-emerald-600 transition text-sm shadow-md shadow-emerald-500/10 flex items-center justify-center gap-1.5"
                     id="save-skills-btn">
-                    💾 Save Skills
+                    <i data-lucide="save" class="w-4 h-4"></i> Save Skills
                 </button>
             </div>
         </div>
     </main>
 
     <!-- Sidebar -->
-    <aside class="w-full md:w-[280px] flex-shrink-0 flex flex-col gap-4">
-        <div class="li-card p-5">
-            <h3 class="font-bold text-sm text-brandText mb-3">Quick Links</h3>
-            <ul class="space-y-2">
+    <aside class="w-full lg:w-[280px] flex-shrink-0 flex flex-col gap-6">
+        <div class="bg-white border border-brandBorder rounded-3xl p-6 shadow-premium hover:shadow-premiumHover transition-all duration-300">
+            <h3 class="font-extrabold text-sm text-brandText mb-4 pb-2 border-b border-slate-100">Quick Links</h3>
+            <ul class="space-y-3 pl-0 list-none font-bold text-xs">
                 <li><a href="{% url 'edit_profile' %}"
-                        class="text-sm font-semibold text-brandIcon hover:text-brandBlue transition block">✏️ Edit
-                        Profile</a></li>
+                        class="text-xs font-bold text-brandIcon hover:text-brandBlue transition flex items-center gap-2 no-underline"><i data-lucide="edit" class="w-4 h-4 text-slate-400"></i> Edit Profile</a></li>
                 <li><a href="{% url 'business' %}"
-                        class="text-sm font-semibold text-brandIcon hover:text-brandBlue transition block">📊
-                        Dashboard</a></li>
+                        class="text-xs font-bold text-brandIcon hover:text-brandBlue transition flex items-center gap-2 no-underline"><i data-lucide="bar-chart-2" class="w-4 h-4 text-slate-400"></i> Business Dashboard</a></li>
                 <li><a href="{% url 'nearby_map' %}"
-                        class="text-sm font-semibold text-brandIcon hover:text-brandBlue transition block">🗺️ Nearby
-                        Map</a></li>
+                        class="text-xs font-bold text-brandIcon hover:text-brandBlue transition flex items-center gap-2 no-underline"><i data-lucide="map" class="w-4 h-4 text-slate-400"></i> Nearby Map</a></li>
                 <li><a href="{% url 'inbox' %}"
-                        class="text-sm font-semibold text-brandIcon hover:text-brandBlue transition block">💬
-                        Messages</a></li>
+                        class="text-xs font-bold text-brandIcon hover:text-brandBlue transition flex items-center gap-2 no-underline"><i data-lucide="message-circle" class="w-4 h-4 text-slate-400"></i> Messages</a></li>
             </ul>
         </div>
-        <div class="li-card p-5">
-            <h3 class="font-bold text-sm text-brandText">Verification</h3>
-            <p
-                class="text-xs font-semibold mt-2 {% if request.user.profile.is_verified %}text-emerald-600{% else %}text-amber-600{% endif %}">
-                {% if request.user.profile.is_verified %}✅ Verified Account{% else %}⏳ Pending Verification{% endif %}
-            </p>
+
+        <div class="bg-white border border-brandBorder rounded-3xl p-6 shadow-premium hover:shadow-premiumHover transition-all duration-300">
+            <h3 class="font-extrabold text-sm text-brandText mb-3 pb-2 border-b border-slate-100">Verification Status</h3>
+            <div class="mt-2.5 flex items-center gap-2 font-bold text-xs {% if request.user.profile.is_verified %}text-emerald-600 bg-emerald-50/50 border border-emerald-100/60 p-3 rounded-2xl{% else %}text-amber-600 bg-amber-50/50 border border-amber-100/60 p-3 rounded-2xl{% endif %}">
+                {% if request.user.profile.is_verified %}
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 shrink-0"></i> <span>Verified Account</span>
+                {% else %}
+                <i data-lucide="clock" class="w-5 h-5 text-amber-500 shrink-0"></i> <span>Pending Verification</span>
+                {% endif %}
+            </div>
         </div>
-        <div class="li-card p-5 border-l-4 border-l-red-500">
-            <h3 class="font-bold text-sm text-red-600 mb-2">Danger Zone</h3>
-            <p class="text-xs text-slate-500 mb-4 font-medium">Permanently delete your account and all associated data.
-            </p>
+
+        <div class="bg-white border border-red-100 rounded-3xl p-6 shadow-premium hover:shadow-premiumHover transition-all duration-300">
+            <h3 class="font-extrabold text-sm text-brandRed mb-2">Danger Zone</h3>
+            <p class="text-xs text-slate-500 mb-4 font-bold leading-relaxed">Permanently delete your account and all associated data.</p>
             <a href="{% url 'delete_account' %}"
-                class="block text-center w-full bg-red-50 text-red-600 font-bold py-2 rounded-lg hover:bg-red-100 transition text-sm">Delete
-                Account</a>
+                class="block text-center w-full bg-red-50 text-brandRed font-extrabold py-3 rounded-2xl hover:bg-red-100 border border-red-100 transition duration-300 text-xs no-underline">Delete Account</a>
         </div>
     </aside>
 </div>
@@ -238,8 +240,8 @@
         noMsg.classList.add('hidden');
         currentSkills.forEach(skill => {
             const pill = document.createElement('span');
-            pill.className = 'skill-pill inline-flex items-center gap-1.5 bg-brandBlue/10 text-brandBlue px-3 py-1.5 rounded-full text-xs font-bold border border-brandBlue/20';
-            pill.innerHTML = `🛠️ ${skill} <button onclick="removeSkill('${skill.replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 ml-1 text-sm leading-none">&times;</button>`;
+            pill.className = 'skill-pill inline-flex items-center gap-1.5 bg-blue-50 text-brandBlue px-3.5 py-2 rounded-full text-xs font-bold border border-blue-100';
+            pill.innerHTML = `⚙️ ${skill} <button onclick="removeSkill('${skill.replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 ml-1 text-sm leading-none focus:outline-none">&times;</button>`;
             container.insertBefore(pill, noMsg);
         });
     }
@@ -248,7 +250,10 @@
         const editor = document.getElementById('skills-editor');
         const btn = document.getElementById('edit-skills-btn');
         editor.classList.toggle('hidden');
-        btn.textContent = editor.classList.contains('hidden') ? '✏️ Edit Skills' : '✕ Close';
+        btn.innerHTML = editor.classList.contains('hidden') ? '<i data-lucide="edit-2" class="w-3.5 h-3.5"></i> Edit Skills' : '<i data-lucide="x" class="w-3.5 h-3.5"></i> Close';
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 
     function addSkill() {
@@ -277,7 +282,8 @@
     function saveSkills() {
         const btn = document.getElementById('save-skills-btn');
         btn.disabled = true;
-        btn.textContent = 'Saving...';
+        btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Saving...';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
 
         fetch('{% url "update_skills" %}', {
             method: 'POST',
@@ -290,21 +296,29 @@
             .then(r => r.json())
             .then(data => {
                 if (data.status === 'ok') {
-                    btn.textContent = '✅ Saved!';
-                    btn.classList.remove('bg-emerald-600');
-                    btn.classList.add('bg-emerald-500');
+                    btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Saved!';
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                    btn.classList.remove('bg-emerald-500');
+                    btn.classList.add('bg-emerald-600');
                     setTimeout(() => {
-                        btn.textContent = '💾 Save Skills';
-                        btn.classList.remove('bg-emerald-500');
-                        btn.classList.add('bg-emerald-600');
+                        btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Save Skills';
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                        btn.classList.remove('bg-emerald-600');
+                        btn.classList.add('bg-emerald-500');
                         btn.disabled = false;
                     }, 2000);
                 }
             })
             .catch(() => {
-                btn.textContent = 'Error — retry';
+                btn.innerHTML = 'Error — retry';
                 btn.disabled = false;
             });
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
 </script>
 {% endblock %}

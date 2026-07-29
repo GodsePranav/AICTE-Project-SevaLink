@@ -1,79 +1,87 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-[1000px] mx-auto mt-4 pb-10 px-4">
+<div class="max-w-[1000px] mx-auto mt-4 pb-12 px-4">
     <!-- Header -->
-    <div class="li-card p-6 mb-5">
+    <div class="bg-white border border-brandBorder rounded-3xl p-6 sm:p-8 mb-6 shadow-premium hover:shadow-premiumHover transition-all duration-300">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>
-                <h1 class="text-xl font-extrabold text-brandText">Worker Dashboard</h1>
-                <p class="text-sm text-brandIcon mt-1">Manage your service assignments and history</p>
+                <h1 class="text-2xl font-extrabold text-brandText tracking-tight">Worker Dashboard</h1>
+                <p class="text-sm text-brandIcon font-bold mt-1">Manage your service assignments and history</p>
             </div>
-            <div class="flex flex-wrap items-center gap-3">
-                <div class="flex gap-1 bg-slate-100 p-1 rounded-xl">
+            <div class="flex flex-wrap items-center gap-4">
+                <div class="flex gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200/60 shadow-inner">
                     <button onclick="setView('cards')" id="view-cards"
-                        class="px-4 py-2 rounded-lg text-xs font-bold bg-white shadow-sm text-brandBlue transition">🗂️
-                        Cards</button>
+                        class="px-4 py-2 rounded-xl text-xs font-bold bg-white shadow-sm text-brandBlue transition-all duration-200 flex items-center gap-1.5"><i data-lucide="grid" class="w-4 h-4"></i> Cards</button>
                     <button onclick="setView('table')" id="view-table"
-                        class="px-4 py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-brandText transition">📊
-                        Table</button>
+                        class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-brandText transition-all duration-200 flex items-center gap-1.5"><i data-lucide="table-2" class="w-4 h-4"></i> Table</button>
                 </div>
                 <a href="{% url 'jobs' %}"
-                    class="bg-brandOrange text-white px-5 py-2.5 rounded-xl font-bold hover:bg-orange-600 transition shadow-md whitespace-nowrap">
-                    🔍 Browse New Jobs
+                    class="bg-brandOrange text-white px-5 py-3 rounded-2xl font-bold hover:bg-orange-600 transition shadow-md shadow-orange-500/10 whitespace-nowrap text-xs flex items-center gap-1.5 no-underline hover:-translate-y-0.5 active:translate-y-0">
+                    <i data-lucide="search" class="w-4 h-4"></i> Browse New Jobs
                 </a>
             </div>
         </div>
 
         <!-- Stats -->
-        <div class="grid grid-cols-3 gap-4 mt-6">
-            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
-                <p class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-1">Active Tasks</p>
-                <p class="text-3xl font-black text-brandBlue">{{ assigned_jobs.count }}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+            <div class="bg-blue-50/50 border border-blue-100/60 p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-brandIcon uppercase tracking-wider mb-1">Active Tasks</p>
+                    <p class="text-3xl font-black text-brandBlue">{{ assigned_jobs.count }}</p>
+                </div>
+                <div class="p-3 bg-blue-100/80 text-brandBlue rounded-xl shadow-inner">
+                    <i data-lucide="briefcase" class="w-6 h-6"></i>
+                </div>
             </div>
-            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
-                <p class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-1">Tasks Completed</p>
-                <p class="text-3xl font-black text-brandOrange">{{ completed_jobs.count }}</p>
+            <div class="bg-emerald-50/50 border border-emerald-100/60 p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-brandIcon uppercase tracking-wider mb-1">Tasks Completed</p>
+                    <p class="text-3xl font-black text-brandTeal">{{ completed_jobs.count }}</p>
+                </div>
+                <div class="p-3 bg-emerald-100/80 text-brandTeal rounded-xl shadow-inner">
+                    <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                </div>
             </div>
-            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
-                <p class="text-xs font-bold text-brandIcon uppercase tracking-wider mb-1">Available Nearby</p>
-                <p class="text-3xl font-black text-brandText">{{ available_jobs.count }}</p>
+            <div class="bg-slate-50 border border-slate-200/60 p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-brandIcon uppercase tracking-wider mb-1">Available Nearby</p>
+                    <p class="text-3xl font-black text-brandText">{{ available_jobs.count }}</p>
+                </div>
+                <div class="p-3 bg-slate-200/80 text-brandText rounded-xl shadow-inner">
+                    <i data-lucide="map-pin" class="w-6 h-6"></i>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Task Invitations (Incoming) -->
-    <div id="cards-view">
+    <div id="cards-view" class="space-y-6">
         {% if service_requests %}
-        <div class="mb-6">
-            <h2 class="text-lg font-bold text-brandText mb-3">Incoming Task Invitations</h2>
+        <div>
+            <h2 class="text-lg font-extrabold text-brandText mb-4 flex items-center gap-2"><i data-lucide="inbox" class="w-5 h-5 text-brandBlue"></i> Incoming Task Invitations</h2>
             <div class="grid grid-cols-1 gap-4">
                 {% for req in service_requests %}
                 {% if req.status == 'pending' %}
-                <div
-                    class="li-card p-5 border-l-4 border-amber-500 bg-amber-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4 transition hover:shadow-md">
+                <div class="bg-white border border-amber-200/80 rounded-3xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition shadow-premium hover:shadow-premiumHover relative overflow-hidden">
+                    <div class="absolute top-0 left-0 md:h-full md:w-1 w-full h-1 bg-brandOrange"></div>
                     <div class="flex items-center gap-4">
-                        <div
-                            class="w-12 h-12 rounded-full bg-white flex items-center justify-center font-bold text-brandBlue shadow-sm border border-brandBorder overflow-hidden">
+                        <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-200/60 flex items-center justify-center font-bold text-brandBlue shadow-inner overflow-hidden flex-shrink-0">
                             {% if req.provider.profile.profile_picture %}
-                            <img src="{{ req.provider.profile.profile_picture.url }}"
-                                class="w-full h-full object-cover">
+                            <img src="{{ req.provider.profile.profile_picture.url }}" class="w-full h-full object-cover">
                             {% else %}
                             {{ req.provider.username|make_list|first|upper }}
                             {% endif %}
                         </div>
                         <div>
-                            <p class="text-base font-bold text-brandText">{{ req.provider.first_name|default:req.provider.username }} {{ req.provider.last_name }}
-                            </p>
+                            <p class="text-sm font-extrabold text-brandText leading-snug">{{ req.provider.first_name|default:req.provider.username }} {{ req.provider.last_name }}</p>
                             {% if req.job %}
-                            <p class="text-xs text-brandIcon">Invited you to work on: <span
-                                    class="font-bold text-brandBlue">{{ req.job.title }}</span></p>
-                            {% if req.job.price %}<p class="text-xs text-emerald-600 font-bold mt-0.5">₹{{ req.job.price }}
-                            </p>{% endif %}
+                            <p class="text-xs font-semibold text-brandIcon mt-1 flex items-center flex-wrap gap-1">Invited you to work on: <span class="font-extrabold text-brandBlue">{{ req.job.title }}</span></p>
+                            {% if req.job.price %}<p class="text-xs text-brandBlue font-extrabold mt-0.5">₹{{ req.job.price }}</p>{% endif %}
                             {% else %}
-                            <p class="text-xs text-brandIcon">Invited you to handle a potential task.</p>
+                            <p class="text-xs font-semibold text-brandIcon mt-1">Invited you to handle a potential task.</p>
                             {% endif %}
-                            <p class="text-[10px] text-slate-500 mt-1 uppercase font-bold tracking-widest">{{ req.timestamp|timesince }} ago</p>
+                            <p class="text-[10px] text-slate-400 mt-1.5 font-bold uppercase tracking-wider flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> {{ req.timestamp|timesince }} ago</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
@@ -81,14 +89,13 @@
                             {% csrf_token %}
                             <input type="hidden" name="action" value="accepted">
                             <button type="submit"
-                                class="bg-emerald-600 text-white px-5 py-2 rounded-xl font-bold hover:bg-emerald-700 transition shadow-md text-xs">Accept
-                                Invitation</button>
+                                class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-md shadow-emerald-500/10 text-xs">Accept Invitation</button>
                         </form>
                         <form method="POST" action="{% url 'respond_service_request' req.id %}">
                             {% csrf_token %}
                             <input type="hidden" name="action" value="rejected">
                             <button type="submit"
-                                class="bg-white border border-brandBorder text-slate-500 px-5 py-2 rounded-xl font-bold hover:bg-slate-50 transition text-xs">Reject</button>
+                                class="bg-slate-50 hover:bg-slate-100 border border-slate-200/60 text-slate-500 px-5 py-2.5 rounded-xl font-bold transition text-xs shadow-sm">Reject</button>
                         </form>
                     </div>
                 </div>
@@ -99,99 +106,91 @@
         {% endif %}
 
         <!-- Active Assigned Jobs -->
-        <div class="mb-6">
-            <h2 class="text-lg font-bold text-brandText mb-3">Your Active Tasks</h2>
+        <div>
+            <h2 class="text-lg font-bold text-brandText mb-4 flex items-center gap-2"><i data-lucide="folder-open" class="w-5 h-5 text-brandBlue"></i> Your Active Tasks</h2>
             <div class="space-y-4">
                 {% for job in assigned_jobs %}
-                <div class="li-card p-5 border-l-4 border-l-brandOrange hover:shadow-md transition">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-base font-bold text-brandText">{{ job.title }}</h3>
-                            <p class="text-xs text-slate-500 mb-1">Posted on {{ job.created_at|date:"M d, Y" }} by {{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}
-                            </p>
-                            <p class="text-sm text-brandIcon line-clamp-2 mt-1">{{ job.description }}</p>
-                            <div class="flex items-center gap-3 mt-3 text-xs font-bold">
-                                <span class="bg-blue-50 text-brandBlue px-2 py-1 rounded-md">{{ job.status }}</span>
-                                {% if job.price %}<span class="text-slate-600">💰 ₹{{ job.price }}</span>{% endif %}
-                                <span class="text-slate-500">📍 {{ job.address|truncatechars:30 }}</span>
-                                <span class="text-brandIcon">🕓
-                                    {{ job.scheduled_time|date:"M d, Y h:i A"|default:"ASAP" }}
-                                </span>
+                <div class="bg-white border border-brandBorder rounded-3xl p-6 shadow-premium hover:shadow-premiumHover transition-all duration-300 relative group">
+                    <div class="absolute top-0 left-0 h-full w-1 bg-brandOrange"></div>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div class="flex-grow min-w-0">
+                            <h3 class="text-base font-extrabold text-brandText group-hover:text-brandBlue transition duration-200 truncate">{{ job.title }}</h3>
+                            <p class="text-[10px] text-slate-400 mt-1 font-bold">Posted on {{ job.created_at|date:"M d, Y" }} by {{ job.provider.first_name|default:job.provider.username }}</p>
+                            <p class="text-sm text-brandIcon mt-2 font-medium line-clamp-2 italic">"{{ job.description }}"</p>
+                            <div class="flex flex-wrap items-center gap-3.5 mt-4 text-xs font-bold">
+                                <span class="bg-blue-50 border border-blue-100 text-brandBlue px-3 py-1 rounded-full shadow-sm">{{ job.status }}</span>
+                                {% if job.price %}<span class="text-slate-600 flex items-center gap-1">💰 ₹{{ job.price }}</span>{% endif %}
+                                <span class="text-slate-500 truncate max-w-[200px] flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i> {{ job.address|default:"Local Area" }}</span>
+                                <span class="text-brandIcon flex items-center gap-1"><i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i> {{ job.scheduled_time|date:"M d, Y h:i A"|default:"ASAP" }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-4 border-t border-brandBorder flex items-center justify-between">
+                    <div class="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-semibold text-brandIcon">Requested by:</span>
-                            <div
-                                class="w-6 h-6 rounded-full bg-slate-200 text-brandBlue text-xs font-bold flex items-center justify-center uppercase">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Requested by:</span>
+                            <div class="w-7 h-7 rounded-full bg-brandBlue/10 text-brandBlue text-xs font-bold flex items-center justify-center uppercase overflow-hidden shadow-inner border border-blue-50">
+                                {% if job.provider.profile.profile_picture %}
+                                <img src="{{ job.provider.profile.profile_picture.url }}" class="w-full h-full object-cover">
+                                {% else %}
                                 {{ job.provider.username|make_list|first }}
+                                {% endif %}
                             </div>
-                            <span class="text-sm font-bold text-brandText">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</span>
+                            <span class="text-xs font-extrabold text-brandText">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</span>
                             <a href="{% url 'inbox' %}?user={{ job.provider.id }}"
-                                class="text-xs text-brandBlue hover:underline ml-2 hidden sm:inline-block">Message
-                                Client</a>
+                                class="text-xs font-bold text-brandBlue hover:text-blue-800 transition flex items-center gap-1 ml-2"><i data-lucide="message-square" class="w-3 h-3"></i> Message Client</a>
                         </div>
 
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 w-full sm:w-auto">
                             <a href="{% url 'inbox' %}?user={{ job.provider.id }}"
-                                class="bg-slate-100 text-brandText px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-200 transition sm:hidden">💬</a>
-                            <form method="POST" action="{% url 'update_status' job.id %}" class="inline">
+                                class="bg-slate-50 border border-slate-200/60 text-slate-600 w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 transition shadow-sm sm:hidden"><i data-lucide="message-square" class="w-4 h-4"></i></a>
+                            <form method="POST" action="{% url 'update_status' job.id %}" class="inline-block flex-1 sm:flex-none">
                                 {% csrf_token %}
                                 <input type="hidden" name="status" value="Completed">
                                 <button type="submit"
-                                    class="bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-emerald-600 transition shadow-sm">
-                                    Mark Completed
+                                    class="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-md shadow-emerald-500/10 flex items-center justify-center gap-1">
+                                    <i data-lucide="check" class="w-3.5 h-3.5"></i> Mark Completed
                                 </button>
                             </form>
                         </div>
                     </div>
                 </div>
                 {% empty %}
-                <div class="li-card p-8 text-center bg-slate-50">
-                    <div class="text-4xl mb-3">🛠️</div>
-                    <p class="text-brandIcon font-bold mb-2">You don't have any active tasks right now.</p>
-                    <a href="{% url 'jobs' %}"
-                        class="bg-white border border-brandBorder text-brandText px-4 py-2 mt-2 inline-block rounded-lg font-bold hover:bg-slate-50 transition shadow-sm text-sm">Find
-                        New Tasks</a>
+                <div class="bg-white border border-brandBorder rounded-3xl p-10 text-center shadow-premium flex flex-col items-center justify-center">
+                    <div class="bg-slate-50 text-slate-400 p-4 rounded-full mb-3 shadow-inner">
+                        <i data-lucide="briefcase" class="w-8 h-8"></i>
+                    </div>
+                    <p class="text-sm font-semibold text-brandIcon mb-3">You don't have any active tasks right now.</p>
+                    <a href="{% url 'jobs' %}" class="bg-brandBlue text-white text-xs font-bold px-5 py-2.5 rounded-2xl shadow-md shadow-blue-500/10 hover:bg-blue-700 transition duration-300 no-underline">Find New Tasks</a>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
         <!-- Completed History -->
-        <div>
-            <h2 class="text-lg font-bold text-brandText mb-3">Task History (Completed)</h2>
+        <div class="pt-2">
+            <h2 class="text-lg font-bold text-brandText mb-4 flex items-center gap-2"><i data-lucide="history" class="w-5 h-5 text-brandTeal"></i> Task History (Completed)</h2>
             <div class="space-y-4">
                 {% for job in completed_jobs %}
-                <div class="li-card p-5 bg-slate-50/50">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-base font-bold text-brandText line-through text-slate-500">{{ job.title }}
-                            </h3>
-                            <p class="text-xs text-slate-400 mb-1">Posted on {{ job.created_at|date:"M d, Y" }} by {{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}
-                            </p>
-                            <div class="flex items-center gap-3 mt-2 text-xs font-bold">
-                                <span
-                                    class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-1 rounded-md">
-                                    ✓ Completed
-                                </span>
+                <div class="bg-slate-50/70 border border-slate-200/60 rounded-3xl p-6 transition group relative">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div class="min-w-0 flex-1">
+                            <h3 class="text-base font-extrabold text-slate-500 line-through truncate">{{ job.title }}</h3>
+                            <p class="text-[10px] text-slate-400 mt-1 font-bold">Posted on {{ job.created_at|date:"M d, Y" }} by {{ job.provider.username }}</p>
+                            <div class="flex flex-wrap items-center gap-3.5 mt-3 text-xs font-bold">
+                                <span class="bg-emerald-50 border border-emerald-100 text-emerald-700 px-3 py-1 rounded-full shadow-sm flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Completed</span>
                                 {% if job.price %}<span class="text-slate-500">Earned: ₹{{ job.price }}</span>{% endif %}
-                                <span class="text-slate-500">Finished on
-                                    {{ job.updated_at|date:"M d, Y h:i A" }} by You
-                                </span>
+                                <span class="text-slate-500">Finished on {{ job.updated_at|date:"M d, Y" }} by You</span>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <span class="text-xs font-bold text-slate-500">Client:</span>
-                            <p class="text-sm font-bold text-brandText">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}
-                            </p>
+                        <div class="text-left sm:text-right shrink-0">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Client:</span>
+                            <p class="text-xs font-extrabold text-brandText mt-1">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</p>
                         </div>
                     </div>
                 </div>
                 {% empty %}
-                <div class="li-card p-8 text-center bg-transparent border border-dashed border-slate-300 shadow-none">
+                <div class="bg-transparent border-2 border-dashed border-slate-200 rounded-3xl p-8 text-center shadow-none">
                     <p class="text-slate-400 font-bold">No completed tasks yet.</p>
                 </div>
                 {% endfor %}
@@ -202,14 +201,14 @@
     <!-- Tabular View Section -->
     <div id="table-view" class="hidden space-y-8">
         <!-- Active Tasks Table -->
-        <div class="li-card p-0 overflow-hidden">
+        <div class="bg-white border border-brandBorder rounded-3xl overflow-hidden shadow-premium">
             <div class="p-5 border-b border-slate-100 bg-slate-50/50">
-                <h2 class="text-lg font-bold text-brandText">Active Tasks Tracker</h2>
+                <h2 class="text-lg font-extrabold text-brandText flex items-center gap-2"><i data-lucide="activity" class="w-5 h-5 text-brandBlue"></i> Active Tasks Tracker</h2>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-50 text-xs text-brandIcon uppercase tracking-wider">
+                        <tr class="bg-slate-50 text-[10px] text-brandIcon uppercase tracking-wider">
                             <th class="p-4 font-bold border-b border-slate-200">Date Posted / ID</th>
                             <th class="p-4 font-bold border-b border-slate-200">Job Details</th>
                             <th class="p-4 font-bold border-b border-slate-200">Location & Pay</th>
@@ -218,50 +217,44 @@
                             <th class="p-4 font-bold border-b border-slate-200">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="text-sm">
+                    <tbody class="text-sm text-slate-700">
                         {% for job in assigned_jobs %}
                         <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
-                            <td class="p-4 font-medium text-slate-500 whitespace-nowrap">{{ job.created_at|date:"M d, Y" }}<br><span class="text-xs text-slate-400">#{{ job.id }}</span></td>
+                            <td class="p-4 font-semibold text-slate-500 whitespace-nowrap">{{ job.created_at|date:"M d, Y" }}<br><span class="text-xs text-slate-400 font-bold">#{{ job.id }}</span></td>
                             <td class="p-4">
-                                <p class="font-bold text-brandText">{{ job.title }}</p>
-                                <p class="text-xs text-brandIcon truncate max-w-[200px] mt-0.5">{{ job.description }}
-                                </p>
+                                <p class="font-extrabold text-brandText">{{ job.title }}</p>
+                                <p class="text-xs text-brandIcon truncate max-w-[200px] mt-1 font-medium">{{ job.description }}</p>
                             </td>
-                            <td class="p-4 text-slate-600 font-semibold whitespace-nowrap">📍 {{ job.address|truncatechars:20 }}<br>{% if job.price %}💰 ₹{{ job.price }}{% else %}-{% endif %}</td>
-                            <td class="p-4"><span
-                                    class="bg-brandOrange/10 text-brandOrange border border-brandOrange/20 px-2.5 py-1 rounded-md text-[11px] font-bold">{{ job.status }}</span></td>
-                            <td class="p-4 font-bold text-brandText whitespace-nowrap">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}
-                            </td>
+                            <td class="p-4 text-slate-600 font-bold whitespace-nowrap">📍 {{ job.address|truncatechars:20 }}<br>{% if job.price %}💰 ₹{{ job.price }}{% else %}-{% endif %}</td>
+                            <td class="p-4"><span class="bg-blue-50 text-brandBlue px-3 py-1 rounded-full text-xs font-bold border border-blue-100">{{ job.status }}</span></td>
+                            <td class="p-4 font-extrabold text-brandText whitespace-nowrap">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</td>
                             <td class="p-4 whitespace-nowrap">
                                 <div class="flex gap-2 items-center">
                                     <a href="{% url 'job_detail' job.id %}"
-                                        class="bg-white border border-brandBorder text-brandText px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition shadow-sm">View</a>
+                                        class="bg-white border border-brandBorder text-brandText px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-slate-50 transition shadow-sm no-underline">View</a>
                                     {% if job.status == 'Arrived' %}
                                     <form method="POST" action="{% url 'update_status' job.id %}" class="inline">
                                         {% csrf_token %}
                                         <input type="hidden" name="status" value="Completed">
                                         <button type="submit"
-                                            class="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-600 transition shadow-sm whitespace-nowrap">✓
-                                            Complete</button>
+                                            class="bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-emerald-600 transition shadow-md whitespace-nowrap">✓ Complete</button>
                                     </form>
                                     {% elif job.status == 'On the Way' %}
                                     <form method="POST" action="{% url 'update_status' job.id %}" class="inline">
                                         {% csrf_token %}
                                         <input type="hidden" name="status" value="Arrived">
                                         <button type="submit"
-                                            class="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-amber-600 transition shadow-sm whitespace-nowrap">Arrived</button>
+                                            class="bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-amber-600 transition shadow-md whitespace-nowrap">Arrived</button>
                                     </form>
                                     {% elif job.status == 'Pending Approval' %}
-                                    <span
-                                        class="bg-purple-50 text-purple-600 border border-purple-200 px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap">⏳
-                                        Awaiting</span>
+                                    <span class="bg-purple-50 text-purple-600 border border-purple-200 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap">⏳ Awaiting</span>
                                     {% endif %}
                                 </div>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="p-8 text-center text-slate-500 font-bold">No active tasks.</td>
+                            <td colspan="6" class="p-8 text-center text-slate-400 font-bold">No active tasks.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -270,14 +263,14 @@
         </div>
 
         <!-- Completed Tasks Table -->
-        <div class="li-card p-0 overflow-hidden">
+        <div class="bg-white border border-brandBorder rounded-3xl overflow-hidden shadow-premium">
             <div class="p-5 border-b border-slate-100 bg-slate-50/50">
-                <h2 class="text-lg font-bold text-brandText">Completed Tasks History</h2>
+                <h2 class="text-lg font-extrabold text-brandText flex items-center gap-2"><i data-lucide="history" class="w-5 h-5 text-brandTeal"></i> Completed Tasks History</h2>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-50 text-xs text-brandIcon uppercase tracking-wider">
+                        <tr class="bg-slate-50 text-[10px] text-brandIcon uppercase tracking-wider">
                             <th class="p-4 font-bold border-b border-slate-200">Date Posted / ID</th>
                             <th class="p-4 font-bold border-b border-slate-200">Job Details</th>
                             <th class="p-4 font-bold border-b border-slate-200">Location & Pay</th>
@@ -286,33 +279,30 @@
                             <th class="p-4 font-bold border-b border-slate-200">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="text-sm">
+                    <tbody class="text-sm text-slate-700">
                         {% for job in completed_jobs %}
                         <tr class="border-b border-slate-100 hover:bg-slate-50 transition opacity-80">
-                            <td class="p-4 font-medium text-slate-500 whitespace-nowrap">{{ job.created_at|date:"M d, Y" }}<br><span class="text-xs text-slate-400">#{{ job.id }}</span></td>
+                            <td class="p-4 font-semibold text-slate-500 whitespace-nowrap">{{ job.created_at|date:"M d, Y" }}<br><span class="text-xs text-slate-400 font-bold">#{{ job.id }}</span></td>
                             <td class="p-4">
                                 <p class="font-bold text-slate-500 line-through">{{ job.title }}</p>
                             </td>
-                            <td class="p-4 text-slate-600 font-semibold whitespace-nowrap">📍 {{ job.address|truncatechars:15 }}<br>{% if job.price %}💰 ₹{{ job.price }}{% else %}-{% endif %}</td>
+                            <td class="p-4 text-slate-600 font-bold whitespace-nowrap">📍 {{ job.address|truncatechars:15 }}<br>{% if job.price %}💰 ₹{{ job.price }}{% else %}-{% endif %}</td>
                             <td class="p-4"><span
-                                    class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded-md text-[11px] font-bold">Completed</span><br><span
-                                    class="text-[10px] text-slate-400 font-medium">{{ job.updated_at|date:"M d, Y h:i A" }}</span></td>
-                            <td class="p-4 font-bold text-slate-600 whitespace-nowrap">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}
-                            </td>
+                                    class="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1 rounded-full text-xs font-bold">Completed</span><br><span
+                                    class="text-[10px] text-slate-400 font-bold mt-1 inline-block">{{ job.updated_at|date:"M d, Y" }}</span></td>
+                            <td class="p-4 font-bold text-slate-600 whitespace-nowrap">{{ job.provider.first_name|default:job.provider.username }} {{ job.provider.last_name }}</td>
                             <td class="p-4 whitespace-nowrap">
                                 <div class="flex gap-2">
                                     <a href="{% url 'job_detail' job.id %}"
-                                        class="bg-white border border-brandBorder text-slate-500 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50 transition shadow-sm">View</a>
+                                        class="bg-white border border-brandBorder text-slate-500 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-slate-50 transition shadow-sm no-underline">View</a>
                                     <a href="{% url 'job_detail' job.id %}#feedback"
-                                        class="bg-brandOrange text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-orange-600 transition shadow-sm whitespace-nowrap">⭐
-                                        Feedback</a>
+                                        class="bg-brandOrange text-white px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-orange-600 transition shadow-sm no-underline flex items-center gap-1"><i data-lucide="star" class="w-3.5 h-3.5"></i> Feedback</a>
                                 </div>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="p-8 text-center text-slate-400 font-bold">No completed tasks yet.
-                            </td>
+                            <td colspan="6" class="p-8 text-center text-slate-400 font-bold">No completed tasks yet.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -322,14 +312,14 @@
 
         {% if service_requests %}
         <!-- Incoming Task Invitations Table -->
-        <div class="li-card p-0 overflow-hidden">
+        <div class="bg-white border border-brandBorder rounded-3xl overflow-hidden shadow-premium">
             <div class="p-5 border-b border-slate-100 bg-slate-50/50">
-                <h2 class="text-lg font-bold text-brandText">Incoming Task Invitations</h2>
+                <h2 class="text-lg font-extrabold text-brandText flex items-center gap-2"><i data-lucide="mail" class="w-5 h-5 text-brandBlue"></i> Incoming Task Invitations Log</h2>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-50 text-xs text-brandIcon uppercase tracking-wider">
+                        <tr class="bg-slate-50 text-[10px] text-brandIcon uppercase tracking-wider">
                             <th class="p-4 font-bold border-b border-slate-200">Date/Time</th>
                             <th class="p-4 font-bold border-b border-slate-200">Client / Requested By</th>
                             <th class="p-4 font-bold border-b border-slate-200">Related Job</th>
@@ -337,25 +327,18 @@
                             <th class="p-4 font-bold border-b border-slate-200">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="text-sm">
+                    <tbody class="text-sm text-slate-700">
                         {% for req in service_requests %}
                         {% if req.status == 'pending' %}
                         <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
-                            <td class="p-4 font-medium text-slate-500 text-xs whitespace-nowrap">{{ req.timestamp|date:"M d, Y" }}<br>{{ req.timestamp|time:"h:i A" }}</td>
-                            <td class="p-4 font-bold text-brandText whitespace-nowrap">{{ req.provider.first_name|default:req.provider.username }} {{ req.provider.last_name }}
-                            </td>
-                            <td class="p-4 font-bold text-slate-600 text-xs">{% if req.job %}{{ req.job.title|truncatechars:35 }}{% else %}General Invite{% endif %}</td>
+                            <td class="p-4 font-semibold text-slate-500 text-xs whitespace-nowrap">{{ req.timestamp|date:"M d, Y" }}<br><span class="text-slate-400">{{ req.timestamp|time:"h:i A" }}</span></td>
+                            <td class="p-4 font-bold text-brandText whitespace-nowrap">{{ req.provider.first_name|default:req.provider.username }} {{ req.provider.last_name }}</td>
+                            <td class="p-4 font-bold text-slate-500 text-xs">{% if req.job %}{{ req.job.title|truncatechars:35 }}{% else %}General Invite{% endif %}</td>
                             <td class="p-4">
-                                <span
-                                    class="text-amber-600 font-bold text-xs uppercase bg-amber-50 px-2 py-1 rounded">Pending</span>
+                                <span class="bg-amber-50 border border-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold">Pending</span>
                             </td>
                             <td class="p-4"><a href="{% url 'inbox' %}?user={{ req.provider.id }}"
-                                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:from-indigo-600 hover:to-purple-700 transition shadow-sm"><svg
-                                        class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                                        </path>
-                                    </svg>Chat</a></td>
+                                    class="inline-flex items-center gap-1.5 bg-brandBlue text-white px-3.5 py-1.5 rounded-xl text-xs font-bold hover:bg-blue-700 transition shadow-md shadow-blue-500/10 no-underline"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> Chat</a></td>
                         </tr>
                         {% endif %}
                         {% endfor %}
@@ -365,7 +348,6 @@
         </div>
         {% endif %}
     </div>
-
 </div>
 
 <script>
@@ -378,14 +360,14 @@
         if (mode === 'cards') {
             cardsView.classList.remove('hidden');
             tableView.classList.add('hidden');
-            btnCards.className = 'px-4 py-2 rounded-lg text-xs font-bold bg-white shadow-sm text-brandBlue transition';
-            btnTable.className = 'px-4 py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-brandText transition';
+            btnCards.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-white shadow-sm text-brandBlue transition-all duration-200 flex items-center gap-1.5';
+            btnTable.className = 'px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-brandText transition-all duration-200 flex items-center gap-1.5';
             localStorage.setItem('workerDashView', 'cards');
         } else {
             cardsView.classList.add('hidden');
             tableView.classList.remove('hidden');
-            btnTable.className = 'px-4 py-2 rounded-lg text-xs font-bold bg-white shadow-sm text-brandBlue transition';
-            btnCards.className = 'px-4 py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-brandText transition';
+            btnTable.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-white shadow-sm text-brandBlue transition-all duration-200 flex items-center gap-1.5';
+            btnCards.className = 'px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-brandText transition-all duration-200 flex items-center gap-1.5';
             localStorage.setItem('workerDashView', 'table');
         }
     }
@@ -395,6 +377,9 @@
         const saved = localStorage.getItem('workerDashView');
         if (saved === 'table') {
             setView('table');
+        }
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
         }
     });
 </script>

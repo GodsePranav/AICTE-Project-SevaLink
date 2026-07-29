@@ -1,66 +1,90 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="min-h-[calc(100vh-64px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full li-card p-8 bg-white">
+<div class="min-h-[calc(100vh-140px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <!-- Decorative background blobs -->
+    <div class="absolute -top-10 -left-10 w-72 h-72 bg-brandBlue/5 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-10 -right-10 w-72 h-72 bg-brandTeal/5 rounded-full blur-3xl"></div>
+
+    <div class="max-w-md w-full bg-white border border-brandBorder rounded-3xl p-8 sm:p-10 shadow-premium relative z-10 transition-all duration-300 hover:shadow-premiumHover">
         <div class="text-center mb-8">
-            <h2 class="text-3xl font-extrabold text-brandBlue">
-                Welcome back to Sev<span class="text-brandOrange">Link</span>
+            <!-- Brand Icon -->
+            <div class="inline-flex bg-blue-50 text-brandBlue p-3 rounded-2xl mb-4 shadow-inner">
+                <i data-lucide="shield-check" class="w-8 h-8 text-brandBlue"></i>
+            </div>
+            <h2 class="text-3xl font-extrabold text-brandText tracking-tight">
+                Welcome to Seva<span class="text-brandOrange">Link</span>
             </h2>
-            <p class="mt-2 text-sm text-brandIcon font-semibold">
-                Sign in to your account
+            <p class="mt-2 text-sm text-brandIcon font-bold">
+                Sign in to connect with workers & jobs
             </p>
         </div>
 
         {% if messages %}
         {% for message in messages %}
-        <div
-            class="mb-4 p-4 rounded-lg text-sm font-semibold {% if message.tags == 'error' %}bg-red-50 text-red-600 border border-red-200{% else %}bg-emerald-50 text-emerald-600 border border-emerald-200{% endif %}">
-            {{ message }}
+        <div class="mb-5 p-4 rounded-2xl text-xs font-bold flex items-center gap-2.5
+            {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-100
+            {% else %}bg-emerald-50 text-emerald-700 border border-emerald-100{% endif %}">
+            {% if message.tags == 'error' %}
+            <i data-lucide="alert-circle" class="w-4 h-4 text-red-500 flex-shrink-0"></i>
+            {% else %}
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 flex-shrink-0"></i>
+            {% endif %}
+            <span>{{ message }}</span>
         </div>
         {% endfor %}
         {% endif %}
 
         {% if form.errors and not messages %}
-        <div class="mb-4 p-4 rounded-lg text-sm font-semibold bg-red-50 text-red-600 border border-red-200">
-            Please correct the errors below.
+        <div class="mb-5 p-4 rounded-2xl text-xs font-bold bg-red-50 text-red-700 border border-red-100 flex items-center gap-2.5">
+            <i data-lucide="alert-circle" class="w-4 h-4 text-red-500 flex-shrink-0"></i>
+            <span>Please check your username and password.</span>
         </div>
         {% endif %}
 
-        <form class="space-y-6" method="POST" action="{% url 'login' %}">
+        <form class="space-y-5" method="POST" action="{% url 'login' %}">
             {% csrf_token %}
 
             <div>
-                <label for="{{ form.username.id_for_label }}"
-                    class="block text-sm font-bold text-brandText mb-1">Username</label>
-                {{ form.username }}
+                <label for="{{ form.username.id_for_label }}" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 ml-1">Username</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brandIcon">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                    </span>
+                    {{ form.username }}
+                </div>
                 {% if form.username.errors %}
-                <p class="text-xs text-red-500 mt-1">{{ form.username.errors.0 }}</p>
+                <p class="text-xs text-brandRed mt-1.5 ml-1 font-semibold">{{ form.username.errors.0 }}</p>
                 {% endif %}
             </div>
 
             <div>
-                <label for="{{ form.password.id_for_label }}"
-                    class="block text-sm font-bold text-brandText mb-1">Password</label>
-                {{ form.password }}
+                <label for="{{ form.password.id_for_label }}" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 ml-1">Password</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brandIcon">
+                        <i data-lucide="lock" class="w-4 h-4"></i>
+                    </span>
+                    {{ form.password }}
+                </div>
                 {% if form.password.errors %}
-                <p class="text-xs text-red-500 mt-1">{{ form.password.errors.0 }}</p>
+                <p class="text-xs text-brandRed mt-1.5 ml-1 font-semibold">{{ form.password.errors.0 }}</p>
                 {% endif %}
             </div>
 
-            <div>
+            <div class="pt-2">
                 <button type="submit"
-                    class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-brandBlue hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brandBlue transition-all">
+                    class="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-2xl shadow-md text-sm font-bold text-white bg-brandBlue hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0">
                     Sign in
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
             </div>
         </form>
 
-        <div class="mt-6 text-center">
-            <p class="text-sm text-brandIcon font-semibold">
-                Don't have an account?
-                <a href="{% url 'signup' %}" class="font-bold text-brandOrange hover:text-orange-700 transition">
-                    Sign up now
+        <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+            <p class="text-sm text-brandIcon font-bold">
+                New to SevaLink?
+                <a href="{% url 'signup' %}" class="font-extrabold text-brandOrange hover:text-orange-600 transition duration-200 ml-1">
+                    Create an account
                 </a>
             </p>
         </div>
@@ -68,12 +92,19 @@
 </div>
 
 <script>
-    // Add Tailwind classes to Django form inputs dynamically
+    // Add custom styling class to Django default fields dynamically
     document.addEventListener("DOMContentLoaded", function () {
         const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
         inputs.forEach(input => {
-            input.classList.add('w-full', 'bg-slate-50', 'border', 'border-slate-200', 'rounded-xl', 'px-4', 'py-2', 'text-sm', 'font-medium', 'focus:outline-none', 'focus:ring-2', 'focus:ring-brandOrange', 'focus:border-brandOrange', 'transition-all');
+            input.className = "w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue transition-all duration-200";
         });
+        const usernameInput = document.getElementById('id_username');
+        if (usernameInput) usernameInput.setAttribute('placeholder', 'Enter your username');
+        const passwordInput = document.getElementById('id_password');
+        if (passwordInput) passwordInput.setAttribute('placeholder', '••••••••');
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     });
 </script>
 {% endblock %}

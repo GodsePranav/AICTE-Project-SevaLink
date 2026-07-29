@@ -6,22 +6,22 @@
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <style>
     #location-map {
-        height: 300px;
-        border-radius: 12px;
+        height: 320px;
+        border-radius: 20px;
         z-index: 10;
         cursor: crosshair;
     }
 
     .leaflet-popup-content-wrapper {
-        border-radius: 10px;
+        border-radius: 12px;
         font-family: inherit;
     }
 
     .pin-marker {
-        background: #f97316;
+        background: #f59e0b;
         border: 3px solid #fff;
         border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     }
 
     .search-results {
@@ -31,25 +31,26 @@
         right: 0;
         background: white;
         border: 1px solid #e2e8f0;
-        border-radius: 0 0 12px 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
         z-index: 1000;
         max-height: 200px;
         overflow-y: auto;
+        margin-top: 6px;
     }
 
     .search-results .result-item {
-        padding: 10px 14px;
+        padding: 12px 16px;
         cursor: pointer;
         font-size: 13px;
         color: #334155;
         border-bottom: 1px solid #f1f5f9;
-        transition: background 0.15s;
+        transition: all 0.15s;
     }
 
     .search-results .result-item:hover {
-        background: #f8fafc;
-        color: #1e3a8a;
+        background: #eff6ff;
+        color: #2563eb;
     }
 
     .search-results .result-item:last-child {
@@ -61,32 +62,19 @@
     }
 
     @keyframes shake {
-
-        0%,
-        100% {
-            transform: translateX(0);
-        }
-
-        25% {
-            transform: translateX(-5px);
-        }
-
-        75% {
-            transform: translateX(5px);
-        }
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto py-8">
-    <div class="mb-4">
+<div class="max-w-2xl mx-auto py-8 px-4">
+    <div class="mb-5">
         <a href="javascript:history.back()"
-            class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-brandBlue transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
-                </path>
-            </svg>
+            class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-brandBlue transition no-underline bg-white border border-slate-200/60 px-4 py-2 rounded-2xl shadow-sm">
+            <i data-lucide="arrow-left" class="w-4 h-4 text-slate-500"></i>
             Back
         </a>
     </div>
@@ -94,212 +82,187 @@
     <!-- Page Header -->
     <div class="text-center mb-8">
         <div
-            class="mx-auto w-14 h-14 bg-gradient-to-br from-brandBlue to-blue-700 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+            class="mx-auto w-14 h-14 bg-gradient-to-br from-brandBlue to-blue-700 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+            <i data-lucide="plus-circle" class="w-7 h-7 text-white"></i>
         </div>
-        <h1 class="text-2xl font-extrabold text-brandText">Post a New Job</h1>
-        <p class="text-sm text-brandIcon font-medium mt-1">Describe what you need done and find skilled workers nearby
-        </p>
+        <h1 class="text-2xl font-extrabold text-brandText tracking-tight">Post a New Job</h1>
+        <p class="text-sm text-brandIcon font-bold mt-1">Describe what you need done and find skilled workers nearby</p>
     </div>
 
     <!-- Messages -->
     {% if messages %}
     {% for message in messages %}
     <div
-        class="mb-6 p-4 rounded-xl text-sm font-semibold {% if message.tags == 'error' %}bg-red-50 text-red-600 border border-red-100{% else %}bg-emerald-50 text-emerald-600 border border-emerald-100{% endif %}">
-        {{ message }}
+        class="mb-6 p-4 rounded-2xl text-xs font-bold flex items-center gap-2.5 {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-100{% else %}bg-emerald-50 text-emerald-700 border border-emerald-100{% endif %}">
+        <i data-lucide="info" class="w-4 h-4"></i>
+        <span>{{ message }}</span>
     </div>
     {% endfor %}
     {% endif %}
 
     <!-- Job Posting Form -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="bg-white rounded-3xl border border-brandBorder shadow-premium overflow-hidden hover:shadow-premiumHover transition-all duration-300">
         <form method="POST" action="{% url 'post_job_page' %}" id="post-job-form" class="p-6 sm:p-8 space-y-6">
             {% csrf_token %}
 
             <!-- Job Title -->
             <div>
-                <label for="title" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Job Title
+                <label for="title" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 ml-1">Job Title
                     <span class="text-red-400">*</span>
                 </label>
-                <input type="text" id="title" name="title" value="{{ form_data.title|default:'' }}"
-                    placeholder="e.g. Fix kitchen plumbing leak" minlength="5"
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition"
-                    required>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                        <i data-lucide="type" class="w-4 h-4"></i>
+                    </span>
+                    <input type="text" id="title" name="title" value="{{ form_data.title|default:'' }}"
+                        placeholder="e.g. Fix kitchen plumbing leak" minlength="5"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue transition duration-200"
+                        required>
+                </div>
             </div>
 
             <!-- Job Description -->
             <div>
-                <label for="description" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Description
+                <label for="description" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 ml-1">Description
                     <span class="text-red-400">*</span>
                 </label>
                 <textarea id="description" name="description" rows="4" minlength="20"
                     placeholder="Describe the work needed in detail — include specifics like room size, materials needed, urgency, etc."
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition resize-none"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue transition duration-200 resize-none"
                     required>{{ form_data.description|default:'' }}</textarea>
             </div>
 
             <!-- Budget & Category Row -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <!-- Budget -->
                 <div>
-                    <label for="price" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Budget (₹)
-                        <span class="text-slate-400 font-medium">— optional</span>
+                    <label for="price" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 ml-1">Budget (₹)
+                        <span class="text-slate-400 font-medium lowercase">— optional</span>
                     </label>
                     <div class="relative">
-                        <span
-                            class="absolute inset-y-0 left-0 pl-4 flex items-center text-sm font-bold text-brandIcon">₹</span>
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-sm font-bold text-brandIcon">₹</span>
                         <input type="number" id="price" name="price" value="{{ form_data.price|default:'' }}"
                             placeholder="e.g. 500" min="50" max="1000000" step="50"
-                            class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
+                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-8 pr-4 py-3.5 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue transition duration-200">
                     </div>
-                    <p class="text-[11px] text-slate-400 mt-1 ml-1">You can negotiate with the worker later</p>
+                    <p class="text-[10px] text-slate-400 mt-1.5 ml-1 font-bold">You can negotiate with the worker later</p>
                 </div>
                 <!-- Job Category -->
                 <div>
-                    <label for="job_category" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Job
-                        Category</label>
+                    <label for="job_category" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 ml-1">Job Category</label>
                     <select id="job_category" name="job_category" onchange="toggleOtherCategory()"
-                        class="appearance-none w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/20 focus:border-brandBlue cursor-pointer transition bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%221.67%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat pr-10">
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm font-bold text-brandText focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue cursor-pointer transition duration-200">
                         <option value="">Select a category</option>
-                        <option value="Plumbing" {% if form_data.job_category == 'Plumbing' %}selected{% endif %}>🔧
-                            Plumbing</option>
-                        <option value="Electrical" {% if form_data.job_category == 'Electrical' %}selected{% endif %}>⚡
-                            Electrical</option>
-                        <option value="Carpentry" {% if form_data.job_category == 'Carpentry' %}selected{% endif %}>🪚
-                            Carpentry</option>
-                        <option value="Mechanic" {% if form_data.job_category == 'Mechanic' %}selected{% endif %}>🔩
-                            Mechanic</option>
-                        <option value="Housekeeping" {% if form_data.job_category == 'Housekeeping' %}selected{% endif %}>
-                            🧹 Housekeeping</option>
-                        <option value="Guard" {% if form_data.job_category == 'Guard' %}selected{% endif %}>🛡️ Guard /
-                            Security</option>
-                        <option value="Packing" {% if form_data.job_category == 'Packing' %}selected{% endif %}>📦 Packing
-                            / Moving</option>
-                        <option value="AC Repair" {% if form_data.job_category == 'AC Repair' %}selected{% endif %}>❄️ AC
-                            Repair</option>
-                        <option value="Painting" {% if form_data.job_category == 'Painting' %}selected{% endif %}>🎨
-                            Painting</option>
-                        <option value="Other" {% if form_data.job_category == 'Other' %}selected{% endif %}>📋 Other
-                        </option>
+                        <option value="Plumbing" {% if form_data.job_category == 'Plumbing' %}selected{% endif %}><i data-lucide="droplet" class="w-4 h-4 text-blue-500"></i> Plumbing</option>
+                        <option value="Electrical" {% if form_data.job_category == 'Electrical' %}selected{% endif %}><i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> Electrical</option>
+                        <option value="Carpentry" {% if form_data.job_category == 'Carpentry' %}selected{% endif %}><i data-lucide="hammer" class="w-4 h-4 text-amber-600"></i> Carpentry</option>
+                        <option value="Mechanic" {% if form_data.job_category == 'Mechanic' %}selected{% endif %}><i data-lucide="wrench" class="w-3.5 h-3.5 text-slate-500"></i> Mechanic</option>
+                        <option value="Housekeeping" {% if form_data.job_category == 'Housekeeping' %}selected{% endif %}><i data-lucide="sparkles" class="w-3.5 h-3.5 text-teal-500"></i> Housekeeping</option>
+                        <option value="Guard" {% if form_data.job_category == 'Guard' %}selected{% endif %}><i data-lucide="shield" class="w-4 h-4 text-emerald-500"></i> Guard / Security</option>
+                        <option value="Packing" {% if form_data.job_category == 'Packing' %}selected{% endif %}><i data-lucide="package" class="w-4 h-4 text-indigo-500"></i> Packing / Moving</option>
+                        <option value="AC Repair" {% if form_data.job_category == 'AC Repair' %}selected{% endif %}><i data-lucide="wind" class="w-4 h-4 text-sky-400"></i> AC Repair</option>
+                        <option value="Painting" {% if form_data.job_category == 'Painting' %}selected{% endif %}><i data-lucide="palette" class="w-4 h-4 text-rose-500"></i> Painting</option>
+                        <option value="Other" {% if form_data.job_category == 'Other' %}selected{% endif %}><i data-lucide="edit" class="w-4 h-4 text-slate-500"></i> Other</option>
                     </select>
                 </div>
             </div>
 
             <!-- Other Category Name (Hidden by default) -->
             <div id="other_category_container" class="{% if form_data.job_category != 'Other' %}hidden{% endif %}">
-                <label for="other_category_name" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Custom
-                    Category Name
+                <label for="other_category_name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 ml-1">Custom Category Name
                     <span class="text-red-400">*</span>
                 </label>
                 <input type="text" id="other_category_name" name="other_category_name"
                     value="{{ form_data.other_category_name|default:'' }}"
                     placeholder="e.g. Deep Cleaning, Pool Maintenance"
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
-                <p class="text-[11px] text-slate-400 mt-1 ml-1">Specify the exact service type if not in the list above
-                </p>
+                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue transition duration-200">
+                <p class="text-[10px] text-slate-400 mt-1 ml-1 font-bold">Specify the exact service type if not in the list above</p>
             </div>
+
+            <!-- Address Input -->
             <div>
-                <label for="address" class="block text-sm font-bold text-brandText mb-1.5 ml-1">Address
-                    <span class="text-slate-400 font-medium">— auto-filled from map or enter manually</span>
+                <label for="address" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 ml-1">Address
+                    <span class="text-slate-400 font-medium lowercase">— auto-filled from map or enter manually</span>
                 </label>
-                <input type="text" id="address" name="address" value="{{ form_data.address|default:'' }}"
-                    placeholder="e.g. 12 MG Road, Andheri West, Mumbai 400058"
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                    </span>
+                    <input type="text" id="address" name="address" value="{{ form_data.address|default:'' }}"
+                        placeholder="e.g. 12 MG Road, Andheri West, Mumbai 400058"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue transition duration-200">
+                </div>
             </div>
 
             <!-- Scheduled Time -->
             <div>
-                <label for="scheduled_time" class="block text-sm font-bold text-brandText mb-1.5 ml-1">When do you need
-                    this done?
-                    <span class="text-slate-400 font-medium">— leave empty for ASAP</span>
+                <label for="scheduled_time" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 ml-1">When do you need this done?
+                    <span class="text-slate-400 font-medium lowercase">— leave empty for ASAP</span>
                 </label>
                 <div class="flex gap-3 items-center">
                     <input type="datetime-local" id="scheduled_time" name="scheduled_time"
                         value="{{ form_data.scheduled_time|default:'' }}"
-                        class="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-brandText focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
+                        class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-sm font-medium text-brandText focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue transition duration-200">
                     <button type="button" onclick="document.getElementById('scheduled_time').value=''"
-                        class="px-4 py-3 rounded-xl border border-slate-200 bg-white text-xs font-bold text-brandIcon hover:text-brandBlue hover:border-brandBlue transition whitespace-nowrap">
+                        class="px-5 py-3.5 rounded-2xl border border-slate-200 bg-white text-xs font-bold text-brandIcon hover:text-brandBlue hover:border-brandBlue transition-all duration-200 shadow-sm whitespace-nowrap">
                         ⚡ ASAP
                     </button>
                 </div>
-                <p class="text-[11px] text-slate-400 mt-1.5 ml-1">Leave empty if you need the service right now</p>
+                <p class="text-[10px] text-slate-400 mt-1.5 ml-1 font-bold">Leave empty if you need the service right now</p>
             </div>
 
             <!-- Location Section with Map -->
-            <div class="bg-slate-50 rounded-xl p-5 border border-slate-100" id="location-section">
-                <div class="flex items-center justify-between mb-3">
+            <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200/60" id="location-section">
+                <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h3 class="text-sm font-bold text-brandText flex items-center gap-1.5">
-                            <svg class="w-4 h-4 text-brandOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                </path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
+                        <h3 class="text-sm font-extrabold text-brandText flex items-center gap-1.5">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-brandOrange"></i>
                             Job Location <span class="text-red-400 text-xs">*</span>
                         </h3>
-                        <p class="text-xs text-brandIcon mt-0.5 ml-5.5">Search, click the map, or use GPS</p>
+                        <p class="text-[11px] text-brandIcon mt-0.5 ml-5.5 font-medium">Search, click the map, or use GPS</p>
                     </div>
                     <button type="button" id="detect-location-btn"
-                        class="text-xs font-bold text-white bg-brandBlue hover:bg-blue-900 px-4 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
+                        class="text-xs font-bold text-white bg-brandBlue hover:bg-blue-700 px-4 py-2.5 rounded-xl transition duration-200 flex items-center gap-1.5 shadow-md shadow-blue-500/10">
+                        <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
                         Use My GPS
                     </button>
                 </div>
 
                 <!-- Search Box -->
-                <div class="relative mb-3">
+                <div class="relative mb-4">
                     <div class="relative">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </span>
                         <input type="text" id="location-search"
                             placeholder="Search for an address, city, or landmark..." autocomplete="off"
-                            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brandBlue/30 focus:border-brandBlue transition">
+                            class="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-medium text-brandText placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-brandBlue transition duration-200">
                     </div>
                     <div id="search-results" class="search-results hidden"></div>
                 </div>
 
                 <!-- GPS Error Message -->
                 <div id="gps-error"
-                    class="hidden mb-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs overflow-hidden">
+                    class="hidden mb-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs overflow-hidden">
                     <div class="p-4">
-                        <div class="flex items-start gap-2 font-semibold">
-                            <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z">
-                                </path>
-                            </svg>
+                        <div class="flex items-start gap-2 font-bold">
+                            <i data-lucide="alert-circle" class="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-600"></i>
                             <span id="gps-error-text">GPS detection failed.</span>
                         </div>
                     </div>
                     <div id="gps-reset-instructions" class="hidden border-t border-amber-200 bg-amber-50/50 p-4">
-                        <p class="font-bold text-amber-900 text-[13px] mb-3">📍 Location permission was previously
-                            blocked. To re-enable:</p>
+                        <p class="font-bold text-amber-900 text-xs mb-3">📍 Location permission was previously blocked. To re-enable:</p>
                         <div class="flex items-start gap-4">
-                            <div class="flex-1 space-y-2 text-amber-700">
+                            <div class="flex-1 space-y-2 text-amber-700 text-xs font-semibold">
                                 <div class="flex items-start gap-2">
                                     <span
                                         class="flex-shrink-0 w-5 h-5 rounded-full bg-amber-200 text-amber-800 font-bold flex items-center justify-center text-[10px]">1</span>
-                                    <span>Click the <strong>🔒 lock / ⓘ icon</strong> in your address bar (top-left,
-                                        next to the URL)</span>
+                                    <span>Click the <strong>🔒 lock / ⓘ icon</strong> in your address bar (top-left, next to the URL)</span>
                                 </div>
                                 <div class="flex items-start gap-2">
                                     <span
                                         class="flex-shrink-0 w-5 h-5 rounded-full bg-amber-200 text-amber-800 font-bold flex items-center justify-center text-[10px]">2</span>
-                                    <span>Click <strong>"Site settings"</strong> or find <strong>"Location"</strong> →
-                                        change to <strong>"Allow"</strong></span>
+                                    <span>Click <strong>"Site settings"</strong> or find <strong>"Location"</strong> → change to <strong>"Allow"</strong></span>
                                 </div>
                                 <div class="flex items-start gap-2">
                                     <span
@@ -308,68 +271,59 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex gap-2 mt-4">
+                        <div class="flex gap-2.5 mt-4">
                             <button type="button" onclick="window.location.reload()"
-                                class="bg-amber-600 text-white font-bold px-4 py-2 rounded-lg text-xs hover:bg-amber-700 transition flex items-center gap-1.5">
+                                class="bg-amber-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs hover:bg-amber-700 transition flex items-center gap-1.5 shadow-sm">
                                 🔄 Reload Page & Retry
                             </button>
                             <button type="button"
                                 onclick="window.open(window.location.href, '_blank', 'width=800,height=700')"
-                                class="bg-white border border-amber-300 text-amber-800 font-bold px-4 py-2 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5">
+                                class="bg-white border border-amber-300 text-amber-800 font-bold px-4 py-2.5 rounded-xl text-xs hover:bg-amber-100 transition flex items-center gap-1.5 shadow-sm">
                                 🪟 Try in New Window
                             </button>
                         </div>
-                        <p class="text-[10px] text-amber-400 mt-3">💡 Alternatively, just search for your address or
-                            click directly on the map below</p>
+                        <p class="text-[10px] text-amber-500 mt-3 font-semibold">💡 Alternatively, just search for your address or click directly on the map below</p>
                     </div>
                 </div>
 
                 <!-- Interactive Map -->
-                <div id="location-map" class="w-full border border-slate-200 overflow-hidden shadow-sm"></div>
+                <div id="location-map" class="w-full border border-slate-200 overflow-hidden shadow-inner"></div>
 
                 <!-- Map Help -->
-                <p class="text-[10px] text-slate-400 mt-2 ml-1">💡 Click anywhere on the map to set location • Drag the
-                    marker to adjust</p>
+                <p class="text-[10px] text-slate-400 mt-2.5 ml-1 font-bold">💡 Click anywhere on the map to set location • Drag the marker to adjust</p>
 
                 <!-- Hidden lat/lon -->
                 <input type="hidden" id="lat" name="lat" value="{{ form_data.lat|default:'0' }}">
                 <input type="hidden" id="lon" name="lon" value="{{ form_data.lon|default:'0' }}">
 
                 <!-- Location Status -->
-                <div id="location-status" class="hidden mt-3 p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+                <div id="location-status" class="hidden mt-4 p-3 rounded-2xl bg-emerald-50 border border-emerald-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                            <span class="text-xs font-bold text-emerald-700">Location Set</span>
+                            <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></div>
+                            <span class="text-xs font-bold text-emerald-700">Location Configured</span>
                         </div>
                         <button type="button" onclick="clearLocation()"
-                            class="text-xs font-semibold text-slate-400 hover:text-red-500 transition">✕ Clear</button>
+                            class="text-xs font-bold text-slate-400 hover:text-red-500 transition">✕ Clear</button>
                     </div>
-                    <p id="location-address" class="text-xs text-emerald-600 mt-1 ml-[18px]"></p>
-                    <p id="location-coords" class="text-[10px] text-emerald-500 mt-0.5 ml-[18px]"></p>
+                    <p id="location-address" class="text-xs text-emerald-600 mt-1 ml-[18px] font-semibold"></p>
+                    <p id="location-coords" class="text-[10px] text-emerald-500 mt-0.5 ml-[18px] font-bold"></p>
                 </div>
 
                 <!-- Location Validation Error -->
                 <div id="location-validation-error"
-                    class="hidden mt-2 text-xs font-semibold text-red-500 flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
+                    class="hidden mt-3 text-xs font-bold text-red-500 flex items-center gap-1.5">
+                    <i data-lucide="alert-triangle" class="w-4 h-4"></i>
                     Please set the job location before posting
                 </div>
             </div>
 
             <!-- Submit Area -->
-            <div class="flex items-center justify-between pt-2">
-                <a href="{% url 'home' %}" class="text-sm font-bold text-brandIcon hover:text-brandText transition">←
-                    Back to Dashboard</a>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <a href="{% url 'home' %}" class="text-xs font-bold text-brandIcon hover:text-brandText transition no-underline flex items-center gap-1"><i data-lucide="chevron-left" class="w-4 h-4"></i> Back to Dashboard</a>
                 <button type="submit" id="submit-btn"
-                    class="bg-brandBlue hover:bg-blue-900 text-white font-bold px-8 py-3 rounded-xl shadow-sm transition-all hover:shadow-md active:scale-[0.98] flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                    </svg>
+                    class="bg-brandBlue hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-2xl shadow-md shadow-blue-500/10 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2">
+                    <i data-lucide="send" class="w-4 h-4"></i>
                     Post Job
                 </button>
             </div>
@@ -691,5 +645,10 @@
             dt.setAttribute('min', minDT);
         }
     })();
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
 </script>
 {% endblock %}

@@ -1,49 +1,68 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-[500px] mx-auto mt-10 p-6 bg-white rounded-2xl shadow-sm border border-red-100">
-    <div class="text-center mb-6">
-        <div
-            class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-            ⚠️
+<div class="min-h-[calc(100vh-140px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <!-- Decorative background blobs -->
+    <div class="absolute -top-10 -left-10 w-72 h-72 bg-brandRed/5 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-10 -right-10 w-72 h-72 bg-brandOrange/5 rounded-full blur-3xl"></div>
+
+    <div class="max-w-[480px] w-full bg-white border border-red-100 rounded-3xl p-8 sm:p-10 shadow-premium relative z-10 hover:shadow-premiumHover transition-all duration-300">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-50 text-brandRed rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner border border-red-100">
+                <i data-lucide="alert-triangle" class="w-8 h-8 text-brandRed"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-brandText tracking-tight">Delete Account</h2>
+            <p class="text-slate-500 mt-2 text-sm leading-relaxed font-medium">
+                This action cannot be undone. All your profile information, job history, and messages will be permanently removed.
+            </p>
         </div>
-        <h2 class="text-2xl font-bold text-slate-800">Delete Account</h2>
-        <p class="text-slate-500 mt-2 text-sm max-w-sm mx-auto">
-            This action cannot be undone. All your profile information, job history, and messages will be permanently
-            removed.
-        </p>
+
+        {% if messages %}
+        <div class="mb-5">
+            {% for message in messages %}
+            <div class="p-4 text-xs font-bold rounded-2xl flex items-center gap-2.5
+                {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-100
+                {% else %}bg-amber-50 text-amber-700 border border-amber-100{% endif %}">
+                <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'delete_account' %}" class="space-y-5">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 ml-1">To confirm, verify your password:</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                        <i data-lucide="lock" class="w-4 h-4"></i>
+                    </span>
+                    <input type="password" name="password" required
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-red-100 focus:border-brandRed transition-all duration-200"
+                        placeholder="Enter current password">
+                </div>
+            </div>
+
+            <div class="flex gap-4 pt-3">
+                <a href="{% url 'profile' %}"
+                    class="flex-1 text-center bg-slate-50 text-slate-700 font-bold py-3.5 rounded-2xl hover:bg-slate-100 border border-slate-200/60 transition-all duration-300 shadow-sm">
+                    Cancel
+                </a>
+                <button type="submit"
+                    class="flex-1 bg-brandRed text-white font-bold py-3.5 rounded-2xl hover:bg-red-700 transition-all duration-300 shadow-md shadow-red-500/20 hover:-translate-y-0.5 active:translate-y-0">
+                    Permanently Delete
+                </button>
+            </div>
+        </form>
     </div>
-
-    {% if messages %}
-    <div class="mb-5">
-        {% for message in messages %}
-        <div
-            class="p-3 text-sm font-semibold rounded-lg {% if message.tags == 'error' %}bg-red-50 text-red-600 border border-red-100{% else %}bg-amber-50 text-amber-600 border border-amber-100{% endif %}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <form method="POST" action="{% url 'delete_account' %}" class="space-y-4">
-        {% csrf_token %}
-        <div>
-            <label class="block text-sm font-bold text-slate-700 mb-2">To confirm, verify your password:</label>
-            <input type="password" name="password" required
-                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium"
-                placeholder="Enter current password">
-        </div>
-
-        <div class="flex gap-3 pt-4">
-            <a href="{% url 'profile' %}"
-                class="flex-1 text-center bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">
-                Cancel
-            </a>
-            <button type="submit"
-                class="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl hover:bg-red-700 transition-colors shadow-sm shadow-red-500/30">
-                Permanently Delete
-            </button>
-        </div>
-    </form>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
+</script>
 {% endblock %}
